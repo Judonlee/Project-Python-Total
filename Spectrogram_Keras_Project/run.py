@@ -1,0 +1,2 @@
+from trainer.iemocap import smile_trainer_lstm_final_pooling
+smile_trainer_lstm_final_pooling()
