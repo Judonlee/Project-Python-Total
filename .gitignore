@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 *.xml
 .idea/
+*.BZT
 
 # C extensions
 *.so
