@@ -3,7 +3,7 @@ import numpy
 import tensorflow
 
 if __name__ == '__main__':
-    loadpath = 'D:\\Project-Python\\Emergency\\30\\'
+    loadpath = 'D:\\ProjectData\\Emergency\\40\\'
     trainData = numpy.load(loadpath + 'TrainData.npy')
     trainLabel = numpy.load(loadpath + 'TrainLabel.npy')
     trainnSeq = numpy.load(loadpath + 'TrainSeq.npy')
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     graph = tensorflow.Graph()
     with graph.as_default():
         classifier = LSTM_FinalPooling(trainData=trainData, trainLabel=trainLabel, trainSeqLength=trainnSeq,
-                                       featureShape=30)
+                                       featureShape=40, batchSize=8)
         for episode in range(100):
             loss = classifier.Train()
             print('\r', end='')
