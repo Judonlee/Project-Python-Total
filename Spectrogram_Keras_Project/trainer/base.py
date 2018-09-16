@@ -128,3 +128,38 @@ def training_engine_final_pooling(data_train, data_tests, callbacks_list,
         shuffle=True,
         callbacks=callbacks_list
     )
+
+def training_engine_average_pooling(data_train, data_tests, callbacks_list,
+                                  blstm_layers=2, with_fcn=True,
+                                  bidirectional=True, batch_size=32, epoch=100):
+    """
+    Generic training engine
+
+    Designed with various parallel params to tweak training process.
+
+    :param data_train: training data
+    :param data_tests: test data
+    :param callbacks_list: callbacks generated outsides
+    :param blstm_layers: how many blstm layers are used
+    :param with_fcn: if fcn is used
+    :param bidirectional: if all blstm layers are bidirectional
+    :param batch_size: batch size
+    :param epoch: epoch
+    """
+
+    x_train, y_train = data_train
+    x_tests, y_tests = data_tests
+
+    model = model_lstm_final_pooling(x_train.shape[-3], x_train.shape[-2], output_size=y_train.shape[-1],
+                                     blstm_layers=blstm_layers, bidirectional=bidirectional)
+
+    model.fit(
+        x_train,
+        y_train,
+        batch_size=batch_size,
+        epochs=epoch,
+        verbose=1,
+        validation_data=(x_tests, y_tests),
+        shuffle=True,
+        callbacks=callbacks_list
+    )

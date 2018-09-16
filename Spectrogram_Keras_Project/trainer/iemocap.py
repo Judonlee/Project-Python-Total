@@ -9,6 +9,7 @@ from trainer.base import generate_callback_list, training_engine
 from trainer.base import training_engine_final_pooling
 
 
+
 def smile_trainer(feature_name='spectrogram', fold_range=range(10)):
     """
     Training for SMILE problem
@@ -63,7 +64,7 @@ def smile_trainer_lstm_final_pooling(feature_name='spectrogram', fold_range=rang
         data_set=IEMDataSets.improvise,
         feature_set=FeatureSets.spectrogram,
         win_length=25,
-        m_bands=40
+        m_bands=120
     )
 
     for idx in fold_range:
