@@ -5,6 +5,7 @@ __pycache__/
 *.xml
 .idea/
 *.BZT
+Spectrogram_Keras_Project/.idea/
 
 # C extensions
 *.so
