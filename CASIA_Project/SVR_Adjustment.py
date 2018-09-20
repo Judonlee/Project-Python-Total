@@ -3,7 +3,7 @@ import numpy
 import os
 
 if __name__ == '__main__':
-    conf = 'avec2011'
+    conf = 'IS12'
     loadpath = 'F:\\DataAugment20dB-Features-Npy\\' + conf + '\\'
     savepath = 'F:\\AVEC-SVR-Changed\\' + conf + '\\'
     os.makedirs(savepath)

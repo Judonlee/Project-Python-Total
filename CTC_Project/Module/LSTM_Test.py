@@ -1,5 +1,5 @@
 import tensorflow
-from CTC_Project.Module.BaseClass import NeuralNetwork_Base
+from __Base.BaseClass import NeuralNetwork_Base
 import numpy
 from tensorflow.contrib import rnn
 
