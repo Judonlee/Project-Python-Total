@@ -166,3 +166,27 @@ class CTC(NeuralNetwork_Base):
             file.close()
             exit()
             startPosition += self.batchSize
+
+    def LogitsCalculation(self, testData, testSeq):
+        startPosition = 0
+        while startPosition < len(testData):
+            maxlen = 0
+            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
+                if maxlen < len(testData[index]): maxlen = len(testData[index])
+            # print(maxlen)
+
+            batchData = []
+            batchSeq = testSeq[startPosition:startPosition + self.batchSize]
+            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
+                currentData = numpy.concatenate(
+                    (testData[index], numpy.zeros((maxlen - len(testData[index]), len(testData[index][0])))), axis=0)
+                batchData.append(currentData)
+
+            result = self.session.run(fetches=self.parameters['Logits_TimeMajor'],
+                                      feed_dict={self.dataInput: batchData, self.seqLengthInput: batchSeq})
+            print(numpy.shape(result))
+            for indexA in range(len(result)):
+                for indexB in range(len(result[indexA])):
+                    print(numpy.argmax(numpy.array(result[indexA][indexB])), end=',')
+                print()
+            return

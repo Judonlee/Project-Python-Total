@@ -2,7 +2,7 @@ import os
 import numpy
 
 if __name__ == '__main__':
-    loadpath = 'F:\\AVEC-Final\\NetworkChangedAgain-SigmoidLastNot\\'
+    loadpath = 'F:\\AVEC-Final\\NetworkChangedAgain-TanhLastNot\\'
     for indexA in os.listdir(loadpath):
         totalData = []
         for indexB in os.listdir(loadpath + indexA):
