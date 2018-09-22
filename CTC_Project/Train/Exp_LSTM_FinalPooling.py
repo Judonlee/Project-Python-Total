@@ -1,5 +1,5 @@
-from CTC_Project.Module.LSTM_FinalPooling import LSTM_FinalPooling
-from CTC_Project.Loader.IEMOCAP_Spectrogram_Loader import IEMOCAP_Spectrogram_Loader
+from CTC_Project_Perhaps_Failed.Module.LSTM_FinalPooling import LSTM_FinalPooling
+from CTC_Project_Perhaps_Failed.Loader.IEMOCAP_Spectrogram_Loader import IEMOCAP_Spectrogram_Loader
 from time import strftime
 import os
 import tensorflow

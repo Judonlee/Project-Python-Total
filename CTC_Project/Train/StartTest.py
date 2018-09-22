@@ -1,6 +1,6 @@
-from CTC_Project.Module.CTC_Reconfiguration import CTC
-from CTC_Project.Loader.IEMOCAP_Transaction_Loader import CTC_Loader
-from CTC_Project.Loader.IEMOCAP_CTC_Loader import IEMOCAP_CTC_Loader
+from CTC_Project_Perhaps_Failed.Module.CTC_Reconfiguration import CTC
+from CTC_Project_Perhaps_Failed.Loader.IEMOCAP_Transaction_Loader import CTC_Loader
+from CTC_Project_Perhaps_Failed.Loader.IEMOCAP_CTC_Loader import IEMOCAP_CTC_Loader
 from time import strftime
 import os
 

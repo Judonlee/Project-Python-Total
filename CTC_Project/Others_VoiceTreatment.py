@@ -17,8 +17,8 @@ except ImportError:
     print("Failed to import python_speech_features.\n Try pip install python_speech_features.")
     raise ImportError
 
-from CTC_Project.utils import maybe_download as maybe_download
-from CTC_Project.utils import sparse_tuple_from as sparse_tuple_from
+from CTC_Project_Perhaps_Failed.utils import maybe_download as maybe_download
+from CTC_Project_Perhaps_Failed.utils import sparse_tuple_from as sparse_tuple_from
 
 # Constants
 SPACE_TOKEN = '<space>'
@@ -27,38 +27,38 @@ FIRST_INDEX = ord('a') - 1  # 0 is reserved to space
 
 # Some configs
 num_features = 13
-num_units=50 # Number of units in the LSTM cell
+num_units = 128  # Number of units in the LSTM cell
 # Accounting the 0th indice +  space + blank label = 28 characters
-num_classes = ord('z') - ord('a') + 1 + 1 + 1
+num_classes = 15
 
 # Hyper-parameters
 num_epochs = 200
-num_hidden = 50
-num_layers = 1
+num_hidden = num_units
+num_layers = 2
 batch_size = 1
 initial_learning_rate = 1e-2
-momentum = 0.9
+momentum = 0.5
 
 num_examples = 1
-num_batches_per_epoch = int(num_examples/batch_size)
+num_batches_per_epoch = int(num_examples / batch_size)
 
 # Loading the data
 
 audio_filename = maybe_download('LDC93S1.wav', 93638)
 target_filename = maybe_download('LDC93S1.txt', 62)
+# target_filename = 'LDC93S1.txt'
 
 fs, audio = wav.read(audio_filename)
 
 inputs = mfcc(audio, samplerate=fs)
 # Tranform in 3D array
 train_inputs = np.asarray(inputs[np.newaxis, :])
-train_inputs = (train_inputs - np.mean(train_inputs))/np.std(train_inputs)
+train_inputs = (train_inputs - np.mean(train_inputs)) / np.std(train_inputs)
 train_seq_len = [train_inputs.shape[1]]
 
 # Readings targets
 with open(target_filename, 'r') as f:
-
-    #Only the last line is necessary
+    # Only the last line is necessary
     line = f.readlines()[-1]
 
     # Get only the words between [a-z] and replace period for none
@@ -79,7 +79,6 @@ train_targets = sparse_tuple_from([targets])
 # We don't have a validation dataset :(
 val_inputs, val_targets, val_seq_len = train_inputs, train_targets, \
                                        train_seq_len
-
 
 # THE MAIN CODE!
 
@@ -153,20 +152,18 @@ with tf.Session(graph=graph) as session:
     # Initializate the weights and biases
     tf.global_variables_initializer().run()
 
-
     for curr_epoch in range(num_epochs):
         train_cost = train_ler = 0
         start = time.time()
 
         for batch in range(num_batches_per_epoch):
-
             feed = {inputs: train_inputs,
                     targets: train_targets,
                     seq_len: train_seq_len}
 
             batch_cost, _ = session.run([cost, optimizer], feed)
-            train_cost += batch_cost*batch_size
-            train_ler += session.run(ler, feed_dict=feed)*batch_size
+            train_cost += batch_cost * batch_size
+            train_ler += session.run(ler, feed_dict=feed) * batch_size
 
         train_cost /= num_examples
         train_ler /= num_examples
@@ -178,15 +175,15 @@ with tf.Session(graph=graph) as session:
         val_cost, val_ler = session.run([cost, ler], feed_dict=val_feed)
 
         log = "Epoch {}/{}, train_cost = {:.3f}, train_ler = {:.3f}, val_cost = {:.3f}, val_ler = {:.3f}, time = {:.3f}"
-        print(log.format(curr_epoch+1, num_epochs, train_cost, train_ler,
+        print(log.format(curr_epoch + 1, num_epochs, train_cost, train_ler,
                          val_cost, val_ler, time.time() - start))
-    # Decoding
-    d = session.run(decoded[0], feed_dict=feed)
-    str_decoded = ''.join([chr(x) for x in np.asarray(d[1]) + FIRST_INDEX])
-    # Replacing blank label to none
-    str_decoded = str_decoded.replace(chr(ord('z') + 1), '')
-    # Replacing space label to space
-    str_decoded = str_decoded.replace(chr(ord('a') - 1), ' ')
+        # Decoding
+        d = session.run(decoded[0], feed_dict=feed)
+        str_decoded = ''.join([chr(x) for x in np.asarray(d[1]) + FIRST_INDEX])
+        # Replacing blank label to none
+        str_decoded = str_decoded.replace(chr(ord('z') + 1), '')
+        # Replacing space label to space
+        str_decoded = str_decoded.replace(chr(ord('a') - 1), ' ')
 
-    print('Original:\n%s' % original)
-    print('Decoded:\n%s' % str_decoded)
+        print('Original:\n%s' % original)
+        print('Decoded:\n%s' % str_decoded)

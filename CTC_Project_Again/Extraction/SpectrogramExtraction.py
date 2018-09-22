@@ -6,7 +6,7 @@ import numpy
 if __name__ == '__main__':
     m_bands = 120
     loadpath = 'D:\\ProjectData\\IEMOCAP\\'
-    savepath = 'D:\\ProjectData\\IEMOCAP-Reextraction\\Bands' + str(m_bands) + '\\'
+    savepath = 'F:\\Project-CTC-Data\\Csv\\Bands' + str(m_bands) + '\\'
 
     s_rate = 16000
     win_length = int(0.025 * s_rate)  # Window length 15ms, 25ms, 50ms, 100ms, 200ms

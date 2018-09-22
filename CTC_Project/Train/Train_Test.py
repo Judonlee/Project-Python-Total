@@ -17,8 +17,8 @@ except ImportError:
     print("Failed to import python_speech_features.\n Try pip install python_speech_features.")
     raise ImportError
 
-from CTC_Project.utils import maybe_download as maybe_download
-from CTC_Project.utils import sparse_tuple_from as sparse_tuple_from
+from CTC_Project_Perhaps_Failed.utils import maybe_download as maybe_download
+from CTC_Project_Perhaps_Failed.utils import sparse_tuple_from as sparse_tuple_from
 
 # Constants
 SPACE_TOKEN = '<space>'

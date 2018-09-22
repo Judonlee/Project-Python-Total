@@ -1,5 +1,5 @@
-from CTC_Project.Loader.IEMOCAP_CTC_Loader import IEMOCAP_CTC_Loader
-from CTC_Project.Module.CTC_Reconfiguration import CTC
+from CTC_Project_Perhaps_Failed.Loader.IEMOCAP_CTC_Loader import IEMOCAP_CTC_Loader
+from CTC_Project_Perhaps_Failed.Module.CTC_Reconfiguration import CTC
 import tensorflow
 
 if __name__ == '__main__':

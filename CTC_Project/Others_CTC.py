@@ -11,8 +11,8 @@ import time
 import tensorflow as tf
 import numpy as np
 from six.moves import xrange as range
-from CTC_Project.utils import sparse_tuple_from as sparse_tuple_from
-from CTC_Project.utils import pad_sequences as pad_sequences
+from CTC_Project_Perhaps_Failed.utils import sparse_tuple_from as sparse_tuple_from
+from CTC_Project_Perhaps_Failed.utils import pad_sequences as pad_sequences
 
 
 def fake_data(num_examples, num_features, num_labels, min_size=10, max_size=15):

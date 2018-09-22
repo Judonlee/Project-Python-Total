@@ -1,4 +1,4 @@
-from CTC_Project.Module.LSTM_R_FinalPooling import LSTM_FinalPooling
+from CTC_Project_Perhaps_Failed.Module.LSTM_R_FinalPooling import LSTM_FinalPooling
 import numpy
 import tensorflow
 

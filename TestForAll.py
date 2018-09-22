@@ -1,79 +1,274 @@
-# -*-coding:utf8-*-
+# coding=utf-8
+import time
 
-__author = "buyizhiyou"
-__date = "2017-11-21"
-
-'''
-单步调试,结合汉字的识别学习lstm，ctc loss的tf实现,tensorflow1.4
-'''
 import tensorflow as tf
+import scipy.io.wavfile as wav
 import numpy as np
-import random
+
+from six.moves import xrange as range
+
+try:
+    from python_speech_features import mfcc
+except ImportError:
+    print("Failed to import python_speech_features.\n Try pip install python_speech_features.")
+    raise ImportError
+
+# 常量
+SPACE_TOKEN = '<space>'
+SPACE_INDEX = 0
+FIRST_INDEX = ord('a') - 1  # 0 is reserved to space
+
+# mfcc默认提取出来的一帧13个特征
+num_features = 13
+# 26个英文字母 + 1个空白 + 1个no label = 28 label个数
+num_classes = ord('z') - ord('a') + 1 + 1 + 1
+
+# 迭代次数
+num_epochs = 200
+# lstm隐藏单元数
+num_hidden = 40
+# 2层lstm网络
+num_layers = 1
+# batch_size设置为1
+batch_size = 1
+# 初始学习率
+initial_learning_rate = 0.01
+
+# 样本个数
+num_examples = 1
+# 一个epoch有多少个batch
+num_batches_per_epoch = int(num_examples / batch_size)
 
 
-def create_sparse(batch_size, dtype=np.int32):
-    '''
-    创建稀疏张量,ctc_loss中labels要求是稀疏张量,随机生成序列长度在150～180之间的labels
-    '''
+def sparse_tuple_from(sequences, dtype=np.int32):
+    """得到一个list的稀疏表示，为了直接将数据赋值给tensorflow的tf.sparse_placeholder稀疏矩阵
+    Args:
+        sequences: 序列的列表
+    Returns:
+        一个三元组，和tensorflow的tf.sparse_placeholder同结构
+    """
     indices = []
     values = []
-    for i in range(batch_size):
-        length = random.randint(150, 180)
-        for j in range(length):
-            indices.append((i, j))
-            value = random.randint(0, 30)
-            values.append(value)
+
+    for n, seq in enumerate(sequences):
+        indices.extend(zip([n] * len(seq), range(len(seq))))
+        values.extend(seq)
 
     indices = np.asarray(indices, dtype=np.int64)
     values = np.asarray(values, dtype=dtype)
-    shape = np.asarray([batch_size, np.asarray(indices).max(0)[1] + 1], dtype=np.int64)  # [64,180]
+    shape = np.asarray([len(sequences), np.asarray(indices).max(0)[1] + 1], dtype=np.int64)
 
-    return [indices, values, shape]
+    return indices, values, shape
 
 
-W = tf.Variable(tf.truncated_normal([200, 781], stddev=0.1),
-                name="W")  # num_hidden=200,num_classes=781(想象成780个汉字+blank),shape (200,781)
-b = tf.Variable(tf.constant(0., shape=[781]), name="b")  # 781
-global_step = tf.Variable(0, trainable=False)  # 全局步骤计数
+def get_audio_feature():
+    '''
+    获取wav文件提取mfcc特征之后的数据
+    '''
 
-# 构造输入
-inputs = tf.random_normal(shape=[64, 60, 3000], dtype=tf.float32)
-# 为了测试，随机batch_size=64张图片,h=60,w=3000,w可以看成lstm的时间步，即lstm输入的time_step=3000,h看成是每一时间步的输入tensor的size
-shape = tf.shape(inputs)  # array([ 64, 3000, 60], dtype=int32)
-batch_s, max_timesteps = shape[0], shape[1]  # 64,3000
-output = create_sparse(64)  # 创建64张图片对应的labels,稀疏张量，序列长度变长
-seq_len = np.ones(64) * 180  # 180为变长序列的最大值
-labels = tf.SparseTensor(values=output[1], indices=output[0], dense_shape=output[2])
+    audio_filename = "audio.wav"
 
-# pdb.set_trace()
-cell = tf.nn.rnn_cell.LSTMCell(200, state_is_tuple=True)
-inputs = tf.transpose(inputs, [0, 2, 1])
-# 转置，因为默认的tf.nn.dynamic_rnn中参数time_major=false,即inputs的shape 是`[batch_size, max_time, ...]`,
+    # 读取wav文件内容，fs为采样率， audio为数据
+    fs, audio = wav.read(audio_filename)
 
-'''
-tf.nn.dynamic_rnn(cell, inputs, sequence_length=None, initial_state=None, dtype=None, paralle
-l_iterations=None, swap_memory=False, time_major=False, scope=None)
-'''
-outputs1, _ = tf.nn.dynamic_rnn(cell, inputs, seq_len,
-                                dtype=tf.float32)  # (64, 3000, 200)动态rnn实现了输入变长问题的解决方案http://blog.csdn.net/u010223750/article/details/71079036
+    # 提取mfcc特征
+    inputs = mfcc(audio, samplerate=fs)
+    # 对特征数据进行归一化，减去均值除以方差
+    feature_inputs = np.asarray(inputs[np.newaxis, :])
+    feature_inputs = (feature_inputs - np.mean(feature_inputs)) / np.std(feature_inputs)
 
-outputs = tf.reshape(outputs1, [-1, 200])  # (64×3000,200)
-logits0 = tf.matmul(outputs, W) + b
-logits1 = tf.reshape(logits0, [batch_s, -1, 781])
-logits = tf.transpose(logits1, (1, 0, 2))  # (3000, 64, 781)
+    # 特征数据的序列长度
+    feature_seq_len = [feature_inputs.shape[1]]
 
-'''
-tf.nn.ctc_loss(labels, inputs, sequence_length, preprocess_collapse_repeated=False, ctc_merge
-_repeated=True, ignore_longer_outputs_than_inputs=False, time_major=True)
-'''
-loss = tf.nn.ctc_loss(labels, logits, seq_len)  # 关于ctc loss解决rnn输出和序列不对齐问题
-# http://blog.csdn.net/left_think/article/details/76370453
-# https://zhuanlan.zhihu.com/p/23293860
-cost = tf.reduce_mean(loss)
-optimizer = tf.train.MomentumOptimizer(learning_rate=0.01, momentum=0.9).minimize(cost, global_step=global_step)
-# decoded, log_prob = tf.nn.ctc_beam_search_decoder(logits, seq_len, merge_repeated=False)#or "tf.nn.ctc_greedy_decoder"一种解码策略
-# acc = tf.reduce_mean(tf.edit_distance(tf.cast(decoded[0], tf.int32), labels))
-with tf.Session() as sess:
-    sess.run(tf.global_variables_initializer())
-    print(outputs.get_shape())
-    print(sess.run(loss))
+    return feature_inputs, feature_seq_len
+
+
+def get_audio_label():
+    '''
+    将label文本转换成整数序列，然后再换成稀疏三元组
+    '''
+    target_filename = 'label.txt'
+
+    with open(target_filename, 'r') as f:
+        # 原始文本为“she had your dark suit in greasy wash water all year”
+        line = f.readlines()[0].strip()
+        targets = line.replace(' ', '  ')
+        # 放入list中，空格用''代替
+        # ['she', '', 'had', '', 'your', '', 'dark', '', 'suit', '', 'in', '', 'greasy', '', 'wash', '', 'water', '', 'all', '', 'year']
+        targets = targets.split(' ')
+
+        # 每个字母作为一个label,转换成如下：
+        # ['s' 'h' 'e' '<space>' 'h' 'a' 'd' '<space>' 'y' 'o' 'u' 'r' '<space>' 'd'
+        # 'a' 'r' 'k' '<space>' 's' 'u' 'i' 't' '<space>' 'i' 'n' '<space>' 'g' 'r'
+        # 'e' 'a' 's' 'y' '<space>' 'w' 'a' 's' 'h' '<space>' 'w' 'a' 't' 'e' 'r'
+        # '<space>' 'a' 'l' 'l' '<space>' 'y' 'e' 'a' 'r']
+        targets = np.hstack([SPACE_TOKEN if x == '' else list(x) for x in targets])
+
+        # 将label转换成整数序列表示:
+        # [19  8  5  0  8  1  4  0 25 15 21 18  0  4  1 18 11  0 19 21  9 20  0  9 14
+        # 0  7 18  5  1 19 25  0 23  1 19  8  0 23  1 20  5 18  0  1 12 12  0 25  5
+        # 1 18]
+        targets = np.asarray([SPACE_INDEX if x == SPACE_TOKEN else ord(x) - FIRST_INDEX
+                              for x in targets])
+
+        # 将列表转换成稀疏三元组
+        train_targets = sparse_tuple_from([targets])
+    return train_targets
+
+
+def inference(inputs, seq_len):
+    '''
+    2层双向LSTM的网络结构定义
+
+    Args：
+    inputs： 输入数据，形状是[batch_size, 序列最大长度，一帧特征的个数13]
+          序列最大长度是指，一个样本在转成特征矩阵之后保存在一个矩阵中，
+          在n个样本组成的batch中，因为不同的样本的序列长度不一样，在组成的3维数据中，
+          第2维的长度要足够容纳下所有的样本的特征序列长度。
+    seq_len: batch里每个样本的有效的序列长度
+    '''
+
+    # 定义一个向前计算的LSTM单元，40个隐藏单元
+    cell_fw = tf.contrib.rnn.LSTMCell(num_hidden,
+                                      initializer=tf.random_normal_initializer(
+                                          mean=0.0, stddev=0.1),
+                                      state_is_tuple=True)
+
+    # 组成一个有2个cell的list
+    cells_fw = [cell_fw] * num_layers
+    # 定义一个向后计算的LSTM单元，40个隐藏单元
+    cell_bw = tf.contrib.rnn.LSTMCell(num_hidden,
+                                      initializer=tf.random_normal_initializer(
+                                          mean=0.0, stddev=0.1),
+                                      state_is_tuple=True)
+    # 组成一个有2个cell的list
+    cells_bw = [cell_bw] * num_layers
+
+    # 将前面定义向前计算和向后计算的2个cell的list组成双向lstm网络
+    # sequence_length为实际有效的长度，大小为batch_size，
+    # 相当于表示batch中每个样本的实际有用的序列长度有多长。
+    # 输出的outputs宽度是隐藏单元的个数，即num_hidden的大小
+    outputs, _, _ = tf.contrib.rnn.stack_bidirectional_dynamic_rnn(cells_fw,
+                                                                   cells_bw,
+                                                                   inputs,
+                                                                   dtype=tf.float32,
+                                                                   sequence_length=seq_len)
+
+    # 获得输入数据的形状
+    shape = tf.shape(inputs)
+    batch_s, max_timesteps = shape[0], shape[1]
+
+    # 将2层LSTM的输出转换成宽度为40的矩阵
+    # 后面进行全连接计算
+    outputs = tf.reshape(outputs, [-1, num_hidden])
+
+    W = tf.Variable(tf.truncated_normal([num_hidden,
+                                         num_classes],
+                                        stddev=0.1))
+
+    b = tf.Variable(tf.constant(0., shape=[num_classes]))
+
+    # 进行全连接线性计算
+    logits = tf.matmul(outputs, W) + b
+
+    # 将全连接计算的结果，由宽度40变成宽度80，
+    # 即最后的输入给CTC的数据宽度必须是26+2的宽度
+    logits = tf.reshape(logits, [batch_s, -1, num_classes])
+
+    # 转置，将第一维和第二维交换。
+    # 变成序列的长度放第一维，batch_size放第二维。
+    # 也是为了适应Tensorflow的CTC的输入格式
+    logits = tf.transpose(logits, (1, 0, 2))
+
+    return logits
+
+
+def main():
+    # 输入特征数据，形状为：[batch_size, 序列长度，一帧特征数]
+    inputs = tf.placeholder(tf.float32, [None, None, num_features])
+
+    # 输入数据的label，定义成稀疏sparse_placeholder会生成稀疏的tensor：SparseTensor
+    # 这个结构可以直接输入给ctc求loss
+    targets = tf.sparse_placeholder(tf.int32)
+
+    # 序列的长度，大小是[batch_size]大小
+    # 表示的是batch中每个样本的有效序列长度是多少
+    seq_len = tf.placeholder(tf.int32, [None])
+
+    # 向前计算网络，定义网络结构，输入是特征数据，输出提供给ctc计算损失值。
+    logits = inference(inputs, seq_len)
+
+    # ctc计算损失
+    # 参数targets必须是一个值为int32的稀疏tensor的结构：tf.SparseTensor
+    # 参数logits是前面lstm网络的输出
+    # 参数seq_len是这个batch的样本中，每个样本的序列长度。
+    loss = tf.nn.ctc_loss(targets, logits, seq_len)
+
+    # 计算损失的平均值
+    cost = tf.reduce_mean(loss)
+
+    # 采用冲量优化方法
+    optimizer = tf.train.MomentumOptimizer(initial_learning_rate, 0.9).minimize(cost)
+
+    # 还有另外一个ctc的函数：tf.contrib.ctc.ctc_beam_search_decoder
+    # 本函数会得到更好的结果，但是效果比ctc_beam_search_decoder低
+    # 返回的结果中，decode是ctc解码的结果，即输入的数据解码出结果序列是什么
+    decoded, _ = tf.nn.ctc_greedy_decoder(logits, seq_len)
+
+    # 采用计算编辑距离的方式计算，计算decode后结果的错误率。
+    ler = tf.reduce_mean(tf.edit_distance(tf.cast(decoded[0], tf.int32),
+                                          targets))
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+
+    with tf.Session(config=config) as session:
+        # 初始化变量
+        tf.global_variables_initializer().run()
+
+        for curr_epoch in range(num_epochs):
+            train_cost = train_ler = 0
+            start = time.time()
+
+            for batch in range(num_batches_per_epoch):
+                # 获取训练数据，本例中只去一个样本的训练数据
+                train_inputs, train_seq_len = get_audio_feature()
+                # 获取这个样本的label
+                train_targets = get_audio_label()
+                feed = {inputs: train_inputs,
+                        targets: train_targets,
+                        seq_len: train_seq_len}
+
+                # 一次训练，更新参数
+                batch_cost, _ = session.run([cost, optimizer], feed)
+                # 计算累加的训练的损失值
+                train_cost += batch_cost * batch_size
+                # 计算训练集的错误率
+                train_ler += session.run(ler, feed_dict=feed) * batch_size
+
+            train_cost /= num_examples
+            train_ler /= num_examples
+
+            # 打印每一轮迭代的损失值，错误率
+            log = "Epoch {}/{}, train_cost = {:.3f}, train_ler = {:.3f}, time = {:.3f}"
+            print(log.format(curr_epoch + 1, num_epochs, train_cost, train_ler,
+                             time.time() - start))
+        # 在进行了1200次训练之后，计算一次实际的测试，并且输出
+        # 读取测试数据，这里读取的和训练数据的同一个样本
+        test_inputs, test_seq_len = get_audio_feature()
+        test_targets = get_audio_label()
+        test_feed = {inputs: test_inputs,
+                     targets: test_targets,
+                     seq_len: test_seq_len}
+        d = session.run(decoded[0], feed_dict=test_feed)
+        # 将得到的测试语音经过ctc解码后的整数序列转换成字母
+        str_decoded = ''.join([chr(x) for x in np.asarray(d[1]) + FIRST_INDEX])
+        # 将no label转换成空
+        str_decoded = str_decoded.replace(chr(ord('z') + 1), '')
+        # 将空白转换成空格
+        str_decoded = str_decoded.replace(chr(ord('a') - 1), ' ')
+        # 打印最后的结果
+        print('Decoded:\n%s' % str_decoded)
+
+
+if __name__ == "__main__":
+    main()
