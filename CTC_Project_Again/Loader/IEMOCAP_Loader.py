@@ -26,8 +26,8 @@ def IEMOCAP_Loader(loadpath, appoint):
 
 
 if __name__ == '__main__':
-    loadpath = 'F:\\Project-CTC-Data\\Csv\\Bands30\\'
-    savepath = 'F:\\Project-CTC-Data\\Npy\\Bands30\\'
+    loadpath = 'F:\\Project-CTC-Data\\Csv\\Bands120\\'
+    savepath = 'F:\\Project-CTC-Data\\Npy\\Bands120\\'
 
     for indexA in os.listdir(loadpath):
         for indexB in os.listdir(loadpath + indexA):
