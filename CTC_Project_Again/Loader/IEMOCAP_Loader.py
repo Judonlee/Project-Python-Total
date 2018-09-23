@@ -8,9 +8,9 @@ def IEMOCAP_Loader(loadpath, appoint):
         for indexB in os.listdir(loadpath + indexA):
             print('Loading : ', indexA, indexB)
             for indexC in range(1, 6):
-                currentData = numpy.load(loadpath + indexA + '\\' + indexB + '\\Session' + str(indexC) + '-Data.npy')
-                currentLabel = numpy.load(loadpath + indexA + '\\' + indexB + '\\Session' + str(indexC) + '-Label.npy')
-                currentSeq = numpy.load(loadpath + indexA + '\\' + indexB + '\\Session' + str(indexC) + '-Seq.npy')
+                currentData = numpy.load(loadpath + indexA + '/' + indexB + '/Session' + str(indexC) + '-Data.npy')
+                currentLabel = numpy.load(loadpath + indexA + '/' + indexB + '/Session' + str(indexC) + '-Label.npy')
+                currentSeq = numpy.load(loadpath + indexA + '/' + indexB + '/Session' + str(indexC) + '-Seq.npy')
 
                 if ['Female', 'Male'].index(indexB) * 5 + indexC - 1 == appoint:
                     testData.extend(currentData)

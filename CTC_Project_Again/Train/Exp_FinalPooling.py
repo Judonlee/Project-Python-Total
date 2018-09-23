@@ -10,14 +10,14 @@ if __name__ == '__main__':
 
     for bands in [30, 40, 60, 80, 100, 120]:
         for appoint in range(10):
-            savepath = 'F:\\Project-CTC-Data\\Records\\Bands-' + str(bands) + '-' + str(appoint) + '\\'
+            savepath = 'F:/Project-CTC-Data/Records/Bands-' + str(bands) + '-' + str(appoint) + '/'
             graph = tensorflow.Graph()
             with graph.as_default():
                 trainData, trainLabel, trainSeq, testData, testLabel, testSeq = \
-                    IEMOCAP_Loader(loadpath='F:\\Project-CTC-Data\\Npy\\Bands' + str(bands) + '\\', appoint=appoint)
+                    IEMOCAP_Loader(loadpath='F:/Project-CTC-Data/Npy/Bands' + str(bands) + '/', appoint=appoint)
                 dataClass = DataClass_TrainTest_Sequence(trainData=trainData, trainLabel=trainLabel, trainSeq=trainSeq,
                                                          testData=testData, testLabel=testLabel, testSeq=testSeq)
                 classifier = LSTM_FinalPooling(trainData=trainData, trainLabel=trainLabel, trainSeqLength=trainSeq,
-                                               featureShape=30, numClass=4)
+                                               featureShape=bands, numClass=4)
 
                 TrainTestEngine(dataClass=dataClass, classifier=classifier, totalEpoch=5, savepath=savepath)
