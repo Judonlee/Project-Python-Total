@@ -47,7 +47,6 @@ class LSTM_FinalPooling(NeuralNetwork_Base):
                                                 name='dataInput')
         self.labelInput = tensorflow.placeholder(dtype=tensorflow.int32, shape=[None, self.numClass], name='labelInput')
         self.seqLenInput = tensorflow.placeholder(dtype=tensorflow.int32, shape=[None], name='seqLenInput')
-        self.keepProbability = tensorflow.placeholder(dtype=tensorflow.float32, shape=None, name='keepProbability')
 
         self.rnnCell = []
         for layers in range(self.rnnLayer):

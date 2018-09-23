@@ -25,7 +25,25 @@ def IEMOCAP_Loader(loadpath, appoint):
     return trainData, trainLabel, trainSeq, testData, testLabel, testSeq
 
 
+def IEMOCAP_TranscriptionLoader(loadpath, appoint):
+    trainTranscription, testTranscription = [], []
+    for indexA in os.listdir(loadpath):
+        for indexB in os.listdir(loadpath + indexA):
+            for indexC in range(1, 6):
+                currentTranscription = numpy.load(
+                    loadpath + indexA + '/' + indexB + '/Session' + str(indexC) + '.npy')
+                if ['Female', 'Male'].index(indexB) * 5 + indexC - 1 == appoint:
+                    testTranscription.extend(currentTranscription)
+                else:
+                    trainTranscription.extend(currentTranscription)
+    return trainTranscription, testTranscription
+
+
 if __name__ == '__main__':
+    trainTranscription, testTranscription = IEMOCAP_TranscriptionLoader(
+        loadpath='F:\\Project-CTC-Data\\Transcription-SingleNumber\\', appoint=0)
+    print(testTranscription)
+    '''
     loadpath = 'F:\\Project-CTC-Data\\Csv\\Bands120\\'
     savepath = 'F:\\Project-CTC-Data\\Npy\\Bands120\\'
 
@@ -57,3 +75,4 @@ if __name__ == '__main__':
                 numpy.save(savepath + indexA + '\\' + indexB + '\\' + indexC + '-Data.npy', currentData)
                 numpy.save(savepath + indexA + '\\' + indexB + '\\' + indexC + '-Label.npy', currentLabel)
                 numpy.save(savepath + indexA + '\\' + indexB + '\\' + indexC + '-Seq.npy', currentSeq)
+    '''
