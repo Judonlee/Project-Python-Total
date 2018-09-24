@@ -124,7 +124,7 @@ class CTC(NeuralNetwork_Base):
             startPosition += self.batchSize
         return totalLoss
 
-    def Test(self, testData, testLabel, testSeq):
+    def Test_Decode(self, testData, testLabel, testSeq):
         startPosition = 0
         totalPredict = []
         while startPosition < len(testData):
@@ -157,3 +157,77 @@ class CTC(NeuralNetwork_Base):
             matrix[numpy.argmax(numpy.array(testLabel[index]))][predict] += 1
         print()
         print(matrix)
+        return matrix
+
+    def Test_LogitsPooling(self, testData, testLabel, testSeq):
+        startPosition = 0
+        totalPredict = []
+        while startPosition < len(testData):
+            print('\rTesting %d/%d' % (startPosition, len(testSeq)), end='')
+            batchData = []
+            batachSeq = testSeq[startPosition:startPosition + self.batchSize]
+
+            maxLen = max(testSeq[startPosition:startPosition + self.batchSize])
+            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
+                currentData = numpy.concatenate(
+                    (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))), axis=0)
+                batchData.append(currentData)
+
+            logits = self.session.run(fetches=self.parameters['Logits_Reshape'],
+                                      feed_dict={self.dataInput: batchData, self.seqLenInput: batachSeq})
+
+            for indexX in range(numpy.shape(logits)[0]):
+                records = numpy.zeros(4)
+                for indexY in range(testSeq[startPosition + indexX]):
+                    chooseArera = logits[indexX][indexY][1:5]
+                    records[numpy.argmax(numpy.array(chooseArera))] += 1
+                totalPredict.append(records)
+            startPosition += self.batchSize
+        print()
+
+        matrix = numpy.zeros((4, 4))
+        for index in range(len(testLabel)):
+            # print(testLabel[index], totalPredict[index])
+            matrix[numpy.argmax(numpy.array(testLabel[index]))][numpy.argmax(numpy.array(totalPredict[index]))] += 1
+        print(matrix)
+        return matrix
+
+    def Test_SoftMax(self, testData, testLabel, testSeq):
+        startPosition = 0
+        totalPredict = []
+        while startPosition < len(testData):
+            print('\rTesting %d/%d' % (startPosition, len(testSeq)), end='')
+            batchData = []
+            batachSeq = testSeq[startPosition:startPosition + self.batchSize]
+
+            maxLen = max(testSeq[startPosition:startPosition + self.batchSize])
+            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
+                currentData = numpy.concatenate(
+                    (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))), axis=0)
+                batchData.append(currentData)
+
+            logits = self.session.run(fetches=self.parameters['Logits_Reshape'],
+                                      feed_dict={self.dataInput: batchData, self.seqLenInput: batachSeq})
+
+            for indexX in range(numpy.shape(logits)[0]):
+                records = numpy.zeros(4)
+                for indexY in range(testSeq[startPosition + indexX]):
+                    chooseArera = logits[indexX][indexY][1:5]
+
+                    totalSoftMax = numpy.sum(numpy.exp(chooseArera))
+                    for indexZ in range(4):
+                        records[indexZ] += numpy.exp(chooseArera[indexZ]) / totalSoftMax
+
+                for indexZ in range(4):
+                    records[indexZ] /= testSeq[startPosition + indexX]
+                totalPredict.append(records)
+                # print(records)
+            startPosition += self.batchSize
+        print()
+        # exit()
+        matrix = numpy.zeros((4, 4))
+        for index in range(len(testLabel)):
+            # print(testLabel[index], totalPredict[index])
+            matrix[numpy.argmax(numpy.array(testLabel[index]))][numpy.argmax(numpy.array(totalPredict[index]))] += 1
+        print(matrix)
+        return matrix
