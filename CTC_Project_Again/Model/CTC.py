@@ -123,11 +123,12 @@ class CTC(NeuralNetwork_Base):
             print(output, end='')
             startPosition += self.batchSize
         return totalLoss
-    '''
+
     def Test(self, testData, testLabel, testSeq):
         startPosition = 0
         totalPredict = []
         while startPosition < len(testData):
+            print('\rTesting %d/%d' % (startPosition, len(testSeq)), end='')
             batchData = []
             batachSeq = testSeq[startPosition:startPosition + self.batchSize]
 
@@ -139,11 +140,20 @@ class CTC(NeuralNetwork_Base):
 
             result = self.session.run(fetches=self.decodeDense,
                                       feed_dict={self.dataInput: batchData, self.seqLenInput: batachSeq})
-
+            # print(result)
             for indexX in range(len(result)):
-                recorder = numpy.zeros(5)
+                records = numpy.zeros(6)
                 for indexY in range(len(result[indexX])):
-                    recorder[int(result[indexX][indexY])] += 1
-                print(recorder)
-            exit()
-            startPosition += self.batchSize'''
+                    records[result[indexX][indexY]] += 1
+                records[0] = 0
+                totalPredict.append(numpy.argmax(numpy.array(records)))
+            startPosition += self.batchSize
+
+        matrix = numpy.zeros((4, 4))
+        for index in range(len(totalPredict)):
+            predict = totalPredict[index] - 1
+            if predict < 0:
+                predict = 2
+            matrix[numpy.argmax(numpy.array(testLabel[index]))][predict] += 1
+        print()
+        print(matrix)
