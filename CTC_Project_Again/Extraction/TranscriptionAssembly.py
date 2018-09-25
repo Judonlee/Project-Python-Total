@@ -3,7 +3,7 @@ import numpy
 
 if __name__ == '__main__':
     loadpath = 'D:\\ProjectData\\IEMOCAP-Transcription\\'
-    savepath = 'F:\\Project-CTC-Data\\Transcription-SingleNumber\\'
+    savepath = 'F:\\Project-CTC-Data\\Transcription-SingleNumber-Class5\\'
     for indexA in os.listdir(loadpath):
         for indexB in os.listdir(loadpath + indexA):
             if not os.path.exists(savepath + indexA + '\\' + indexB):
@@ -17,10 +17,11 @@ if __name__ == '__main__':
                         data = file.read()
                         file.close()
                         transcription = numpy.ones(data.count(' ') + 1)
-                        if indexD == 'ang': transcription = transcription * 1
-                        if indexD == 'exc' or indexD == 'hap': transcription = transcription * 2
-                        if indexD == 'neu': transcription = transcription * 3
-                        if indexD == 'sad': transcription = transcription * 4
+                        if indexD == 'ang': transcription = transcription * 0
+                        if indexD == 'exc' or indexD == 'hap': transcription = transcription * 1
+                        if indexD == 'neu': transcription = transcription * 2
+                        if indexD == 'sad': transcription = transcription * 3
                         totalTranscription.append(transcription)
+                        print(transcription)
                 print(indexA, indexB, indexC, numpy.shape(totalTranscription))
                 numpy.save(savepath + indexA + '\\' + indexB + '\\' + indexC + '.npy', totalTranscription)

@@ -2,8 +2,8 @@ import os
 import numpy
 
 if __name__ == '__main__':
-    loadpath = 'D:\\ProjectData\\IEMOCAP-Features\\GeMAPS-Normalized\\'
-    savepath = 'F:\\Project-CTC-Data\\GeMAPS-Npy\\'
+    loadpath = 'F:\\Project-CTC-Data\\Csv-Normalized\\Bands30\\'
+    savepath = 'F:\\Project-CTC-Data\\Npy-Normalized\\Bands30\\'
     for indexA in os.listdir(loadpath):
         for indexB in os.listdir(loadpath + indexA):
             os.makedirs(savepath + indexA + '\\' + indexB)

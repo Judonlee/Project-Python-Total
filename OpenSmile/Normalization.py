@@ -3,8 +3,8 @@ import numpy
 from sklearn.preprocessing import scale
 
 if __name__ == '__main__':
-    loadpath = 'D:\\ProjectData\\IEMOCAP-Features\\GeMAPS\\'
-    savepath = 'D:\\ProjectData\\IEMOCAP-Features\\GeMAPS-Normalized\\'
+    loadpath = 'F:\\Project-CTC-Data\\Csv\\Bands60\\'
+    savepath = 'F:\\Project-CTC-Data\\Csv-Normalized\\Bands60\\'
     totalData = []
     for indexA in os.listdir(loadpath):
         for indexB in os.listdir(loadpath + indexA):

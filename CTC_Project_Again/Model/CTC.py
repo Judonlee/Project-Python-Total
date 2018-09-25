@@ -87,7 +87,7 @@ class CTC(NeuralNetwork_Base):
             inputs=self.parameters['Logits_TimeMajor'],
             sequence_length=self.seqLenInput,
             merge_repeated=False)
-        self.decodeDense = tensorflow.sparse_tensor_to_dense(sp_input=self.decode[0])
+        self.decodeDense = tensorflow.sparse_tensor_to_dense(sp_input=self.decode[0], default_value=4)
 
     def Train(self):
         trainData, trainLabel, trainSeq = Shuffle(data=self.data, label=self.label, seqLen=self.seqLen)
@@ -145,8 +145,8 @@ class CTC(NeuralNetwork_Base):
                 records = numpy.zeros(6)
                 for indexY in range(len(result[indexX])):
                     records[result[indexX][indexY]] += 1
-                records[0] = 0
                 totalPredict.append(numpy.argmax(numpy.array(records)))
+                records[4] = 0
             startPosition += self.batchSize
 
         matrix = numpy.zeros((4, 4))
@@ -179,10 +179,12 @@ class CTC(NeuralNetwork_Base):
             for indexX in range(numpy.shape(logits)[0]):
                 records = numpy.zeros(4)
                 for indexY in range(testSeq[startPosition + indexX]):
-                    chooseArera = logits[indexX][indexY][1:5]
+                    chooseArera = logits[indexX][indexY][0:4]
                     records[numpy.argmax(numpy.array(chooseArera))] += 1
+                # print(records)
                 totalPredict.append(records)
             startPosition += self.batchSize
+            # exit()
         print()
 
         matrix = numpy.zeros((4, 4))
@@ -212,7 +214,7 @@ class CTC(NeuralNetwork_Base):
             for indexX in range(numpy.shape(logits)[0]):
                 records = numpy.zeros(4)
                 for indexY in range(testSeq[startPosition + indexX]):
-                    chooseArera = logits[indexX][indexY][1:5]
+                    chooseArera = logits[indexX][indexY][0:4]
 
                     totalSoftMax = numpy.sum(numpy.exp(chooseArera))
                     for indexZ in range(4):
