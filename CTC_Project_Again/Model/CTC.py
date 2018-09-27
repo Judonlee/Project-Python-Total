@@ -232,3 +232,25 @@ class CTC(NeuralNetwork_Base):
             matrix[numpy.argmax(numpy.array(testLabel[index]))][numpy.argmax(numpy.array(totalPredict[index]))] += 1
         print(matrix)
         return matrix
+
+    def LogitsOutput(self, testData, testSeq):
+        startPosition = 0
+        totalResult = []
+        while startPosition < len(testData):
+            print('\rCalculating %d/%d' % (startPosition, len(testSeq)), end='')
+            batchData = []
+            batachSeq = testSeq[startPosition:startPosition + self.batchSize]
+
+            maxLen = max(testSeq[startPosition:startPosition + self.batchSize])
+            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
+                currentData = numpy.concatenate(
+                    (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))), axis=0)
+                batchData.append(currentData)
+
+            logits = self.session.run(fetches=self.parameters['Logits_Reshape'],
+                                      feed_dict={self.dataInput: batchData, self.seqLenInput: batachSeq})
+            for index in range(min(self.batchSize, len(testData) - startPosition)):
+                totalResult.append(logits[index][0:testSeq[startPosition + index]])
+
+            startPosition += self.batchSize
+        return totalResult

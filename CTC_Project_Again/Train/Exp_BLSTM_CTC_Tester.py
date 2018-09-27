@@ -9,10 +9,15 @@ import numpy
 if __name__ == '__main__':
     # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
+    savepath = 'D:\\ProjectData\\Records-BLSTM-CTC-Normalized\\Result-SoftMax\\'
+
     for bands in [30, 40, 60, 80, 100, 120]:
         if bands != 30: continue
 
-        for appoint in range(6):
+        for appoint in range(10):
+            if appoint == 6: continue
+            if os.path.exists(savepath + str(bands) + '-' + str(appoint)): continue
+            os.makedirs(savepath + str(bands) + '-' + str(appoint))
             trainData, trainLabel, trainSeq, testData, testLabel, testSeq = \
                 IEMOCAP_Loader(loadpath='D:/ProjectData/Project-CTC-Data/Npy-Normalized/Bands' + str(bands) + '/',
                                appoint=appoint)
@@ -22,18 +27,25 @@ if __name__ == '__main__':
                                                      trainSeq=trainSeq, testData=testData,
                                                      testLabel=testTranscription, testSeq=testSeq)
 
-            episode = 99
-            graph = tensorflow.Graph()
-            with graph.as_default():
-                classifier = CTC_BLSTM(trainData=trainData, trainLabel=trainScription, trainSeqLength=trainSeq,
-                                       featureShape=bands, numClass=5, learningRate=5e-5, rnnLayers=1,
-                                       startFlag=False)
-                # print(classifier.information)
-                classifier.Load('D:\\ProjectData\\Records-BLSTM-CTC-Normalized\\Bands-' + str(bands) + '-'
-                                + str(appoint) + '\\%04d-Network' % episode)
-                # classifier.Train()
-                classifier.Test_SoftMax(testData=trainData, testLabel=trainLabel, testSeq=trainSeq)
-                classifier.Test_SoftMax(testData=testData, testLabel=testLabel, testSeq=testSeq)
-                print()
+            for episode in range(100):
+                graph = tensorflow.Graph()
+                with graph.as_default():
+                    classifier = CTC_BLSTM(trainData=trainData, trainLabel=trainScription, trainSeqLength=trainSeq,
+                                           featureShape=bands, numClass=5, learningRate=5e-5, rnnLayers=1,
+                                           startFlag=False)
+                    # print(classifier.information)
+                    classifier.Load('D:\\ProjectData\\Records-BLSTM-CTC-Normalized\\Bands-' + str(bands) + '-'
+                                    + str(appoint) + '\\%04d-Network' % episode)
+                    # classifier.Train()
+                    # classifier.Test_SoftMax(testData=trainData, testLabel=trainLabel, testSeq=trainSeq)
+                    file = open(savepath + str(bands) + '-' + str(appoint) + '\\Epoch%04d.csv' % episode, 'w')
+                    matrix = classifier.Test_SoftMax(testData=testData, testLabel=testLabel, testSeq=testSeq)
+                    for indexX in range(len(matrix)):
+                        for indexY in range(len(matrix[indexX])):
+                            if indexY != 0: file.write(',')
+                            file.write(str(matrix[indexX][indexY]))
+                        file.write('\n')
+                    file.close()
+                    print()
 
             # exit()
