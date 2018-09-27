@@ -3,8 +3,8 @@ import numpy
 from sklearn.preprocessing import scale
 
 if __name__ == '__main__':
-    loadpath = 'F:\\Project-CTC-Data\\Csv\\Bands60\\'
-    savepath = 'F:\\Project-CTC-Data\\Csv-Normalized\\Bands60\\'
+    loadpath = 'F:\\Project-CTC-Data\\Csv\\Bands120\\'
+    savepath = 'F:\\Project-CTC-Data\\Csv-Normalized\\Bands120\\'
     totalData = []
     for indexA in os.listdir(loadpath):
         for indexB in os.listdir(loadpath + indexA):

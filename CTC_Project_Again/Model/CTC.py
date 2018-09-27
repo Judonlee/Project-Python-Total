@@ -137,24 +137,23 @@ class CTC(NeuralNetwork_Base):
                 currentData = numpy.concatenate(
                     (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))), axis=0)
                 batchData.append(currentData)
-
-            result = self.session.run(fetches=self.decodeDense,
+            # print(numpy.shape(batchData))
+            decode = self.session.run(fetches=self.decode,
                                       feed_dict={self.dataInput: batchData, self.seqLenInput: batachSeq})
-            # print(result)
-            for indexX in range(len(result)):
-                records = numpy.zeros(6)
-                for indexY in range(len(result[indexX])):
-                    records[result[indexX][indexY]] += 1
-                totalPredict.append(numpy.argmax(numpy.array(records)))
-                records[4] = 0
+            indices, value = decode[0].indices, decode[0].values
+
+            result = numpy.zeros((len(batchData), self.numClass))
+            for index in range(len(value)):
+                result[indices[index][0]][value[index]] += 1
+            for sample in result:
+                totalPredict.append(numpy.argmax(numpy.array(sample)))
+
             startPosition += self.batchSize
 
         matrix = numpy.zeros((4, 4))
         for index in range(len(totalPredict)):
-            predict = totalPredict[index] - 1
-            if predict < 0:
-                predict = 2
-            matrix[numpy.argmax(numpy.array(testLabel[index]))][predict] += 1
+            # print(testLabel[index], totalPredict[index])
+            matrix[numpy.argmax(numpy.array(testLabel[index]))][totalPredict[index]] += 1
         print()
         print(matrix)
         return matrix

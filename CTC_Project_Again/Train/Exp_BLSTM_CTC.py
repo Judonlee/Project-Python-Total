@@ -1,5 +1,6 @@
 from CTC_Project_Again.Loader.IEMOCAP_Loader import IEMOCAP_Loader, IEMOCAP_TranscriptionLoader
 from CTC_Project_Again.Model.CTC_BLSTM import CTC_BLSTM
+from CTC_Project_Again.Model.CTC_BLSTM_NN import CTC_BLSTM_NN
 import tensorflow
 from __Base.DataClass import DataClass_TrainTest_Sequence
 import os
@@ -9,7 +10,7 @@ if __name__ == '__main__':
 
     for bands in [30, 40, 60, 80, 100, 120]:
         for appoint in range(10):
-            savepath = 'F:/Project-CTC-Data/Records-BLSTM-CTC-Normalized/Bands-' + str(bands) + '-' + str(appoint) + '/'
+            savepath = 'F:/Project-CTC-Data/Records-BLSTM-CTC-NN/Bands-' + str(bands) + '-' + str(appoint) + '/'
             graph = tensorflow.Graph()
             with graph.as_default():
                 trainData, trainLabel, trainSeq, testData, testLabel, testSeq = \
@@ -19,8 +20,8 @@ if __name__ == '__main__':
                 dataClass = DataClass_TrainTest_Sequence(trainData=trainData, trainLabel=trainScription,
                                                          trainSeq=trainSeq, testData=testData,
                                                          testLabel=testTranscription, testSeq=testSeq)
-                classifier = CTC_BLSTM(trainData=trainData, trainLabel=trainScription, trainSeqLength=trainSeq,
-                                       featureShape=bands, numClass=5, learningRate=5e-5, rnnLayers=1)
+                classifier = CTC_BLSTM_NN(trainData=trainData, trainLabel=trainScription, trainSeqLength=trainSeq,
+                                          featureShape=bands, numClass=5, learningRate=5e-5, rnnLayers=1)
                 print(classifier.information)
                 os.makedirs(savepath)
                 for epoch in range(100):

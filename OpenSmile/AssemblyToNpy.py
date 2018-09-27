@@ -2,9 +2,10 @@ import os
 import numpy
 
 if __name__ == '__main__':
-    loadpath = 'F:\\Project-CTC-Data\\Csv-Normalized\\Bands30\\'
-    savepath = 'F:\\Project-CTC-Data\\Npy-Normalized\\Bands30\\'
+    loadpath = 'F:\\Project-CTC-Data\\Csv-Normalized\\Bands120\\'
+    savepath = 'F:\\Project-CTC-Data\\Npy-Normalized\\Bands120\\'
     for indexA in os.listdir(loadpath):
+        os.path.exists()
         for indexB in os.listdir(loadpath + indexA):
             os.makedirs(savepath + indexA + '\\' + indexB)
             for indexC in os.listdir(loadpath + indexA + '\\' + indexB):
