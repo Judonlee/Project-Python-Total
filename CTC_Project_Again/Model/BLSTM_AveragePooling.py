@@ -5,7 +5,7 @@ from tensorflow.contrib import rnn
 from __Base.Shuffle import Shuffle
 
 
-class BLSTM_FinalPooling(NeuralNetwork_Base):
+class BLSTM_AveragePooling(NeuralNetwork_Base):
     def __init__(self, trainData, trainLabel, trainSeqLength, featureShape, numClass, batchSize=32, learningRate=1e-4,
                  startFlag=True, graphRevealFlag=True, graphPath='logs/', occupyRate=-1):
         '''
@@ -20,10 +20,10 @@ class BLSTM_FinalPooling(NeuralNetwork_Base):
         self.featureShape = featureShape
         self.seqLen = trainSeqLength
         self.numClass = numClass
-        super(BLSTM_FinalPooling, self).__init__(trainData=trainData, trainLabel=trainLabel, batchSize=batchSize,
-                                                 learningRate=learningRate, startFlag=startFlag,
-                                                 graphRevealFlag=graphRevealFlag,
-                                                 graphPath=graphPath, occupyRate=occupyRate)
+        super(BLSTM_AveragePooling, self).__init__(trainData=trainData, trainLabel=trainLabel, batchSize=batchSize,
+                                                   learningRate=learningRate, startFlag=startFlag,
+                                                   graphRevealFlag=graphRevealFlag,
+                                                   graphPath=graphPath, occupyRate=occupyRate)
 
         self.information = 'This Model uses the Final_Pooling to testify the validation of the model.'
         for sample in self.parameters.keys():
@@ -32,8 +32,28 @@ class BLSTM_FinalPooling(NeuralNetwork_Base):
     def BuildNetwork(self, learningRate):
         self.dataInput = tensorflow.placeholder(dtype=tensorflow.float32, shape=[None, None, self.featureShape],
                                                 name='dataInput')
-        self.labelInput = tensorflow.placeholder(dtype=tensorflow.int32, shape=[None, self.numClass], name='labelInput')
         self.seqLenInput = tensorflow.placeholder(dtype=tensorflow.int32, shape=[None], name='seqLenInput')
+        self.labelInput = tensorflow.placeholder(dtype=tensorflow.float32, shape=[None, self.numClass],
+                                                 name='labelInput')
+
+        self.parameters['BatchSize'] = tensorflow.shape(input=self.dataInput, name='BatchSize')[0]
+        self.parameters['TimeStep'] = tensorflow.shape(input=self.dataInput, name='TimeStep')[1]
+
+        ####################################################################################
+        # Average Pooling Matrix
+        ####################################################################################
+
+        self.parameters['AverageMatrixStep1'] = tensorflow.divide(x=1, y=self.seqLenInput, name='AverageMatrixStep1')
+        self.parameters['AverageMatrixStep2'] = tensorflow.reshape(tensor=self.parameters['AverageMatrixStep1'],
+                                                                   shape=[-1, 1], name='AverageMatrixStep2')
+        self.parameters['AverageMatrixStep3'] = tensorflow.tile(input=self.parameters['AverageMatrixStep2'],
+                                                                multiples=[1, 256], name='AverageMatrixStep3')
+        self.parameters['AverageMatrixStep4'] = tensorflow.to_float(x=self.parameters['AverageMatrixStep3'],
+                                                                    name='AverageMatrixStep4')
+
+        ####################################################################################
+        # BLSTM Start
+        ####################################################################################
 
         self.parameters['RNN_Cell_Forward'] = rnn.BasicLSTMCell(num_units=128, name='RNN_Cell_Forward')
         self.parameters['RNN_Cell_Backward'] = rnn.BasicLSTMCell(num_units=128, name='RNN_Cell_Backward')
@@ -44,10 +64,16 @@ class BLSTM_FinalPooling(NeuralNetwork_Base):
                                                     inputs=self.dataInput, sequence_length=self.seqLenInput,
                                                     dtype=tensorflow.float32)
 
-        self.parameters['RNN_Results'] = tensorflow.concat(
-            (self.parameters['RNN_FinalState_Forward'].h, self.parameters['RNN_FinalState_Backward'].h), axis=1)
+        self.parameters['RNN_Concate'] = tensorflow.concat(
+            (self.parameters['RNN_Output_Forward'], self.parameters['RNN_Output_Backward']), axis=2)
 
-        self.parameters['Logits'] = tensorflow.layers.dense(inputs=self.parameters['RNN_Results'],
+        self.parameters['RNN_Result'] = tensorflow.reduce_sum(input_tensor=self.parameters['RNN_Concate'], axis=1,
+                                                              name='RNN_Result')
+        self.parameters['RNN_AveragePooling'] = tensorflow.multiply(x=self.parameters['RNN_Result'],
+                                                                    y=self.parameters['AverageMatrixStep4'],
+                                                                    name='RNN_AveragePooling')
+
+        self.parameters['Logits'] = tensorflow.layers.dense(inputs=self.parameters['RNN_AveragePooling'],
                                                             units=self.numClass, activation=tensorflow.nn.relu,
                                                             name='Logits')
         self.parameters['PredictProbability'] = tensorflow.nn.softmax(logits=self.parameters['Logits'],
