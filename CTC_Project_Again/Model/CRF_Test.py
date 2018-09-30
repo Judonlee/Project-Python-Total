@@ -1,18 +1,23 @@
 import tensorflow
-from CTC_Project_Again.Model.CTC import CTC
+from __Base.BaseClass import NeuralNetwork_Base
 import tensorflow.contrib.rnn as rnn
 import tensorflow.contrib.crf as crf
+import numpy
+from __Base.Shuffle import Shuffle
 
 
-class CRF_Test(CTC):
+class CRF_Test(NeuralNetwork_Base):
     def __init__(self, trainData, trainLabel, trainSeqLength, featureShape, numClass, hiddenNodules=128, batchSize=32,
                  learningRate=1e-4, startFlag=True, graphRevealFlag=True, graphPath='logs/', occupyRate=-1):
-        super(CRF_Test, self).__init__(trainData=trainData, trainLabel=trainLabel, trainSeqLength=trainSeqLength,
-                                       featureShape=featureShape, batchSize=batchSize, numClass=numClass,
-                                       hiddenNodules=hiddenNodules, learningRate=learningRate, startFlag=startFlag,
-                                       graphRevealFlag=graphRevealFlag, graphPath=graphPath, occupyRate=occupyRate)
+        self.featureShape = featureShape
+        self.seqLen = trainSeqLength
+        self.numClass = numClass
+        self.hiddenNodules = hiddenNodules
+        super(CRF_Test, self).__init__(trainData=trainData, trainLabel=trainLabel, batchSize=batchSize,
+                                       learningRate=learningRate, startFlag=startFlag, graphRevealFlag=graphRevealFlag,
+                                       graphPath=graphPath, occupyRate=occupyRate)
 
-        self.information = 'This model is to testify the ability of CRF Model.'
+        self.information = 'This Model uses the Final_Pooling to testify the validation of the model.'
         for sample in self.parameters.keys():
             self.information += '\n' + str(sample) + str(self.parameters[sample])
 
@@ -52,6 +57,10 @@ class CRF_Test(CTC):
                                shape=[self.parameters['BatchSize'], self.parameters['TimeStep'], self.numClass],
                                name='Logits_Reshape')
 
+        ###################################################################################################
+        # Conditional Random Field
+        ###################################################################################################
+
         self.parameters['LogLikelihood'], self.parameters['TransitionParams'] = crf.crf_log_likelihood(
             inputs=self.parameters['Logits_Reshape'], tag_indices=self.labelInput, sequence_lengths=self.seqLenInput)
 
@@ -59,3 +68,74 @@ class CRF_Test(CTC):
             potentials=self.parameters['Logits_Reshape'], transition_params=self.parameters['TransitionParams'],
             sequence_length=self.seqLenInput)
         self.parameters['Loss'] = tensorflow.reduce_mean(input_tensor=self.parameters['LogLikelihood'], name='Loss')
+
+        self.train = tensorflow.train.AdamOptimizer(learning_rate=learningRate).minimize(self.parameters['Loss'])
+
+    def Train(self):
+        trainData, trainLabel, trainSeq = Shuffle(data=self.data, label=self.label, seqLen=self.seqLen)
+
+        startPosition = 0
+        totalLoss = 0
+        while startPosition < len(trainData):
+            batchData, batchLabel = [], []
+            batachSeq = trainSeq[startPosition:startPosition + self.batchSize]
+
+            maxLen = max(trainSeq[startPosition:startPosition + self.batchSize])
+            for index in range(startPosition, min(startPosition + self.batchSize, len(trainData))):
+                currentData = numpy.concatenate(
+                    (trainData[index], numpy.zeros((maxLen - len(trainData[index]), len(trainData[index][0])))), axis=0)
+                batchData.append(currentData)
+
+                currentLabel = numpy.concatenate((trainLabel[index], numpy.zeros(maxLen - len(trainLabel[index]))),
+                                                 axis=0)
+                batchLabel.append(currentLabel)
+
+            loss, _ = self.session.run(fetches=[self.parameters['Loss'], self.train],
+                                       feed_dict={self.dataInput: batchData, self.labelInput: batchLabel,
+                                                  self.seqLenInput: batachSeq})
+            totalLoss += loss
+            output = '\rBatch : %d/%d \t Loss : %f' % (startPosition, len(trainData), loss)
+            print(output, end='')
+            startPosition += self.batchSize
+        return totalLoss
+
+    def Test_CRF(self, testData, testLabel, testSeq):
+        startPosition = 0
+        totalPredict = []
+        totalScore = []
+        while startPosition < len(testData):
+            batchData, batchLabel = [], []
+            batachSeq = testSeq[startPosition:startPosition + self.batchSize]
+
+            maxLen = max(testSeq[startPosition:startPosition + self.batchSize])
+            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
+                output = '\rBatch : %d/%d' % (startPosition, len(testData))
+                print(output, end='')
+
+                currentData = numpy.concatenate(
+                    (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))), axis=0)
+                batchData.append(currentData)
+
+                currentLabel = numpy.concatenate((testLabel[index], numpy.zeros(maxLen - len(testLabel[index]))),
+                                                 axis=0)
+                batchLabel.append(currentLabel)
+
+            result, score = self.session.run(
+                fetches=[self.parameters['ViterbiSequence'], self.parameters['ViterbiScore']],
+                feed_dict={self.dataInput: batchData, self.seqLenInput: batachSeq})
+            for index in range(len(batachSeq)):
+                totalPredict.append(result[index][0:batachSeq[index]])
+                totalScore.append(score[index])
+
+            startPosition += self.batchSize
+
+        print('\n\n')
+        matrix = numpy.zeros((self.numClass, self.numClass))
+        for index in range(len(totalPredict)):
+            notebook = numpy.zeros(5)
+            for sample in totalPredict[index]:
+                notebook[sample] += 1
+            # print(notebook, numpy.argmax(numpy.array(notebook)), totalScore[index], testLabel[index][0])
+
+            matrix[int(testLabel[index][0])][numpy.argmax(numpy.array(notebook)[1:5])+1] += 1
+        print(matrix)
