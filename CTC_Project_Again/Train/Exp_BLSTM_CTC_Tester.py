@@ -1,6 +1,5 @@
 from CTC_Project_Again.Loader.IEMOCAP_Loader import IEMOCAP_Loader, IEMOCAP_TranscriptionLoader
 from CTC_Project_Again.Model.CTC_BLSTM import CTC_BLSTM
-from CTC_Project_Again.Model.CTC_BLSTM_NN import CTC_BLSTM_NN
 import tensorflow
 from __Base.DataClass import DataClass_TrainTest_Sequence
 import os
@@ -9,13 +8,10 @@ import numpy
 if __name__ == '__main__':
     # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-    savepath = 'D:\\ProjectData\\Records-BLSTM-CTC-Normalized\\Result-SoftMax\\'
+    savepath = 'D:\\ProjectData\\Records-BLSTM-CTC-Normalized\\Result-Logits\\'
 
-    for bands in [30, 40, 60, 80, 100, 120]:
-        if bands != 30: continue
-
+    for bands in [30, 40]:
         for appoint in range(10):
-            if appoint == 6: continue
             if os.path.exists(savepath + str(bands) + '-' + str(appoint)): continue
             os.makedirs(savepath + str(bands) + '-' + str(appoint))
             trainData, trainLabel, trainSeq, testData, testLabel, testSeq = \
@@ -39,7 +35,7 @@ if __name__ == '__main__':
                     # classifier.Train()
                     # classifier.Test_SoftMax(testData=trainData, testLabel=trainLabel, testSeq=trainSeq)
                     file = open(savepath + str(bands) + '-' + str(appoint) + '\\Epoch%04d.csv' % episode, 'w')
-                    matrix = classifier.Test_SoftMax(testData=testData, testLabel=testLabel, testSeq=testSeq)
+                    matrix = classifier.Test_LogitsPooling(testData=testData, testLabel=testLabel, testSeq=testSeq)
                     for indexX in range(len(matrix)):
                         for indexY in range(len(matrix[indexX])):
                             if indexY != 0: file.write(',')

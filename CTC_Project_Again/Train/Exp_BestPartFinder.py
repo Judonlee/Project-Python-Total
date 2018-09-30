@@ -3,7 +3,7 @@ import numpy
 import matplotlib.pylab as plt
 
 if __name__ == '__main__':
-    loadpath = 'D:\\ProjectData\\Records-BLSTM-CTC-Normalized\\Result-SoftMax\\30-0\\'
+    loadpath = 'D:\\ProjectData\\Records-BLSTM-CTC-Normalized\\Result-SoftMax\\40-9\\'
     WATrace, UATrace = [], []
     for filename in os.listdir(loadpath):
         matrix = numpy.genfromtxt(loadpath + filename, dtype=int, delimiter=',')
@@ -19,5 +19,5 @@ if __name__ == '__main__':
     plt.plot(WATrace, label='WA')
     plt.plot(UATrace, label='UA')
     plt.legend()
-    plt.show()
-    print(max(UATrace), numpy.argmax(numpy.array(UATrace)))
+    # plt.show()
+    print(WATrace[numpy.argmax(numpy.array(UATrace))], max(UATrace), numpy.argmax(numpy.array(UATrace)))

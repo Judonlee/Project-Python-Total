@@ -15,6 +15,7 @@ def TrainTestEngine(dataClass, classifier, totalEpoch, savepath):
         file = open(savepath + '%04d.txt' % episode, 'w')
         loss = classifier.Train()
         print('\rEpisode %d/%d Total Loss : %f' % (episode, 100, loss) + strftime("%Y/%m/%d %H:%M:%S"))
+        '''
         print('Train Part :')
         matrix = classifier.Test(testData=dataClass.trainData, testLabel=dataClass.trainLabel,
                                  testSeq=dataClass.trainSeq)
@@ -25,7 +26,7 @@ def TrainTestEngine(dataClass, classifier, totalEpoch, savepath):
             for indexY in range(len(matrix[indexX])):
                 if indexY != 0: file.write(',')
                 file.write(str(matrix[indexX][indexY]))
-            file.write('\n')
+            file.write('\n')'''
 
         print('Test Part :')
         matrix = classifier.Test(testData=dataClass.testData, testLabel=dataClass.testLabel, testSeq=dataClass.testSeq)

@@ -1,7 +1,7 @@
 import os
 
 if __name__ == '__main__':
-    loadpath = 'F:\\LIDC\\LIDC-Nodules\\'
+    loadpath = 'E:\\LIDC\\LIDC-Nodules\\'
 
     dictionary = {}
     search = '<malignancy>'
@@ -13,6 +13,17 @@ if __name__ == '__main__':
             file = open(loadpath + indexA + '\\' + indexB + '\\Character.txt', 'r')
             data = file.read()
             file.close()
+
+            preLimited = '<internalStructure>'
+            preLimitedEnd = '</internalStructure>'
+            preType = data[data.find(preLimited) + len(preLimited):data.find(preLimitedEnd)]
+            if preType != '1': continue
+
+            preLimited = '<calcification>'
+            preLimitedEnd = '</calcification>'
+            preType = data[data.find(preLimited) + len(preLimited):data.find(preLimitedEnd)]
+            if preType != '6': continue
+
             type = data[data.find(search):data.find(searchEnd)]
 
             if type in dictionary.keys():
