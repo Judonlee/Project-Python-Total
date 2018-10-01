@@ -2,7 +2,7 @@ import tensorflow
 from CTC_Project_Again.Loader.IEMOCAP_Loader import IEMOCAP_Loader
 from __Base.DataClass import DataClass_TrainTest_Sequence
 import numpy
-from CTC_Project_Again.Model.CRF_Test import CRF_Test
+from CTC_Project_Again.Model.CRF_BLSTM_Test import CRF_Test
 import os
 
 

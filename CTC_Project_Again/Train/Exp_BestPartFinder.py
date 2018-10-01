@@ -3,7 +3,7 @@ import numpy
 import matplotlib.pylab as plt
 
 if __name__ == '__main__':
-    loadpath = 'D:\\ProjectData\\Records-BLSTM-CTC-Normalized\\Result-SoftMax\\40-9\\'
+    loadpath = 'D:\\ProjectData\\Records-BLSTM-CTC-Normalized\\Result-Decode\\30-9\\'
     WATrace, UATrace = [], []
     for filename in os.listdir(loadpath):
         matrix = numpy.genfromtxt(loadpath + filename, dtype=int, delimiter=',')
