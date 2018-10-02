@@ -44,7 +44,7 @@ class CRF_Test(NeuralNetwork_Base):
 
         self.parameters['LogLikelihood'], self.parameters['TransitionParams'] = crf.crf_log_likelihood(
             inputs=self.parameters['Logits'], tag_indices=self.labelInput, sequence_lengths=self.seqLenInput)
-        self.parameters['Loss'] = tensorflow.reduce_mean(input_tensor=-self.parameters['LogLikelihood'])
+        self.parameters['Loss'] = tensorflow.reduce_mean(-self.parameters['LogLikelihood'])
         self.train = tensorflow.train.AdamOptimizer(learning_rate=learningRate).minimize(self.parameters['Loss'])
 
     def Train(self):
@@ -54,10 +54,11 @@ class CRF_Test(NeuralNetwork_Base):
         totalLoss = 0
         while startPosition < len(trainData):
             batchData, batchLabel = [], []
-            batachSeq = trainSeq[startPosition:startPosition + self.batchSize]
+            batchSeq = trainSeq[startPosition:startPosition + self.batchSize]
 
             maxLen = max(trainSeq[startPosition:startPosition + self.batchSize])
             for index in range(startPosition, min(startPosition + self.batchSize, len(trainData))):
+                print(numpy.shape(trainData[index]), numpy.shape(trainLabel[index]))
                 currentData = numpy.concatenate(
                     (trainData[index], numpy.zeros((maxLen - len(trainData[index]), len(trainData[index][0])))), axis=0)
                 batchData.append(currentData)
@@ -68,9 +69,40 @@ class CRF_Test(NeuralNetwork_Base):
 
             loss, _ = self.session.run(fetches=[self.parameters['Loss'], self.train],
                                        feed_dict={self.dataInput: batchData, self.labelInput: batchLabel,
-                                                  self.seqLenInput: batachSeq})
+                                                  self.seqLenInput: batchSeq})
             totalLoss += loss
             output = '\rBatch : %d/%d \t Loss : %f' % (startPosition, len(trainData), loss)
             print(output, end='')
             startPosition += self.batchSize
         return totalLoss
+
+    def Test_Decode(self, testData, testLabel, testSeq):
+        startPosition = 0
+        CorrectLabels = 0
+        while startPosition < len(testData):
+            batchData, batchLabel = [], []
+            batchSeq = testSeq[startPosition:startPosition + self.batchSize]
+
+            maxLen = max(testSeq[startPosition:startPosition + self.batchSize])
+            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
+                currentData = numpy.concatenate(
+                    (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))), axis=0)
+                batchData.append(currentData)
+
+                currentLabel = numpy.concatenate((testLabel[index], numpy.zeros(maxLen - len(testLabel[index]))),
+                                                 axis=0)
+                batchLabel.append(currentLabel)
+
+            [logits, params] = self.session.run(
+                fetches=[self.parameters['Logits'], self.parameters['TransitionParams']],
+                feed_dict={self.dataInput: batchData, self.seqLenInput: batchSeq})
+
+            for index in range(len(logits)):
+                treatLogits = logits[index][0:batchSeq[index]]
+                viterbiSequence, viterbiScore = crf.viterbi_decode(score=treatLogits, transition_params=params)
+                # print(viterbiScore, '\nOrigin', testLabel[startPosition + index], '\nResult', viterbiSequence, '\n')
+
+                CorrectLabels += numpy.sum(numpy.equal(viterbiSequence, testLabel[startPosition + index]))
+
+            startPosition += self.batchSize
+        print('Correct Rate :', CorrectLabels, numpy.sum(testSeq))

@@ -42,7 +42,8 @@ with tf.Graph().as_default():
         # Train for a fixed number of iterations.
         session.run(tf.global_variables_initializer())
         for i in range(100000):
-            tf_unary_scores, tf_transition_params, _ = session.run([unary_scores, transition_params, train_op])
+            tf_unary_scores, tf_transition_params, likelihood, _ = session.run(
+                [unary_scores, transition_params, loss, train_op])
             if i % 100 == 0:
                 correct_labels = 0
                 total_labels = 0
@@ -59,7 +60,7 @@ with tf.Graph().as_default():
                     correct_labels += np.sum(np.equal(viterbi_sequence, y_))
                     total_labels += sequence_length_
 
-                    #print(y[counter], viterbi_sequence)
+                    # print(y[counter], viterbi_sequence)
                     counter += 1
                 accuracy = 100.0 * correct_labels / float(total_labels)
-                print(i, "Accuracy: %.2f%%" % accuracy)
+                print(i, "Accuracy: %.2f%%" % accuracy, likelihood)
