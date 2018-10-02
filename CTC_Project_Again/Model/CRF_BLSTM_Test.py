@@ -6,16 +6,16 @@ import numpy
 from __Base.Shuffle import Shuffle
 
 
-class CRF_Test(NeuralNetwork_Base):
+class CRF_BLSTM(NeuralNetwork_Base):
     def __init__(self, trainData, trainLabel, trainSeqLength, featureShape, numClass, hiddenNodules=128, batchSize=32,
                  learningRate=1e-4, startFlag=True, graphRevealFlag=True, graphPath='logs/', occupyRate=-1):
         self.featureShape = featureShape
         self.seqLen = trainSeqLength
         self.numClass = numClass
         self.hiddenNodules = hiddenNodules
-        super(CRF_Test, self).__init__(trainData=trainData, trainLabel=trainLabel, batchSize=batchSize,
-                                       learningRate=learningRate, startFlag=startFlag, graphRevealFlag=graphRevealFlag,
-                                       graphPath=graphPath, occupyRate=occupyRate)
+        super(CRF_BLSTM, self).__init__(trainData=trainData, trainLabel=trainLabel, batchSize=batchSize,
+                                        learningRate=learningRate, startFlag=startFlag, graphRevealFlag=graphRevealFlag,
+                                        graphPath=graphPath, occupyRate=occupyRate)
 
         self.information = 'This Model uses the Final_Pooling to testify the validation of the model.'
         for sample in self.parameters.keys():
@@ -64,10 +64,7 @@ class CRF_Test(NeuralNetwork_Base):
         self.parameters['LogLikelihood'], self.parameters['TransitionParams'] = crf.crf_log_likelihood(
             inputs=self.parameters['Logits_Reshape'], tag_indices=self.labelInput, sequence_lengths=self.seqLenInput)
 
-        self.parameters['ViterbiSequence'], self.parameters['ViterbiScore'] = crf.crf_decode(
-            potentials=self.parameters['Logits_Reshape'], transition_params=self.parameters['TransitionParams'],
-            sequence_length=self.seqLenInput)
-        self.parameters['Loss'] = tensorflow.reduce_mean(input_tensor=self.parameters['LogLikelihood'], name='Loss')
+        self.parameters['Loss'] = tensorflow.reduce_mean(input_tensor=-self.parameters['LogLikelihood'], name='Loss')
 
         self.train = tensorflow.train.AdamOptimizer(learning_rate=learningRate).minimize(self.parameters['Loss'])
 
@@ -99,19 +96,15 @@ class CRF_Test(NeuralNetwork_Base):
             startPosition += self.batchSize
         return totalLoss
 
-    def Test_CRF(self, testData, testLabel, testSeq):
+    def Test_Decode(self, testData, testLabel, testSeq):
         startPosition = 0
-        totalPredict = []
-        totalScore = []
+        CorrectLabels = 0
         while startPosition < len(testData):
             batchData, batchLabel = [], []
-            batachSeq = testSeq[startPosition:startPosition + self.batchSize]
+            batchSeq = testSeq[startPosition:startPosition + self.batchSize]
 
             maxLen = max(testSeq[startPosition:startPosition + self.batchSize])
             for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
-                output = '\rBatch : %d/%d' % (startPosition, len(testData))
-                print(output, end='')
-
                 currentData = numpy.concatenate(
                     (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))), axis=0)
                 batchData.append(currentData)
@@ -120,22 +113,16 @@ class CRF_Test(NeuralNetwork_Base):
                                                  axis=0)
                 batchLabel.append(currentLabel)
 
-            result, score = self.session.run(
-                fetches=[self.parameters['ViterbiSequence'], self.parameters['ViterbiScore']],
-                feed_dict={self.dataInput: batchData, self.seqLenInput: batachSeq})
-            for index in range(len(batachSeq)):
-                totalPredict.append(result[index][0:batachSeq[index]])
-                totalScore.append(score[index])
+            [logits, params] = self.session.run(
+                fetches=[self.parameters['Logits_Reshape'], self.parameters['TransitionParams']],
+                feed_dict={self.dataInput: batchData, self.seqLenInput: batchSeq})
+
+            for index in range(len(logits)):
+                treatLogits = logits[index][0:batchSeq[index]]
+                viterbiSequence, viterbiScore = crf.viterbi_decode(score=treatLogits, transition_params=params)
+                # print(viterbiScore, '\nOrigin', testLabel[startPosition + index], '\nResult', viterbiSequence, '\n')
+
+                CorrectLabels += numpy.sum(numpy.equal(viterbiSequence, testLabel[startPosition + index]))
 
             startPosition += self.batchSize
-
-        print('\n\n')
-        matrix = numpy.zeros((self.numClass, self.numClass))
-        for index in range(len(totalPredict)):
-            notebook = numpy.zeros(5)
-            for sample in totalPredict[index]:
-                notebook[sample] += 1
-            # print(notebook, numpy.argmax(numpy.array(notebook)), totalScore[index], testLabel[index][0])
-
-            matrix[int(testLabel[index][0])][numpy.argmax(numpy.array(notebook)[1:5])+1] += 1
-        print(matrix)
+        print('Correct Rate :', CorrectLabels, numpy.sum(testSeq))
