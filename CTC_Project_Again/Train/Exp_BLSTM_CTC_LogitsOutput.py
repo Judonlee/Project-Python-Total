@@ -10,46 +10,47 @@ if __name__ == '__main__':
     # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
     bands = 30
-    appoint = 9
-    episode = 98
-    savepath = 'D:\\ProjectData\\Records-BLSTM-CTC-Normalized\\Logits-Class5\\' + str(bands) + '-' + str(appoint) + '\\'
-    if not os.path.exists(savepath): os.makedirs(savepath)
+    episode = 99
+    for appoint in range(10):
+        savepath = 'D:\\ProjectData\\Project-CTC-Data\\Records-CTC-Class6\\Logits-Class6\\' \
+                   + str(bands) + '-' + str(appoint) + '\\'
+        netpath = 'D:\\ProjectData\\Project-CTC-Data\\Records-CTC-Class6\\'
+        if not os.path.exists(savepath): os.makedirs(savepath)
 
-    trainData, trainLabel, trainSeq, testData, testLabel, testSeq = \
-        IEMOCAP_Loader(loadpath='D:/ProjectData/Project-CTC-Data/Npy-Normalized/Bands' + str(bands) + '/',
-                       appoint=appoint)
-    trainScription, testTranscription = IEMOCAP_TranscriptionLoader(
-        loadpath='D:/ProjectData/Project-CTC-Data/Transcription-SingleNumber-Class5/', appoint=appoint)
-    dataClass = DataClass_TrainTest_Sequence(trainData=trainData, trainLabel=trainScription,
-                                             trainSeq=trainSeq, testData=testData,
-                                             testLabel=testTranscription, testSeq=testSeq)
-    # exit()
-    graph = tensorflow.Graph()
-    with graph.as_default():
-        classifier = CTC_BLSTM(trainData=trainData, trainLabel=trainScription, trainSeqLength=trainSeq,
-                               featureShape=bands, numClass=5, learningRate=5e-5, rnnLayers=1,
-                               startFlag=False)
-        classifier.Load('D:\\ProjectData\\Records-BLSTM-CTC-Normalized\\Bands-' + str(bands) + '-'
-                        + str(appoint) + '\\%04d-Network' % episode)
-        logits = classifier.LogitsOutput(testData=trainData, testSeq=trainSeq)
+        trainData, trainLabel, trainSeq, testData, testLabel, testSeq = \
+            IEMOCAP_Loader(loadpath='D:/ProjectData/Project-CTC-Data/Npy-Normalized/Bands' + str(bands) + '/',
+                           appoint=appoint)
+        trainScription, testTranscription = IEMOCAP_TranscriptionLoader(
+            loadpath='D:/ProjectData/Project-CTC-Data/Transcription-IntersectionWordNumber-Class6/', appoint=appoint)
+        dataClass = DataClass_TrainTest_Sequence(trainData=trainData, trainLabel=trainScription,
+                                                 trainSeq=trainSeq, testData=testData,
+                                                 testLabel=testTranscription, testSeq=testSeq)
+        # exit()
+        graph = tensorflow.Graph()
+        with graph.as_default():
+            classifier = CTC_BLSTM(trainData=trainData, trainLabel=trainScription, trainSeqLength=trainSeq,
+                                   featureShape=bands, numClass=6, learningRate=5e-5, rnnLayers=1,
+                                   startFlag=False)
+            classifier.Load(netpath + 'Bands-' + str(bands) + '-' + str(appoint) + '\\%04d-Network' % episode)
 
-        sequenceLabel = []
-        for indexX in range(len(logits)):
-            currentLabel = []
-            for indexY in range(len(logits[indexX])):
-                currentLabel.append(numpy.argmax(numpy.array(logits[indexX][indexY][0:4])))
-            sequenceLabel.append(currentLabel)
+            logits = classifier.LogitsOutput(testData=trainData, testSeq=trainSeq)
+            sequenceLabel = []
+            for indexX in range(len(logits)):
+                currentLabel = []
+                for indexY in range(len(logits[indexX])):
+                    currentLabel.append(numpy.argmax(numpy.array(logits[indexX][indexY][0:5])))
+                sequenceLabel.append(currentLabel)
 
-        numpy.save(savepath + 'TrainSeqLabel.npy', sequenceLabel)
+            numpy.save(savepath + 'TrainSeqLabel.npy', sequenceLabel)
 
-        logits = classifier.LogitsOutput(testData=testData, testSeq=testSeq)
+            logits = classifier.LogitsOutput(testData=testData, testSeq=testSeq)
 
-        sequenceLabel = []
-        for indexX in range(len(logits)):
-            currentLabel = []
-            for indexY in range(len(logits[indexX])):
-                currentLabel.append(numpy.argmax(numpy.array(logits[indexX][indexY][0:4])))
-            sequenceLabel.append(currentLabel)
+            sequenceLabel = []
+            for indexX in range(len(logits)):
+                currentLabel = []
+                for indexY in range(len(logits[indexX])):
+                    currentLabel.append(numpy.argmax(numpy.array(logits[indexX][indexY][0:5])))
+                sequenceLabel.append(currentLabel)
 
-        numpy.save(savepath + 'TestSeqLabel.npy', sequenceLabel)
-    # exit()
+            numpy.save(savepath + 'TestSeqLabel.npy', sequenceLabel)
+        # exit()
