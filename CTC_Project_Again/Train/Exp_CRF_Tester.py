@@ -1,8 +1,7 @@
 import tensorflow
-from CTC_Project_Again.Loader.IEMOCAP_Loader import IEMOCAP_Loader
-from __Base.DataClass import DataClass_TrainTest_Sequence
+from CTC_Project_Again.Loader.IEMOCAP_Loader import IEMOCAP_Loader, IEMOCAP_SeqLabelLoader
 import numpy
-from CTC_Project_Again.Model.CRF_BLSTM_Test import CRF_Test
+from CTC_Project_Again.Model.CRF_NN_Test import CRF_Test
 import os
 
 
@@ -15,30 +14,42 @@ def FrameWiseLabelTransformation(labels, seqLen):
 
 
 if __name__ == '__main__':
-    for bands in [30, 40, 60, 80, 100, 120]:
+    for bands in [30]:
         for appoint in range(10):
-            loadpath = 'Records-FrameWise-CRF/' + str(bands) + '-' + str(appoint) + '/'
+            loadpath = 'D:\\ProjectData\\Project-CTC-Data\\Records-CRF-NN\\' + str(bands) + '-' + str(appoint) + '\\'
+            savepathMatrix = 'D:\\ProjectData\\Project-CTC-Data\\Records-CRF-NN-Result-Matrix\\' + str(
+                bands) + '-' + str(appoint) + '\\'
+            savepathCounter = 'D:\\ProjectData\\Project-CTC-Data\\Records-CRF-NN-Result\\' + str(
+                bands) + '-' + str(appoint) + '\\'
+            if os.path.exists(savepathMatrix): continue
+            os.makedirs(savepathMatrix)
+            os.makedirs(savepathCounter)
 
             trainData, trainLabel, trainSeq, testData, testLabel, testSeq = \
                 IEMOCAP_Loader(loadpath='D:/ProjectData/Project-CTC-Data/Npy-Normalized/Bands' + str(bands) + '/',
                                appoint=appoint)
-            trainData = trainData[0:32]
-            trainLabel = trainLabel[0:32]
-            trainSeq = trainSeq[0:32]
-            dataClass = DataClass_TrainTest_Sequence(trainData=trainData,
-                                                     trainLabel=FrameWiseLabelTransformation(labels=trainLabel,
-                                                                                             seqLen=trainSeq),
-                                                     trainSeq=trainSeq, testData=testData,
-                                                     testLabel=FrameWiseLabelTransformation(labels=testLabel,
-                                                                                            seqLen=testSeq),
-                                                     testSeq=testSeq)
-            print(dataClass.trainLabel)
-            graph = tensorflow.Graph()
-            with graph.as_default():
-                classifier = CRF_Test(trainData=dataClass.trainData, trainLabel=dataClass.trainLabel,
-                                      trainSeqLength=dataClass.trainSeq, featureShape=bands, numClass=5,
-                                      startFlag=False)
-                classifier.Load(loadpath=loadpath + '0099-Network')
-                classifier.Test_CRF(testData=dataClass.trainData, testLabel=dataClass.trainLabel,
-                                    testSeq=dataClass.trainSeq)
-            exit()
+            trainSeqLabel, testSeqLabel = IEMOCAP_SeqLabelLoader(
+                loadpath='D:/ProjectData/Records-BLSTM-CTC-Normalized/Logits-Class5/' +
+                         str(bands) + '-' + str(appoint) + '/')
+
+            for episode in range(100):
+                graph = tensorflow.Graph()
+                with graph.as_default():
+                    classifier = CRF_Test(trainData=trainData, trainLabel=trainSeqLabel, trainSeqLength=trainSeqLabel,
+                                          featureShape=bands, numClass=4, startFlag=False)
+                    classifier.Load(loadpath=loadpath + '%04d-Network' % episode)
+                    matrix, correctNumber, totalNumber = classifier.Test_Decode_GroundLabel(testData=trainData,
+                                                                                            testLabel=trainSeqLabel,
+                                                                                            testGroundLabel=trainLabel,
+                                                                                            testSeq=trainSeq)
+                file = open(savepathMatrix + '%04d.csv' % episode, 'w')
+                for indexX in range(len(matrix)):
+                    for indexY in range(len(matrix[indexX])):
+                        if indexY != 0: file.write(',')
+                        file.write(str(matrix[indexX][indexY]))
+                    file.write('\n')
+                file.close()
+
+                file = open(savepathCounter + '%04d.csv' % episode, 'w')
+                file.write(str(correctNumber) + ',' + str(totalNumber))
+                file.close()

@@ -80,6 +80,7 @@ class CRF_Test(NeuralNetwork_Base):
         startPosition = 0
         CorrectLabels = 0
         while startPosition < len(testData):
+            print('\rTreating %d/%d' % (startPosition, len(testData)), end='')
             batchData, batchLabel = [], []
             batchSeq = testSeq[startPosition:startPosition + self.batchSize]
 
@@ -105,4 +106,45 @@ class CRF_Test(NeuralNetwork_Base):
                 CorrectLabels += numpy.sum(numpy.equal(viterbiSequence, testLabel[startPosition + index]))
 
             startPosition += self.batchSize
-        print('Correct Rate :', CorrectLabels, numpy.sum(testSeq))
+        print('\n\nCorrect Rate :', CorrectLabels, numpy.sum(testSeq))
+        return CorrectLabels, numpy.sum(testSeq)
+
+    def Test_Decode_GroundLabel(self, testData, testLabel, testGroundLabel, testSeq):
+        startPosition = 0
+        CorrectLabels = 0
+        matrix = numpy.zeros((self.numClass, self.numClass))
+        while startPosition < len(testData):
+            print('\rTreating %d/%d' % (startPosition, len(testData)), end='')
+            batchData, batchLabel = [], []
+            batchSeq = testSeq[startPosition:startPosition + self.batchSize]
+
+            maxLen = max(testSeq[startPosition:startPosition + self.batchSize])
+            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
+                currentData = numpy.concatenate(
+                    (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))), axis=0)
+                batchData.append(currentData)
+
+                currentLabel = numpy.concatenate((testLabel[index], numpy.zeros(maxLen - len(testLabel[index]))),
+                                                 axis=0)
+                batchLabel.append(currentLabel)
+
+            [logits, params] = self.session.run(
+                fetches=[self.parameters['Logits'], self.parameters['TransitionParams']],
+                feed_dict={self.dataInput: batchData, self.seqLenInput: batchSeq})
+
+            for index in range(len(logits)):
+                treatLogits = logits[index][0:batchSeq[index]]
+                viterbiSequence, viterbiScore = crf.viterbi_decode(score=treatLogits, transition_params=params)
+
+                CorrectLabels += numpy.sum(numpy.equal(viterbiSequence, testLabel[startPosition + index]))
+
+                counter = numpy.zeros(self.numClass)
+                for sample in viterbiSequence:
+                    counter[sample] += 1
+                matrix[numpy.argmax(numpy.array(testGroundLabel[index + startPosition]))][
+                    numpy.argmax(numpy.array(counter))] += 1
+
+            startPosition += self.batchSize
+        print('\n\nCorrect Rate :', CorrectLabels, numpy.sum(testSeq))
+        print(matrix)
+        return matrix, CorrectLabels, numpy.sum(testSeq)
