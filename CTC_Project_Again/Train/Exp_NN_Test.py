@@ -4,7 +4,7 @@ from CTC_Project_Again.Model.DNN_Layer4 import DNN
 import numpy
 
 if __name__ == '__main__':
-    appoint = 8
+    appoint = 9
     loadpath = 'D:\\ProjectData\\IEMOCAP\\IEMOCAP-Features\\eGeMAPS-Singe-Normalized\\'
     trainData, trainLabel, testData, testLabel = IEMOCAP_LLD_Loader(loadpath=loadpath, appoint=appoint)
     classifier = DNN(trainData=trainData, trainLabel=trainLabel, featureShape=numpy.shape(trainData)[1],
@@ -39,3 +39,4 @@ if __name__ == '__main__':
 
     for index in range(len(WATrace)):
         print(WATrace[index], ',', UATrace[index])
+    print(max(WATrace), max(UATrace))

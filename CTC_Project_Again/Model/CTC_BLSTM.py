@@ -64,7 +64,7 @@ class CTC_BLSTM(CTC):
                                                          inputs=self.parameters['Logits_TimeMajor'],
                                                          sequence_length=self.seqLenInput)
         self.parameters['Cost'] = tensorflow.reduce_mean(self.parameters['Loss'], name='Cost')
-        self.train = tensorflow.train.MomentumOptimizer(learning_rate=learningRate, momentum=0.9).minimize(
+        self.train = tensorflow.train.RMSPropOptimizer(learning_rate=learningRate).minimize(
             self.parameters['Cost'])
         self.decode, self.logProbability = tensorflow.nn.ctc_beam_search_decoder(
             inputs=self.parameters['Logits_TimeMajor'], sequence_length=self.seqLenInput, merge_repeated=False)

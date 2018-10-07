@@ -73,6 +73,17 @@ def IEMOCAP_LLD_Loader(loadpath, appoint):
     return trainData, trainLabel, testData, testLabel
 
 
+def IEMOCAP_Loader_Npy(loadpath):
+    [trainData, trainLabel, trainSeq, trainScription] = numpy.load(file=loadpath + 'TrainData.npy')
+    [testData, testLabel, testSeq, testScription] = numpy.load(file=loadpath + 'TestData.npy')
+
+    print(numpy.shape(trainData), numpy.shape(trainLabel), numpy.shape(trainSeq), numpy.shape(trainScription),
+          numpy.sum(trainLabel, axis=0))
+    print(numpy.shape(testData), numpy.shape(testLabel), numpy.shape(testSeq), numpy.shape(testScription),
+          numpy.sum(testLabel, axis=0))
+    return trainData, trainLabel, trainSeq, trainScription, testData, testLabel, testSeq, testScription
+
+
 if __name__ == '__main__':
     trainTranscription, testTranscription = IEMOCAP_TranscriptionLoader(
         loadpath='F:\\Project-CTC-Data\\Transcription-SingleNumber\\', appoint=0)
