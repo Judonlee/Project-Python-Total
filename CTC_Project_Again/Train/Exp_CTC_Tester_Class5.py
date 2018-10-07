@@ -9,16 +9,21 @@ if __name__ == '__main__':
     # os.environ['CUDA_VISIBLE_DEVICES'] = '3'
 
     bands = 30
-    appoint = 1
+    appoint = 3
     trainData, trainLabel, trainSeq, trainScription, testData, testLabel, testSeq, testScription = \
         IEMOCAP_Loader_Npy(loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper/Bands-%d-%d/' % (bands, appoint))
     savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CTC-LR1e-3-RMSP/Bands-%d-%d/' % (bands, appoint)
-    if not os.path.exists(savepath): os.makedirs(savepath)
+    if not os.path.exists(savepath):
+        os.makedirs(savepath + 'Decode/')
+        os.makedirs(savepath + 'Logits/')
+        os.makedirs(savepath + 'SoftMax/')
     # exit()
 
     for trace in range(100):
-        if os.path.exists(savepath + 'Epoch%04d.csv' % trace): continue
-        file = open(savepath + 'Epoch%04d.csv' % trace, 'w')
+        if os.path.exists(savepath + 'Decode/Epoch%04d.csv' % trace): continue
+        fileDecode = open(savepath + 'Decode/Epoch%04d.csv' % trace, 'w')
+        fileLogits = open(savepath + 'Logits/Epoch%04d.csv' % trace, 'w')
+        fileSoftMax = open(savepath + 'SoftMax/Epoch%04d.csv' % trace, 'w')
         graph = tensorflow.Graph()
         with graph.as_default():
             classifier = CTC_BLSTM(trainData=trainData, trainLabel=trainScription, trainSeqLength=trainSeq,
@@ -26,24 +31,30 @@ if __name__ == '__main__':
                                    batchSize=64)
             classifier.Load('D:/ProjectData/Project-CTC-Data/Records-CTC-Class5-LR1E-3-RMSP/Bands-%d-%d/%04d-Network'
                             % (bands, appoint, trace))
-            matrix = classifier.Test_Decode(testData=testData, testLabel=testLabel, testSeq=testSeq)
-            for indexX in range(len(matrix)):
-                for indexY in range(len(matrix[indexX])):
-                    if indexY != 0: file.write(',')
-                    file.write(str(matrix[indexX][indexY]))
-                file.write('\n')
-        file.close()
-    '''
-        print('Episode %d/100' % trace)
-        matrix = classifier.Test_SoftMax(testData=testData, testLabel=testLabel, testSeq=testSeq)
-        # exit()
+            matrixDecode, matrixLogits, matrixSoftMax = classifier.Test_AllMethods(testData=testData,
+                                                                                   testLabel=testLabel,
+                                                                                   testSeq=testSeq)
+            print()
+            print(matrixDecode)
+            print(matrixLogits)
+            print(matrixSoftMax)
 
-        WA = (matrix[0][0] + matrix[1][1] + matrix[2][2] + matrix[3][3]) / sum(sum(matrix))
-        UA = (matrix[0][0] / sum(matrix[0]) + matrix[1][1] / sum(matrix[1]) +
-              matrix[2][2] / sum(matrix[2]) + matrix[3][3] / sum(matrix[3])) / 4
-        print(WA, UA)
-        traceWA.append(WA)
-        traceUA.append(UA)
-for index in range(len(traceWA)):
-    print(traceWA[index], ',', traceUA[index])
-    '''
+        for indexX in range(len(matrixDecode)):
+            for indexY in range(len(matrixDecode[indexX])):
+                if indexY != 0: fileDecode.write(',')
+                fileDecode.write(str(matrixDecode[indexX][indexY]))
+            fileDecode.write('\n')
+        for indexX in range(len(matrixLogits)):
+            for indexY in range(len(matrixLogits[indexX])):
+                if indexY != 0: fileLogits.write(',')
+                fileLogits.write(str(matrixLogits[indexX][indexY]))
+            fileLogits.write('\n')
+        for indexX in range(len(matrixSoftMax)):
+            for indexY in range(len(matrixSoftMax[indexX])):
+                if indexY != 0: fileSoftMax.write(',')
+                fileSoftMax.write(str(matrixSoftMax[indexX][indexY]))
+            fileSoftMax.write('\n')
+
+        fileDecode.close()
+        fileLogits.close()
+        fileSoftMax.close()
