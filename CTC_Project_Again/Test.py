@@ -2,7 +2,7 @@ import os
 import numpy
 
 if __name__ == '__main__':
-    loadpath = 'D:\\ProjectData\\Project-CTC-Data\\Records-Result-CTC-LR1e-3-RMSP\\Bands-30-3\\SoftMax\\'
+    loadpath = 'D:\\ProjectData\\Project-CTC-Data\\Records-Result-CTC-LR1e-3-RMSP\\Bands-30-8\\SoftMax\\'
     UATrace, WATrace = [], []
     for filename in os.listdir(loadpath):
         data = numpy.genfromtxt(fname=loadpath + filename, dtype=float, delimiter=',')
@@ -12,7 +12,7 @@ if __name__ == '__main__':
             UA += data[index][index] / sum(data[index])
         WA = WA / sum(sum(data))
         UA = UA / len(data)
-        print(WA, UA)
+        print(WA, UA, sum(sum(data)))
         UATrace.append(UA)
         WATrace.append(WA)
     print('\n')
