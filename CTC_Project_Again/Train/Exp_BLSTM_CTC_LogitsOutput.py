@@ -8,9 +8,9 @@ import numpy
 if __name__ == '__main__':
     # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-    bands = 30
+    bands = 40
     episode = 99
-    for appoint in range(4, 9):
+    for appoint in range(10):
         savepath = 'D:/ProjectData/Project-CTC-Data/CTC-SeqLabel-Class5/Bands-%d-%d/' % (bands, appoint)
         netpath = 'D:/ProjectData/Project-CTC-Data/Records-CTC-Class5-LR1E-3-RMSP/Bands-%d-%d/' % (bands, appoint)
 

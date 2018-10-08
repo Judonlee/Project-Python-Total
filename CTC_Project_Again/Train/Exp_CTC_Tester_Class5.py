@@ -8,8 +8,8 @@ import numpy
 if __name__ == '__main__':
     # os.environ['CUDA_VISIBLE_DEVICES'] = '3'
 
-    bands = 30
-    appoint = 8
+    bands = 60
+    appoint = 3
     trainData, trainLabel, trainSeq, trainScription, testData, testLabel, testSeq, testScription = \
         IEMOCAP_Loader_Npy(loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper/Bands-%d-%d/' % (bands, appoint))
     savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CTC-LR1e-3-RMSP/Bands-%d-%d/' % (bands, appoint)

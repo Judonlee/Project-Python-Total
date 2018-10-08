@@ -156,7 +156,7 @@ class CTC(NeuralNetwork_Base):
             ####################################################################
 
             for indexX in range(numpy.shape(logits)[0]):
-                records = numpy.zeros(4)
+                records = numpy.zeros(self.numClass - 1)
                 for indexY in range(testSeq[startPosition + indexX]):
                     chooseArera = logits[indexX][indexY][0:self.numClass - 1]
                     records[numpy.argmax(numpy.array(chooseArera))] += 1
@@ -167,14 +167,14 @@ class CTC(NeuralNetwork_Base):
             ####################################################################
 
             for indexX in range(numpy.shape(logits)[0]):
-                records = numpy.zeros(4)
+                records = numpy.zeros(self.numClass - 1)
                 for indexY in range(testSeq[startPosition + indexX]):
                     chooseArera = logits[indexX][indexY][0:self.numClass - 1]
                     totalSoftMax = numpy.sum(numpy.exp(chooseArera))
-                    for indexZ in range(4):
+                    for indexZ in range(self.numClass - 1):
                         records[indexZ] += numpy.exp(chooseArera[indexZ]) / totalSoftMax
 
-                for indexZ in range(4):
+                for indexZ in range(self.numClass - 1):
                     records[indexZ] /= testSeq[startPosition + indexX]
                 totalPredictSoftMax.append(records)
 
