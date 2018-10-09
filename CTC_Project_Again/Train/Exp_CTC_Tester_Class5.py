@@ -9,52 +9,54 @@ if __name__ == '__main__':
     # os.environ['CUDA_VISIBLE_DEVICES'] = '3'
 
     bands = 60
-    appoint = 3
-    trainData, trainLabel, trainSeq, trainScription, testData, testLabel, testSeq, testScription = \
-        IEMOCAP_Loader_Npy(loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper/Bands-%d-%d/' % (bands, appoint))
-    savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CTC-LR1e-3-RMSP/Bands-%d-%d/' % (bands, appoint)
-    if not os.path.exists(savepath):
-        os.makedirs(savepath + 'Decode/')
-        os.makedirs(savepath + 'Logits/')
-        os.makedirs(savepath + 'SoftMax/')
-    # exit()
+    for appoint in [5, 7]:
+        trainData, trainLabel, trainSeq, trainScription, testData, testLabel, testSeq, testScription = \
+            IEMOCAP_Loader_Npy(
+                loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper/Bands-%d-%d/' % (bands, appoint))
+        savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CTC-LR1e-3-RMSP/Bands-%d-%d/' % (bands, appoint)
+        if not os.path.exists(savepath):
+            os.makedirs(savepath + 'Decode/')
+            os.makedirs(savepath + 'Logits/')
+            os.makedirs(savepath + 'SoftMax/')
+        # exit()
 
-    for trace in range(100):
-        if os.path.exists(savepath + 'Decode/Epoch%04d.csv' % trace): continue
-        fileDecode = open(savepath + 'Decode/Epoch%04d.csv' % trace, 'w')
-        fileLogits = open(savepath + 'Logits/Epoch%04d.csv' % trace, 'w')
-        fileSoftMax = open(savepath + 'SoftMax/Epoch%04d.csv' % trace, 'w')
-        graph = tensorflow.Graph()
-        with graph.as_default():
-            classifier = CTC_BLSTM(trainData=trainData, trainLabel=trainScription, trainSeqLength=trainSeq,
-                                   featureShape=bands, numClass=5, learningRate=5e-5, rnnLayers=1, startFlag=False,
-                                   batchSize=64)
-            classifier.Load('D:/ProjectData/Project-CTC-Data/Records-CTC-Class5-LR1E-3-RMSP/Bands-%d-%d/%04d-Network'
-                            % (bands, appoint, trace))
-            matrixDecode, matrixLogits, matrixSoftMax = classifier.Test_AllMethods(testData=testData,
-                                                                                   testLabel=testLabel,
-                                                                                   testSeq=testSeq)
-            print()
-            print(matrixDecode)
-            print(matrixLogits)
-            print(matrixSoftMax)
+        for trace in range(100):
+            if os.path.exists(savepath + 'Decode/Epoch%04d.csv' % trace): continue
+            fileDecode = open(savepath + 'Decode/Epoch%04d.csv' % trace, 'w')
+            fileLogits = open(savepath + 'Logits/Epoch%04d.csv' % trace, 'w')
+            fileSoftMax = open(savepath + 'SoftMax/Epoch%04d.csv' % trace, 'w')
+            graph = tensorflow.Graph()
+            with graph.as_default():
+                classifier = CTC_BLSTM(trainData=trainData, trainLabel=trainScription, trainSeqLength=trainSeq,
+                                       featureShape=bands, numClass=5, learningRate=5e-5, rnnLayers=1, startFlag=False,
+                                       batchSize=64)
+                classifier.Load(
+                    'D:/ProjectData/Project-CTC-Data/Records-CTC-Class5-LR1E-3-RMSP/Bands-%d-%d/%04d-Network'
+                    % (bands, appoint, trace))
+                matrixDecode, matrixLogits, matrixSoftMax = classifier.Test_AllMethods(testData=testData,
+                                                                                       testLabel=testLabel,
+                                                                                       testSeq=testSeq)
+                print()
+                print(matrixDecode)
+                print(matrixLogits)
+                print(matrixSoftMax)
 
-        for indexX in range(len(matrixDecode)):
-            for indexY in range(len(matrixDecode[indexX])):
-                if indexY != 0: fileDecode.write(',')
-                fileDecode.write(str(matrixDecode[indexX][indexY]))
-            fileDecode.write('\n')
-        for indexX in range(len(matrixLogits)):
-            for indexY in range(len(matrixLogits[indexX])):
-                if indexY != 0: fileLogits.write(',')
-                fileLogits.write(str(matrixLogits[indexX][indexY]))
-            fileLogits.write('\n')
-        for indexX in range(len(matrixSoftMax)):
-            for indexY in range(len(matrixSoftMax[indexX])):
-                if indexY != 0: fileSoftMax.write(',')
-                fileSoftMax.write(str(matrixSoftMax[indexX][indexY]))
-            fileSoftMax.write('\n')
+            for indexX in range(len(matrixDecode)):
+                for indexY in range(len(matrixDecode[indexX])):
+                    if indexY != 0: fileDecode.write(',')
+                    fileDecode.write(str(matrixDecode[indexX][indexY]))
+                fileDecode.write('\n')
+            for indexX in range(len(matrixLogits)):
+                for indexY in range(len(matrixLogits[indexX])):
+                    if indexY != 0: fileLogits.write(',')
+                    fileLogits.write(str(matrixLogits[indexX][indexY]))
+                fileLogits.write('\n')
+            for indexX in range(len(matrixSoftMax)):
+                for indexY in range(len(matrixSoftMax[indexX])):
+                    if indexY != 0: fileSoftMax.write(',')
+                    fileSoftMax.write(str(matrixSoftMax[indexX][indexY]))
+                fileSoftMax.write('\n')
 
-        fileDecode.close()
-        fileLogits.close()
-        fileSoftMax.close()
+            fileDecode.close()
+            fileLogits.close()
+            fileSoftMax.close()
