@@ -1,5 +1,5 @@
 from CTC_Project_Again.Loader.IEMOCAP_Loader import IEMOCAP_Loader_Npy
-from CTC_Project_Again.Model.CTC_BLSTM import CTC_BLSTM
+from CTC_Project_Again.Model.CTC_BLSTM_LR_Changed import CTC_BLSTM
 import tensorflow
 from __Base.DataClass import DataClass_TrainTest_Sequence
 import os
@@ -10,8 +10,7 @@ if __name__ == '__main__':
 
     for bands in [30, 40, 60, 80, 100, 120]:
         for appoint in range(10):
-            savepath = 'D:/ProjectData/Project-CTC-Data/Records-CTC-Class5-Again-LR1E-4/Bands-' + str(
-                bands) + '-' + str(appoint) + '/'
+            savepath = 'Records-CTC-Class5-Again-LR1E-4/Bands-' + str(bands) + '-' + str(appoint) + '/'
             if os.path.exists(savepath): continue
             os.makedirs(savepath)
 

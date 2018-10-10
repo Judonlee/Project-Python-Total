@@ -51,7 +51,7 @@ class CRF_BLSTM(NeuralNetwork_Base):
         self.parameters['RNN_Reshape'] = tensorflow.reshape(tensor=self.parameters['RNN_Concat'],
                                                             shape=[-1, 2 * self.hiddenNodules], name='RNN_Reshape')
         self.parameters['Logits'] = tensorflow.layers.dense(inputs=self.parameters['RNN_Reshape'], units=self.numClass,
-                                                            activation=None)
+                                                            activation=tensorflow.nn.tanh, name='Logits')
         self.parameters['Logits_Reshape'] = \
             tensorflow.reshape(tensor=self.parameters['Logits'],
                                shape=[self.parameters['BatchSize'], self.parameters['TimeStep'], self.numClass],

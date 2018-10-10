@@ -7,10 +7,9 @@ import os
 if __name__ == '__main__':
     # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-    for bands in [30, 40, 60, 80, 100, 120]:
+    for bands in [30, 40, 60]:
         for appoint in range(10):
-            savepath = 'D:/ProjectData/Project-CTC-Data/Records-CRF-BLSTM-Class4/Bands-' + str(bands) \
-                       + '-' + str(appoint) + '/'
+            savepath = 'Records-CRF-BLSTM-Class4/Bands-' + str(bands) + '-' + str(appoint) + '/'
 
             if os.path.exists(savepath): continue
             os.makedirs(savepath)
@@ -30,6 +29,7 @@ if __name__ == '__main__':
                                        trainSeqLength=dataClass.trainSeq, featureShape=bands, numClass=4,
                                        learningRate=1e-3, batchSize=64)
                 print(classifier.information)
+                continue
                 for episode in range(100):
                     loss = classifier.Train()
                     print('\rEpisode %04d : Loss = %f' % (episode, loss))
