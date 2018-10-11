@@ -8,19 +8,22 @@ import numpy
 if __name__ == '__main__':
     # os.environ['CUDA_VISIBLE_DEVICES'] = '3'
 
-    bands = 100
-    for appoint in [1, 3, 5]:
+    bands = 120
+    for appoint in [7]:
         trainData, trainLabel, trainSeq, trainScription, testData, testLabel, testSeq, testScription = \
             IEMOCAP_Loader_Npy(
                 loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper/Bands-%d-%d/' % (bands, appoint))
+
         savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CTC-LR1e-3-RMSP/Bands-%d-%d/' % (bands, appoint)
+
+        '''
         if not os.path.exists(savepath):
             os.makedirs(savepath + 'Decode/')
             os.makedirs(savepath + 'Logits/')
             os.makedirs(savepath + 'SoftMax/')
         # exit()
-
-        for trace in range(100):
+        '''
+        for trace in range(80, 90):
             if os.path.exists(savepath + 'Decode/Epoch%04d.csv' % trace): continue
             fileDecode = open(savepath + 'Decode/Epoch%04d.csv' % trace, 'w')
             fileLogits = open(savepath + 'Logits/Epoch%04d.csv' % trace, 'w')

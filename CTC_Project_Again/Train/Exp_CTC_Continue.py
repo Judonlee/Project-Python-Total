@@ -1,5 +1,5 @@
 from CTC_Project_Again.Loader.IEMOCAP_Loader import IEMOCAP_Loader_Npy
-from CTC_Project_Again.Model.CTC_BLSTM_LR_Changed import CTC_BLSTM
+from CTC_Project_Again.Model.CTC_BLSTM import CTC_BLSTM
 import tensorflow
 from __Base.DataClass import DataClass_TrainTest_Sequence
 import os
@@ -8,9 +8,10 @@ import numpy
 if __name__ == '__main__':
     # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-    bands = 30
+    bands = 120
     appoint = 0
-    savepath = 'Records-CTC-Class5-Again-LR1E-4/Bands-' + str(bands) + '-' + str(appoint) + '/'
+    startPosition = 67
+    savepath = 'D:/ProjectData/Project-CTC-Data/Records-CTC-Class5-LR1E-3-RMSP/Bands-%d-%d/' % (bands, appoint)
 
     graph = tensorflow.Graph()
     with graph.as_default():
@@ -21,14 +22,9 @@ if __name__ == '__main__':
                                                  testLabel=testScription, testSeq=testSeq)
         classifier = CTC_BLSTM(trainData=trainData, trainLabel=trainScription, trainSeqLength=trainSeq,
                                featureShape=bands, numClass=5, learningRate=1e-3, batchSize=64, startFlag=False)
-        classifier.Load(loadpath=savepath + '%04d-Network' % 56)
+        classifier.Load(loadpath=savepath + '%04d-Network' % startPosition)
         print(classifier.information)
         # exit()
-        for epoch in range(100):
-            if epoch <= 56:
-                classifier.learningRate *= 0.98
-                print('Epoch %d : %f' % (epoch, classifier.learningRate))
-                continue
-            # continue
+        for epoch in range(startPosition + 1, 100):
             print('\rEpoch %d: Total Loss = %f' % (epoch, classifier.Train()))
             classifier.Save(savepath=savepath + '%04d-Network' % epoch)

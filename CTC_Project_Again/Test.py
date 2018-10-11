@@ -3,7 +3,7 @@ import numpy
 
 if __name__ == '__main__':
     for appoint in range(10):
-        loadpath = 'D:\\ProjectData\\Project-CTC-Data\\Records-Result-CTC-LR1e-3-RMSP\\Bands-80-%d\\SoftMax\\' % appoint
+        loadpath = 'D:\\ProjectData\\Project-CTC-Data\\Records-Result-CTC-LR1e-3-RMSP\\Bands-120-%d\\SoftMax\\' % appoint
         UATrace, WATrace = [], []
         for filename in os.listdir(loadpath):
             data = numpy.genfromtxt(fname=loadpath + filename, dtype=float, delimiter=',')
