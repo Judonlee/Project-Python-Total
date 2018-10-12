@@ -6,13 +6,13 @@ import os
 if __name__ == '__main__':
     bands = 30
 
-    for appoint in range(3, 4):
+    for appoint in range(6, 10):
         loadpath = 'D:/ProjectData/Project-CTC-Data/Records-CRF-BLSTM-Class4-Tanh/Bands-' + str(bands) + '-' + str(
             appoint) + '/'
         savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CRF-BLSTM-Class4-Tanh/Bands-' + str(
             bands) + '-' + str(appoint) + '/'
-        # if os.path.exists(savepath): continue
-        # os.makedirs(savepath)
+        if os.path.exists(savepath): continue
+        os.makedirs(savepath)
 
         trainData, trainLabel, trainSeq, testData, testLabel, testSeq = \
             IEMOCAP_Loader(loadpath='D:/ProjectData/Project-CTC-Data/Npy-Normalized/Bands' + str(bands) + '/',
@@ -21,7 +21,7 @@ if __name__ == '__main__':
             loadpath='D:/ProjectData/Records-BLSTM-CTC-Normalized/Logits-Class5/' + str(bands) + '-' + str(
                 appoint) + '/')
 
-        for episode in range(96, 100):
+        for episode in range(100):
             graph = tensorflow.Graph()
             with graph.as_default():
                 classifier = CRF_BLSTM(trainData=trainData, trainLabel=trainSeqLabel, trainSeqLength=trainSeqLabel,

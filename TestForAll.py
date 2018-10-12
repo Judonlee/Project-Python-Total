@@ -1,35 +1,20 @@
-import tensorflow
-from CTC_Project_Again.Loader.IEMOCAP_Loader import IEMOCAP_Loader_Npy, IEMOCAP_SeqLabelLoader
-from __Base.DataClass import DataClass_TrainTest_Sequence
-from CTC_Project_Again.Model.CRF_BLSTM_Test import CRF_BLSTM
-import os
+import matplotlib.pyplot as plt
+import tensorflow as tf
 
-if __name__ == '__main__':
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+# tf.gfileGFile()函数：读取图像
+image_png = tf.gfile.FastGFile(r'C:\Users\BZT\Desktop\Pic-Current\Test.png', 'rb').read()
 
-    bands = 30
-    appoint = 0
-    startPosition = 21
-    savepath = 'Records-CRF-BLSTM-Class4-Tanh/Bands-' + str(bands) + '-' + str(appoint) + '/'
+with tf.Session() as sess:
+    image_jpg = tf.image.decode_jpeg(image_png)  # 图像解码
+    print(sess.run(image_jpg))  # 打印解码后的图像（即为一个三维矩阵[w,h,3]）
+    image_jpg = tf.image.convert_image_dtype(image_jpg, dtype=tf.uint8)  # 改变图像数据类型
 
-    trainData, trainLabel, trainSeq, trainScription, testData, testLabel, testSeq, testScription = \
-        IEMOCAP_Loader_Npy(
-            loadpath='/mnt/a2f3b4e1-c182-4f8c-8eb2-5044d9b4ef28/Bobs/Npy-TotalWrapper/Bands-%d-%d/' % (bands, appoint))
-    trainSeqLabel, testSeqLabel = IEMOCAP_SeqLabelLoader(
-        loadpath='/mnt/a2f3b4e1-c182-4f8c-8eb2-5044d9b4ef28/Bobs/Npy-SeqLabel/Bands-%d-%d/' % (bands, appoint))
+    image_png = tf.image.decode_png(image_png)
+    print(sess.run(image_jpg))
+    image_png = tf.image.convert_image_dtype(image_png, dtype=tf.uint8)
 
-    dataClass = DataClass_TrainTest_Sequence(trainData=trainData, trainLabel=trainSeqLabel, trainSeq=trainSeq,
-                                             testData=testData, testLabel=testSeqLabel, testSeq=testSeq)
-    # exit()
-    graph = tensorflow.Graph()
-    with graph.as_default():
-        classifier = CRF_BLSTM(trainData=dataClass.trainData, trainLabel=dataClass.trainLabel,
-                               trainSeqLength=dataClass.trainSeq, featureShape=bands, numClass=4,
-                               learningRate=1e-3, batchSize=64, startFlag=False)
-        print(classifier.information)
-        classifier.Load(loadpath='/home/bztbztbzt/NewStart/Records-CRF-BLSTM-Class4-Tanh/Bands-%d-%d/%04d-Network' % (
-            bands, appoint, startPosition))
-        for episode in range(startPosition + 1, 100):
-            loss = classifier.Train()
-            print('\rEpisode %04d : Loss = %f' % (episode, loss))
-            classifier.Save(savepath=savepath + '%04d-Network' % episode)
+    plt.figure(1)  # 图像显示
+    plt.imshow(image_jpg.eval())
+    plt.figure(2)
+    plt.imshow(image_png.eval())
+    plt.show()
