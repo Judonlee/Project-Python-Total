@@ -1,7 +1,9 @@
 import os
+import shutil
 
 if __name__ == '__main__':
     loadpath = 'E:\\LIDC\\LIDC-Nodules\\'
+    savepath = 'E:\\LIDC\\LIDC-Nodules-Selected\\'
 
     dictionary = {}
     search = '<texture>'
@@ -25,10 +27,8 @@ if __name__ == '__main__':
             if preType != '6': continue
 
             type = data[data.find(search):data.find(searchEnd)]
+            if type != search + '5': continue
 
-            if type in dictionary.keys():
-                dictionary[type] += 1
-            else:
-                dictionary[type] = 1
-    for key in dictionary.keys():
-        print(key, dictionary[key])
+            if not os.path.exists(savepath + indexA):
+                os.makedirs(savepath + indexA)
+            shutil.copytree(loadpath + indexA + '\\' + indexB, savepath + indexA + '\\' + indexB)

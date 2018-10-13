@@ -4,8 +4,8 @@ import numpy
 import matplotlib.pylab as plt
 
 if __name__ == '__main__':
-    loadpath = 'F:\\LIDC\\LIDC-IDRI\\'
-    savepath = 'F:\\LIDC\\LIDC-Nodules\\'
+    loadpath = 'E:\\LIDC\\LIDC-IDRI\\'
+    savepath = 'E:\\LIDC\\LIDC-Nodules\\'
     for indexA in os.listdir(loadpath)[800:]:
         if os.path.exists(savepath + indexA): continue
         os.makedirs(savepath + indexA)
@@ -74,12 +74,12 @@ if __name__ == '__main__':
                             instanceFind = True
                             print(indexA, DCMName)
 
-                            xStart = int(numpy.median(xList)) - 40
-                            yStart = int(numpy.median(yList)) - 40
+                            xStart = int(numpy.median(xList)) - 32
+                            yStart = int(numpy.median(yList)) - 32
                             if xStart < 0: xStart = 0
                             if yStart < 0: yStart = 0
-                            if xStart > 432: xStart = 432
-                            if yStart > 432: yStart = 432
+                            if xStart > 448: xStart = 448
+                            if yStart > 448: yStart = 448
 
                             #########################################################
                             # 存储图片
@@ -110,8 +110,8 @@ if __name__ == '__main__':
                             file = open(
                                 savepath + indexA + '\\Nodule-%04d' % noduleCounter + '\\Csv\\Part%04d.csv' % partCounter,
                                 'w')
-                            for indexY in range(80):
-                                for indexX in range(80):
+                            for indexY in range(64):
+                                for indexX in range(64):
                                     if indexX != 0:
                                         file.write(',')
                                     file.write(str(DCMFile.pixel_array[indexY + yStart, indexX + xStart]))
