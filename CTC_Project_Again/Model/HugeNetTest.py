@@ -201,7 +201,40 @@ class BLSTM_CTC_BLSTM_CRF(NeuralNetwork_Base):
         print(matrix)
         return matrix
 
-    def Load(self, loadpath):
+    def Test_CRF(self, testData, testLabel, testSeq):
+        startPosition = 0
+        matrix = numpy.zeros((self.numClass - 1, self.numClass - 1))
+        while startPosition < len(testData):
+            print('\rTesting %d/%d' % (startPosition, len(testSeq)), end='')
+            batchData = []
+            batchSeq = testSeq[startPosition:startPosition + self.batchSize]
+
+            maxLen = max(testSeq[startPosition:startPosition + self.batchSize])
+            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
+                currentData = numpy.concatenate(
+                    (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))), axis=0)
+                batchData.append(currentData)
+
+            [logits, params] = self.session.run(
+                fetches=[self.parameters['CRF_Logits_Reshape'], self.parameters['CRF_TransitionParams']],
+                feed_dict={self.dataInput: batchData, self.seqLenInput: batchSeq})
+
+            for index in range(len(logits)):
+                treatLogits = logits[index][0:batchSeq[index]]
+                viterbiSequence, viterbiScore = crf.viterbi_decode(score=treatLogits, transition_params=params)
+
+                counter = numpy.zeros(self.numClass)
+                for sample in viterbiSequence:
+                    counter[sample] += 1
+                matrix[numpy.argmax(numpy.array(testLabel[index + startPosition]))][
+                    numpy.argmax(numpy.array(counter))] += 1
+
+            startPosition += self.batchSize
+        print()
+        print(matrix)
+        return matrix
+
+    def LoadPart(self, loadpath):
         saver = tensorflow.train.Saver(var_list=tensorflow.global_variables()[0:18])
         saver.restore(self.session, loadpath)
 

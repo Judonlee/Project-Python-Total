@@ -8,7 +8,7 @@ import numpy
 if __name__ == '__main__':
     # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-    bands = 80
+    bands = 120
     episode = 99
     for appoint in range(10):
         savepath = 'D:/ProjectData/Project-CTC-Data/CTC-SeqLabel-Class5/Bands-%d-%d/' % (bands, appoint)
