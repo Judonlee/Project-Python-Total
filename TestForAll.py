@@ -1,32 +1,36 @@
 from CTC_Project_Again.Loader.IEMOCAP_Loader import IEMOCAP_Loader_Npy
-from CTC_Project_Again.Model.HugeNetTest import BLSTM_CTC_BLSTM_CRF
 import tensorflow
-from __Base.DataClass import DataClass_TrainTest_Sequence
+from CTC_Project_Again.Model.CTC_CRF_Reuse_BLSTM_NotTrain import CTC_CRF_Reuse
 import os
-import numpy
 
 if __name__ == '__main__':
-    # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    # os.environ['CUDA_VISIBLE_DEVICES'] = '3'
 
     bands = 30
     appoint = 0
-    startPosition = 90
-    savepath = 'D:/GitHub/CTC_Project_Again/Train/Records-HugeNetwork/Bands-' + str(bands) + '-' + str(appoint) + '/'
+    trace = 99
+    netPath = 'D:/ProjectData/Project-CTC-Data/Records-CTC-Class5-LR1E-3-RMSP/Bands-%d-%d/%04d-Network' \
+              % (bands, appoint, trace)
+    savepath = 'D:/ProjectData/Project-CTC-Data/Records-CTC-CRF-Reuse/Bands-%d-%d/' % (bands, appoint)
 
-    graph = tensorflow.Graph()
-    with graph.as_default():
-        trainData, trainLabel, trainSeq, trainScription, testData, testLabel, testSeq, testScription = IEMOCAP_Loader_Npy(
-            loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper/Bands-%d-%d/' % (bands, appoint))
-        dataClass = DataClass_TrainTest_Sequence(trainData=trainData, trainLabel=trainScription,
-                                                 trainSeq=trainSeq, testData=testData,
-                                                 testLabel=testScription, testSeq=testSeq)
-        classifier = BLSTM_CTC_BLSTM_CRF(trainData=trainData, trainLabel=trainScription,
-                                         trainSeqLength=trainSeq, featureShape=bands, numClass=5,
-                                         learningRate=1e-3, batchSize=64, startFlag=False)
-        print(classifier.information)
-        classifier.Load(savepath + '%04d-Network' % startPosition)
-        # exit()
+    # os.makedirs(savepath)
 
-        for epoch in range(startPosition + 1, 100):
-            print('\rEpoch %d: Total Loss = %f' % (epoch, classifier.Train_CRF()))
-            classifier.Save(savepath=savepath + '%04d-Network' % epoch)
+    trainData, trainLabel, trainSeq, trainScription, testData, testLabel, testSeq, testScription = \
+        IEMOCAP_Loader_Npy(loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper/Bands-%d-%d/' % (bands, appoint))
+
+    for episode in range(100):
+        graph = tensorflow.Graph()
+        with graph.as_default():
+            classifier = CTC_CRF_Reuse(trainData=trainData, trainLabel=trainLabel, trainSeqLength=trainSeq,
+                                       featureShape=bands, numClass=5, batchSize=64, startFlag=False)
+            classifier.Load(loadpath=savepath + '%04d-Network' % episode)
+
+            matrix = classifier.Test_CRF(testData=testData, testLabel=testLabel, testSeq=testSeq)
+
+            file = open('D:/ProjectData/Result/%04d.csv' % episode, 'w')
+            for indexA in range(len(matrix)):
+                for indexB in range(len(matrix[indexA])):
+                    if indexB != 0: file.write(',')
+                    file.write(str(matrix[indexA][indexB]))
+                file.write('\n')
+            file.close()

@@ -4,9 +4,9 @@ from CTC_Project_Again.Model.CRF_BLSTM_Test import CRF_BLSTM
 import os
 
 if __name__ == '__main__':
-    bands = 30
+    bands = 60
 
-    for appoint in range(6, 10):
+    for appoint in range(8):
         loadpath = 'D:/ProjectData/Project-CTC-Data/Records-CRF-BLSTM-Class4-Tanh/Bands-' + str(bands) + '-' + str(
             appoint) + '/'
         savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CRF-BLSTM-Class4-Tanh/Bands-' + str(
@@ -18,7 +18,7 @@ if __name__ == '__main__':
             IEMOCAP_Loader(loadpath='D:/ProjectData/Project-CTC-Data/Npy-Normalized/Bands' + str(bands) + '/',
                            appoint=appoint)
         trainSeqLabel, testSeqLabel = IEMOCAP_SeqLabelLoader(
-            loadpath='D:/ProjectData/Records-BLSTM-CTC-Normalized/Logits-Class5/' + str(bands) + '-' + str(
+            loadpath='D:/ProjectData/Project-CTC-Data/CTC-SeqLabel-Class5/Bands-' + str(bands) + '-' + str(
                 appoint) + '/')
 
         for episode in range(100):
