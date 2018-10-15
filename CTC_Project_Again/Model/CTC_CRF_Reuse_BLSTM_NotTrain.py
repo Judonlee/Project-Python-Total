@@ -106,6 +106,11 @@ class CTC_CRF_Reuse(CTC):
         self.CRFTrain = tensorflow.train.AdamOptimizer(learning_rate=learningRate). \
             minimize(self.parameters['CRF_Loss'], var_list=tensorflow.global_variables()[18:])
 
+        self.parameters['TotalLoss'] = tensorflow.add(x=self.parameters['Cost'], y=self.parameters['CRF_Loss'],
+                                                      name='TotalLoss')
+        self.TotalTrain = tensorflow.train.AdamOptimizer(learning_rate=learningRate).minimize(
+            self.parameters['TotalLoss'])
+
     def CRF_Train(self):
         trainData, trainLabel, trainSeq = Shuffle(data=self.data, label=self.label, seqLen=self.seqLen)
 

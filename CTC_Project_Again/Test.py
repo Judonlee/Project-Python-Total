@@ -1,31 +1,30 @@
 import os
 import numpy
-from pprint import pprint
+import matplotlib.pylab as plt
 
 if __name__ == '__main__':
-    matrixList = []
-    for appoint in range(8):
-        loadpath = 'D:\\ProjectData\\Project-CTC-Data\\Records-Result-CRF-BLSTM-Class4-Tanh\\Bands-60-%d\\' % appoint
-        UATrace, WATrace = [], []
+    loadpath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CTC-CRF-Reuse-Restart-CRF/Bands-30-0/'
+    UATrace, WATrace = [], []
 
-        maxUAmatrix, maxWAmatrix = [], []
-        for filename in os.listdir(loadpath):
-            data = numpy.genfromtxt(fname=loadpath + filename, dtype=float, delimiter=',')
-            WA, UA = 0, 0
-            for index in range(len(data)):
-                WA += data[index][index]
-                UA += data[index][index] / sum(data[index])
-            WA = WA / sum(sum(data))
-            UA = UA / len(data)
-            # print(WA, UA, sum(sum(data)))
-            UATrace.append(UA)
-            WATrace.append(WA)
+    maxUAmatrix, maxWAmatrix = [], []
+    for filename in os.listdir(loadpath):
+        data = numpy.genfromtxt(fname=loadpath + filename, dtype=float, delimiter=',')
+        WA, UA = 0, 0
+        for index in range(len(data)):
+            WA += data[index][index]
+            UA += data[index][index] / sum(data[index])
+        WA = WA / sum(sum(data))
+        UA = UA / len(data)
+        # print(WA, UA, sum(sum(data)))
+        UATrace.append(UA)
+        WATrace.append(WA)
 
-            if WA == max(WATrace):
-                maxWAmatrix = data.copy()
-            if UA == max(UATrace):
-                maxUAmatrix = data.copy()
-        # print('\n')
-        print(max(WATrace), max(UATrace))
-        #pprint(maxWAmatrix)
-        #pprint(maxUAmatrix)
+        if WA == max(WATrace):
+            maxWAmatrix = data.copy()
+        if UA == max(UATrace):
+            maxUAmatrix = data.copy()
+    plt.plot(UATrace, label='UA')
+    plt.plot(WATrace, label='WA')
+    plt.legend()
+    plt.show()
+    print(max(UATrace), max(WATrace))

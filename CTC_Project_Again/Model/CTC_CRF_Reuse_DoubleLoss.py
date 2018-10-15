@@ -162,7 +162,7 @@ class CTC_CRF_Reuse(CTC):
                 batchData.append(currentData)
 
             [logits, params] = self.session.run(
-                fetches=[self.parameters['Loss'], self.parameters['CRF_TransitionParams']],
+                fetches=[self.parameters['CRF_Logits_Reshape'], self.parameters['CRF_TransitionParams']],
                 feed_dict={self.dataInput: batchData, self.seqLenInput: batchSeq})
 
             for index in range(len(logits)):
