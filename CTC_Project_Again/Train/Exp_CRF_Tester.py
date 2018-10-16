@@ -4,9 +4,9 @@ from CTC_Project_Again.Model.CRF_BLSTM_Test import CRF_BLSTM
 import os
 
 if __name__ == '__main__':
-    bands = 80
+    bands = 100
 
-    for appoint in range(6):
+    for appoint in range(4, 6):
         loadpath = 'D:/ProjectData/Project-CTC-Data/Records-CRF-BLSTM-Class4-Tanh/Bands-' + str(bands) + '-' + str(
             appoint) + '/'
         savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CRF-BLSTM-Class4-Tanh/Bands-' + str(
@@ -22,6 +22,8 @@ if __name__ == '__main__':
                 appoint) + '/')
 
         for episode in range(100):
+            if os.path.exists(savepath + '%04d.csv' % episode):
+                continue
             graph = tensorflow.Graph()
             with graph.as_default():
                 classifier = CRF_BLSTM(trainData=trainData, trainLabel=trainSeqLabel, trainSeqLength=trainSeqLabel,

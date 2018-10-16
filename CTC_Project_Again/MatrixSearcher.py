@@ -3,9 +3,12 @@ import numpy
 from pprint import pprint
 
 if __name__ == '__main__':
+    bands = 100
     matrixList = []
+    WAList, UAList = [], []
     for appoint in range(6):
-        loadpath = 'D:\\ProjectData\\Project-CTC-Data\\Records-Result-CRF-BLSTM-Class4-Tanh\\Bands-80-%d\\' % appoint
+        loadpath = 'D:\\ProjectData\\Project-CTC-Data\\Records-Result-CRF-BLSTM-Class4-Tanh\\Bands-%d-%d\\' \
+                   % (bands, appoint)
         UATrace, WATrace = [], []
 
         maxUAmatrix, maxWAmatrix = [], []
@@ -26,6 +29,19 @@ if __name__ == '__main__':
             if UA == max(UATrace):
                 maxUAmatrix = data.copy()
         # print('\n')
+        # print('\nAppoint =', appoint)
         print(max(WATrace), max(UATrace))
-        #pprint(maxWAmatrix)
-        #pprint(maxUAmatrix)
+        # print(numpy.argmax(numpy.array(WATrace)), numpy.argmax(numpy.array(UATrace)))
+        WAList.append(numpy.argmax(numpy.array(WATrace)))
+        UAList.append(numpy.argmax(numpy.array(UATrace)))
+        # pprint(maxWAmatrix)
+        # pprint(maxUAmatrix)
+
+    print('[', end='')
+    for sample in WAList:
+        print(sample, end=',')
+    print(']')
+    print('[', end='')
+    for sample in UAList:
+        print(sample, end=',')
+    print(']')

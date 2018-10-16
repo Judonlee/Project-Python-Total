@@ -1,30 +1,21 @@
 import os
-import numpy
-import matplotlib.pylab as plt
+import shutil
 
 if __name__ == '__main__':
-    loadpath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CTC-CRF-Reuse-Restart-CRF/Bands-30-0/'
-    UATrace, WATrace = [], []
+    bands = 120
+    WAepisode = [40, 35, 48, 11, 35, 32, 23, 18, 11, 23, ]
+    UAepisode = [85, 35, 27, 10, 35, 9, 74, 58, 3, 12, ]
+    for appoint in range(10):
+        loadpath = 'D:/ProjectData/Project-CTC-Data/Records-CTC-Class5-LR1E-3-RMSP/Bands-%d-%d/' % (bands, appoint)
+        savepath = 'D:/ProjectData/Project-CTC-Data/NetworkParameter-CTC-Class5/Bands-%d-%d/' % (bands, appoint)
 
-    maxUAmatrix, maxWAmatrix = [], []
-    for filename in os.listdir(loadpath):
-        data = numpy.genfromtxt(fname=loadpath + filename, dtype=float, delimiter=',')
-        WA, UA = 0, 0
-        for index in range(len(data)):
-            WA += data[index][index]
-            UA += data[index][index] / sum(data[index])
-        WA = WA / sum(sum(data))
-        UA = UA / len(data)
-        # print(WA, UA, sum(sum(data)))
-        UATrace.append(UA)
-        WATrace.append(WA)
+        if os.path.exists(savepath):
+            print('Have Already Done')
+            exit()
+        if not os.path.exists(savepath): os.makedirs(savepath)
 
-        if WA == max(WATrace):
-            maxWAmatrix = data.copy()
-        if UA == max(UATrace):
-            maxUAmatrix = data.copy()
-    plt.plot(UATrace, label='UA')
-    plt.plot(WATrace, label='WA')
-    plt.legend()
-    plt.show()
-    print(max(UATrace), max(WATrace))
+        for filename in os.listdir(loadpath):
+            if filename[0:4] == '%04d' % WAepisode[appoint]:
+                shutil.copy(loadpath + filename, savepath + 'WA' + filename[filename.find('.'):])
+            if filename[0:4] == '%04d' % UAepisode[appoint]:
+                shutil.copy(loadpath + filename, savepath + 'UA' + filename[filename.find('.'):])
