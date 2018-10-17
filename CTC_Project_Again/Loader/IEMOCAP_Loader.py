@@ -84,6 +84,12 @@ def IEMOCAP_Loader_Npy(loadpath):
     return trainData, trainLabel, trainSeq, trainScription, testData, testLabel, testSeq, testScription
 
 
+def IEMOCAP_Transcription_Loader_Npy_New(loadpath):
+    trainScription = numpy.load(file=loadpath + 'TrainTranscription.npy')
+    testScription = numpy.load(file=loadpath + 'TestTranscription.npy')
+    return trainScription, testScription
+
+
 if __name__ == '__main__':
     trainTranscription, testTranscription = IEMOCAP_TranscriptionLoader(
         loadpath='F:\\Project-CTC-Data\\Transcription-SingleNumber\\', appoint=0)
