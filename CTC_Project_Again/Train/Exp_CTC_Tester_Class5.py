@@ -8,22 +8,21 @@ import numpy
 if __name__ == '__main__':
     # os.environ['CUDA_VISIBLE_DEVICES'] = '3'
 
-    bands = 120
-    for appoint in [7]:
-        trainData, trainLabel, trainSeq, trainScription, testData, testLabel, testSeq, testScription = \
-            IEMOCAP_Loader_Npy(
-                loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper/Bands-%d-%d/' % (bands, appoint))
+    bands = 40
+    for appoint in range(10):
+        savepath = 'D:/ProjectData/Records-Result-CTC-CMU-New-Test/Bands-%d-%d/' % (bands, appoint)
+        # if os.path.exists(savepath): continue
 
-        savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CTC-LR1e-3-RMSP/Bands-%d-%d/' % (bands, appoint)
+        # if not os.path.exists(savepath):
+        #     os.makedirs(savepath + 'Decode/')
+        #     os.makedirs(savepath + 'Logits/')
+        #     os.makedirs(savepath + 'SoftMax/')
 
-        '''
-        if not os.path.exists(savepath):
-            os.makedirs(savepath + 'Decode/')
-            os.makedirs(savepath + 'Logits/')
-            os.makedirs(savepath + 'SoftMax/')
+        trainData, trainLabel, trainSeq, trainScription, testData, testLabel, testSeq, testScription = IEMOCAP_Loader_Npy(
+            loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper-Improve/Bands-%d-%d/' % (bands, appoint))
+
         # exit()
-        '''
-        for trace in range(80, 90):
+        for trace in range(100):
             if os.path.exists(savepath + 'Decode/Epoch%04d.csv' % trace): continue
             fileDecode = open(savepath + 'Decode/Epoch%04d.csv' % trace, 'w')
             fileLogits = open(savepath + 'Logits/Epoch%04d.csv' % trace, 'w')
@@ -34,7 +33,7 @@ if __name__ == '__main__':
                                        featureShape=bands, numClass=5, learningRate=5e-5, rnnLayers=1, startFlag=False,
                                        batchSize=64)
                 classifier.Load(
-                    'D:/ProjectData/Project-CTC-Data/Records-CTC-Class5-LR1E-3-RMSP/Bands-%d-%d/%04d-Network'
+                    'D:/ProjectData/Project-CTC-Data/Records-CTC-CMU-New/Bands-%d-%d/%04d-Network'
                     % (bands, appoint, trace))
                 matrixDecode, matrixLogits, matrixSoftMax = classifier.Test_AllMethods(testData=testData,
                                                                                        testLabel=testLabel,
@@ -63,3 +62,4 @@ if __name__ == '__main__':
             fileDecode.close()
             fileLogits.close()
             fileSoftMax.close()
+            # exit()

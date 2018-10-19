@@ -1,21 +1,19 @@
-import os
-import shutil
+import tensorflow as tf
+import numpy as np
 
-if __name__ == '__main__':
-    bands = 120
-    WAepisode = [40, 35, 48, 11, 35, 32, 23, 18, 11, 23, ]
-    UAepisode = [85, 35, 27, 10, 35, 9, 74, 58, 3, 12, ]
-    for appoint in range(10):
-        loadpath = 'D:/ProjectData/Project-CTC-Data/Records-CTC-Class5-LR1E-3-RMSP/Bands-%d-%d/' % (bands, appoint)
-        savepath = 'D:/ProjectData/Project-CTC-Data/NetworkParameter-CTC-Class5/Bands-%d-%d/' % (bands, appoint)
+# 定义一个矩阵a，表示需要被卷积的矩阵。
+a = np.array(np.arange(1, 1 + 20).reshape([1, 10, 2]), dtype=np.float32)
 
-        if os.path.exists(savepath):
-            print('Have Already Done')
-            exit()
-        if not os.path.exists(savepath): os.makedirs(savepath)
+# 卷积核，此处卷积核的数目为1
+kernel = np.array(np.arange(1, 1 + 2), dtype=np.float32).reshape([1, 2, 1])
 
-        for filename in os.listdir(loadpath):
-            if filename[0:4] == '%04d' % WAepisode[appoint]:
-                shutil.copy(loadpath + filename, savepath + 'WA' + filename[filename.find('.'):])
-            if filename[0:4] == '%04d' % UAepisode[appoint]:
-                shutil.copy(loadpath + filename, savepath + 'UA' + filename[filename.find('.'):])
+# 进行conv1d卷积
+conv1d = tf.nn.conv1d(a, kernel, 1, 'VALID')
+tf.layers.max_pooling1d()
+with tf.Session() as sess:
+    # 初始化
+    tf.global_variables_initializer().run()
+    # 输出卷积值
+    print(np.shape(a))
+    print(np.shape(kernel))
+    print(sess.run(conv1d))

@@ -8,16 +8,16 @@ import numpy
 if __name__ == '__main__':
     # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-    bands = 120
+    bands = 60
     episode = 99
     for appoint in range(10):
-        savepath = 'D:/ProjectData/Project-CTC-Data/CTC-SeqLabel-Class5/Bands-%d-%d/' % (bands, appoint)
-        netpath = 'D:/ProjectData/Project-CTC-Data/Records-CTC-Class5-LR1E-3-RMSP/Bands-%d-%d/' % (bands, appoint)
+        savepath = 'D:/ProjectData/Project-CTC-Data/CTC-SeqLabel-Class5-Improve/Bands-%d-%d/' % (bands, appoint)
+        netpath = 'D:/ProjectData/Project-CTC-Data/Records-CTC-CMU-New/Bands-%d-%d/' % (bands, appoint)
 
         if not os.path.exists(savepath): os.makedirs(savepath)
 
         trainData, trainLabel, trainSeq, trainScription, testData, testLabel, testSeq, testScription = \
-            IEMOCAP_Loader_Npy(loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper/Bands-%d-%d/'
+            IEMOCAP_Loader_Npy(loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper-Improve/Bands-%d-%d/'
                                         % (bands, appoint))
         dataClass = DataClass_TrainTest_Sequence(trainData=trainData, trainLabel=trainScription,
                                                  trainSeq=trainSeq, testData=testData,

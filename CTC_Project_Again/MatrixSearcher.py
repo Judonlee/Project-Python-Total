@@ -3,17 +3,18 @@ import numpy
 from pprint import pprint
 
 if __name__ == '__main__':
-    bands = 120
+    bands = 60
     matrixList = []
     WAList, UAList = [], []
-    for appoint in range(8):
-        loadpath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CRF-BLSTM-Class4-Tanh/Bands-%d-%d/' \
+    for appoint in range(10):
+        loadpath = 'D:/ProjectData/Records-Result-CTC-CMU-New-Test/Bands-%d-%d/SoftMax/' \
                    % (bands, appoint)
         UATrace, WATrace = [], []
 
         maxUAmatrix, maxWAmatrix = [], []
         for filename in os.listdir(loadpath):
             data = numpy.genfromtxt(fname=loadpath + filename, dtype=float, delimiter=',')
+            # print(data)
             WA, UA = 0, 0
             for index in range(len(data)):
                 WA += data[index][index]

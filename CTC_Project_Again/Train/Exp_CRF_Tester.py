@@ -6,7 +6,7 @@ import os
 if __name__ == '__main__':
     bands = 120
 
-    for appoint in range(2, 8):
+    for appoint in range(8, 10):
         loadpath = 'D:/ProjectData/Project-CTC-Data/Records-CRF-BLSTM-Class4-Tanh/Bands-' + str(bands) + '-' + str(
             appoint) + '/'
         savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CRF-BLSTM-Class4-Tanh/Bands-' + str(
