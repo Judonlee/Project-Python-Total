@@ -10,19 +10,19 @@ if __name__ == '__main__':
 
     for bands in [30, 40, 60, 80, 100, 120]:
         for appoint in range(10):
-            savepath = 'Records-CMU/Bands-' + str(bands) + '-' + str(appoint) + '/'
+            savepath = 'Records-CMU-Improve/Bands-' + str(bands) + '-' + str(appoint) + '/'
             if os.path.exists(savepath): continue
             os.makedirs(savepath)
 
             graph = tensorflow.Graph()
             with graph.as_default():
                 trainData, trainLabel, trainSeq, trainScription, testData, testLabel, testSeq, testScription = IEMOCAP_Loader_Npy(
-                    loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper/Bands-%d-%d/' % (bands, appoint))
+                    loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper-Improve/Bands-%d-%d/' % (bands, appoint))
                 dataClass = DataClass_TrainTest_Sequence(trainData=trainData, trainLabel=trainScription,
                                                          trainSeq=trainSeq, testData=testData,
                                                          testLabel=testScription, testSeq=testSeq)
                 trainScription, testScription = IEMOCAP_Transcription_Loader_Npy_New(
-                    loadpath='D:/ProjectData/Project-CTC-Data/IEMOCAP-Transcription-CMU-Npy/Appoint-%d/' % appoint)
+                    loadpath='D:/ProjectData/IEMOCAP/IEMOCAP-Transcription-CMU-Npy-Improve/Appoint-%d/' % appoint)
                 classifier = CTC_BLSTM(trainData=trainData, trainLabel=trainScription, trainSeqLength=trainSeq,
                                        featureShape=bands, numClass=5, learningRate=1e-3, batchSize=64)
                 print(classifier.information)

@@ -12,12 +12,12 @@ if __name__ == '__main__':
     #             print(numpy.shape(trainData[index]), trainSeq[index], trainScription[index])
     #         exit()
     loadpath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Transcription-CMU/'
-    savepath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Transcription-CMU-Npy/'
+    savepath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Transcription-CMU-Npy-Improve/'
 
     for appoint in range(10):
         os.makedirs(savepath + 'Appoint-' + str(appoint))
         trainScription, testScription = [], []
-        for indexA in os.listdir(loadpath):
+        for indexA in ['improve']:
             for indexB in os.listdir(os.path.join(loadpath, indexA)):
                 for indexC in range(1, 6):
                     for indexD in os.listdir(os.path.join(loadpath, indexA, indexB, 'Session' + str(indexC))):

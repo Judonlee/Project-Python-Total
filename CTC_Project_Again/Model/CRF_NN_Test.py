@@ -36,7 +36,7 @@ class CRF_Test(NeuralNetwork_Base):
         self.parameters['Data_Reshape'] = tensorflow.reshape(tensor=self.dataInput, shape=[-1, self.featureShape],
                                                              name='Data_Reshape')
         self.parameters['Layer1st_FC'] = tensorflow.layers.dense(inputs=self.parameters['Data_Reshape'],
-                                                                 units=self.numClass, activation=None,
+                                                                 units=self.numClass, activation=tensorflow.nn.tanh,
                                                                  name='Layer1st_FC')
         self.parameters['Logits'] = tensorflow.reshape(tensor=self.parameters['Layer1st_FC'],
                                                        shape=[self.parameters['BatchSize'], self.parameters['TimeStep'],
@@ -58,7 +58,7 @@ class CRF_Test(NeuralNetwork_Base):
 
             maxLen = max(trainSeq[startPosition:startPosition + self.batchSize])
             for index in range(startPosition, min(startPosition + self.batchSize, len(trainData))):
-                print(numpy.shape(trainData[index]), numpy.shape(trainLabel[index]))
+                # print(numpy.shape(trainData[index]), numpy.shape(trainLabel[index]))
                 currentData = numpy.concatenate(
                     (trainData[index], numpy.zeros((maxLen - len(trainData[index]), len(trainData[index][0])))), axis=0)
                 batchData.append(currentData)
@@ -71,8 +71,7 @@ class CRF_Test(NeuralNetwork_Base):
                                        feed_dict={self.dataInput: batchData, self.labelInput: batchLabel,
                                                   self.seqLenInput: batchSeq})
             totalLoss += loss
-            output = '\rBatch : %d/%d \t Loss : %f' % (startPosition, len(trainData), loss)
-            print(output, end='')
+            print('\rBatch : %d/%d \t Loss : %f' % (startPosition, len(trainData), loss), end='')
             startPosition += self.batchSize
         return totalLoss
 

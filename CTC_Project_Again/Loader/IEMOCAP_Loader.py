@@ -4,7 +4,7 @@ import numpy
 
 def IEMOCAP_Loader(loadpath, appoint):
     trainData, trainLabel, trainSeq, testData, testLabel, testSeq = [], [], [], [], [], []
-    for indexA in ['improve', 'script']:
+    for indexA in ['improve']:
         for indexB in ['Female', 'Male']:
             print('Loading : ', indexA, indexB)
             for indexC in range(1, 6):
@@ -27,7 +27,7 @@ def IEMOCAP_Loader(loadpath, appoint):
 
 def IEMOCAP_TranscriptionLoader(loadpath, appoint):
     trainTranscription, testTranscription = [], []
-    for indexA in os.listdir(loadpath):
+    for indexA in ['improve']:
         for indexB in os.listdir(loadpath + indexA):
             for indexC in range(1, 6):
                 currentTranscription = numpy.load(

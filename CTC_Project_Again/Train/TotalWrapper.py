@@ -4,9 +4,9 @@ import os
 import numpy
 
 if __name__ == '__main__':
-    for bands in [60, 80, 100, 120]:
+    for bands in [30, 40, 60, 80, 100, 120]:
         for appoint in range(10):
-            savepath = 'D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper/Bands-' + str(
+            savepath = 'D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper-Improve/Bands-' + str(
                 bands) + '-' + str(appoint) + '/'
             if os.path.exists(savepath): continue
             os.makedirs(savepath)

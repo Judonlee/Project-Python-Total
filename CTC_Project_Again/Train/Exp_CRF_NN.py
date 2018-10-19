@@ -2,7 +2,6 @@ import tensorflow
 from CTC_Project_Again.Loader.IEMOCAP_Loader import IEMOCAP_Loader, IEMOCAP_SeqLabelLoader
 from __Base.DataClass import DataClass_TrainTest_Sequence
 from CTC_Project_Again.Model.CRF_NN_Test import CRF_Test
-import numpy
 import os
 
 if __name__ == '__main__':
@@ -32,7 +31,6 @@ if __name__ == '__main__':
                 for episode in range(100):
                     print('\nEpoch', episode)
                     print('\rTotalLoss : %f' % classifier.Train())
-                    # classifier.Test_Decode(testData=trainData, testLabel=trainSeqLabel, testSeq=trainSeq)
                     classifier.Save(savepath=savepath + '%04d-Network' % episode)
 
             # exit()
