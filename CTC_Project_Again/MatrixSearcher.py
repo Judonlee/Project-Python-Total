@@ -3,11 +3,11 @@ import numpy
 from pprint import pprint
 
 if __name__ == '__main__':
-    bands = 60
+    bands = 30
     matrixList = []
     WAList, UAList = [], []
     for appoint in range(10):
-        loadpath = 'D:/ProjectData/Records-Result-CTC-CMU-New-Test/Bands-%d-%d/SoftMax/' \
+        loadpath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CRF-BLSTM-Improve/Bands-%d-%d/' \
                    % (bands, appoint)
         UATrace, WATrace = [], []
 

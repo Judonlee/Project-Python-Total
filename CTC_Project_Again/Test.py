@@ -1,19 +1,22 @@
-import tensorflow as tf
-import numpy as np
+import os
 
-# 定义一个矩阵a，表示需要被卷积的矩阵。
-a = np.array(np.arange(1, 1 + 20).reshape([1, 10, 2]), dtype=np.float32)
+if __name__ == '__main__':
+    loadpath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Transcription-CMU/'
+    counter = 0
 
-# 卷积核，此处卷积核的数目为1
-kernel = np.array(np.arange(1, 1 + 2), dtype=np.float32).reshape([1, 2, 1])
-
-# 进行conv1d卷积
-conv1d = tf.nn.conv1d(a, kernel, 1, 'VALID')
-tf.layers.max_pooling1d()
-with tf.Session() as sess:
-    # 初始化
-    tf.global_variables_initializer().run()
-    # 输出卷积值
-    print(np.shape(a))
-    print(np.shape(kernel))
-    print(sess.run(conv1d))
+    dict = {}
+    for indexA in ['improve']:
+        for indexB in os.listdir(os.path.join(loadpath, indexA)):
+            for indexC in os.listdir(os.path.join(loadpath, indexA, indexB)):
+                for indexD in os.listdir(os.path.join(loadpath, indexA, indexB, indexC)):
+                    for indexE in os.listdir(os.path.join(loadpath, indexA, indexB, indexC, indexD)):
+                        # print(indexA, indexB, indexC, indexD, indexE)
+                        if indexD == 'exc': indexD = 'hap'
+                        key = '%s-%s-%s' % (indexB, indexC, indexD)
+                        if key in dict:
+                            dict[key] += 1
+                        else:
+                            dict[key] = 1
+    # print(counter)
+    for sample in dict.keys():
+        print(sample, dict[sample])

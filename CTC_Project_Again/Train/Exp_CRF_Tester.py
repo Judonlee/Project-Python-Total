@@ -1,24 +1,24 @@
 import tensorflow
-from CTC_Project_Again.Loader.IEMOCAP_Loader import IEMOCAP_Loader, IEMOCAP_SeqLabelLoader
+from CTC_Project_Again.Loader.IEMOCAP_Loader import IEMOCAP_Loader_Npy, IEMOCAP_SeqLabelLoader
 from CTC_Project_Again.Model.CRF_BLSTM_Test import CRF_BLSTM
 import os
 
 if __name__ == '__main__':
-    bands = 120
+    bands = 30
 
-    for appoint in range(8, 10):
-        loadpath = 'D:/ProjectData/Project-CTC-Data/Records-CRF-BLSTM-Class4-Tanh/Bands-' + str(bands) + '-' + str(
+    for appoint in range(10):
+        loadpath = 'D:/ProjectData/Project-CTC-Data/Records-CRF-BLSTM-Improve/Bands-' + str(bands) + '-' + str(
             appoint) + '/'
-        savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CRF-BLSTM-Class4-Tanh/Bands-' + str(
-            bands) + '-' + str(appoint) + '/'
+        savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CRF-BLSTM-Improve/Bands-' + str(bands) + '-' + str(
+            appoint) + '/'
         if os.path.exists(savepath): continue
         os.makedirs(savepath)
 
-        trainData, trainLabel, trainSeq, testData, testLabel, testSeq = \
-            IEMOCAP_Loader(loadpath='D:/ProjectData/Project-CTC-Data/Npy-Normalized/Bands' + str(bands) + '/',
-                           appoint=appoint)
+        trainData, trainLabel, trainSeq, trainScription, testData, testLabel, testSeq, testScription = \
+            IEMOCAP_Loader_Npy(
+                loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper-Improve/Bands-%d-%d/' % (bands, appoint))
         trainSeqLabel, testSeqLabel = IEMOCAP_SeqLabelLoader(
-            loadpath='D:/ProjectData/Project-CTC-Data/CTC-SeqLabel-Class5/Bands-' + str(bands) + '-' + str(
+            loadpath='D:/ProjectData/Project-CTC-Data/CTC-SeqLabel-Class5-Improve/Bands-' + str(bands) + '-' + str(
                 appoint) + '/')
 
         for episode in range(100):
@@ -42,3 +42,4 @@ if __name__ == '__main__':
                         file.write(str(matrix[indexX][indexY]))
                     file.write('\n')
                 file.close()
+        # exit()
