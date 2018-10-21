@@ -18,4 +18,16 @@ if __name__ == '__main__':
     #         plt.savefig(savepath + indexA + '\\' + indexB + '.png')
     #         plt.clf()
     #         plt.close()
-    print([1, 2, 3, 4, 5][0:5:2])
+    loadpath = 'E:/LIDC/LIDC-NonNodule-Wavelet/db4/Csv/'
+    for indexA in os.listdir(loadpath):
+        for indexB in os.listdir(os.path.join(loadpath, indexA)):
+            for indexC in os.listdir(os.path.join(loadpath, indexA, indexB)):
+                print(indexA, indexB, indexC)
+                os.renames(old=os.path.join(loadpath, indexA, indexB, indexC),
+                           new=os.path.join(loadpath, indexA, indexB, indexC[0:indexC.find('.')] + '.csv'))
+                #exit()
+                # for indexD in os.listdir(os.path.join(loadpath, indexA, indexB, indexC)):
+                #     print(indexA, indexB, indexC, indexD)
+                #     os.renames(old=os.path.join(loadpath, indexA, indexB, indexC, indexD),
+                #                new=os.path.join(loadpath, indexA, indexB, indexC, indexD[0:indexD.find('.')] + '.csv'))
+                #     #exit()
