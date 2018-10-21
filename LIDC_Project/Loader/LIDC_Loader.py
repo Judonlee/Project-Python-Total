@@ -138,12 +138,12 @@ if __name__ == '__main__':
     #     numpy.save(savepath + 'TestData.npy', testData)
     #     numpy.save(savepath + 'TestLabel.npy', testLabel)
     for appoint in range(10):
-        savepath = 'E:/LIDC/Npy/Wavelet-db4/Appoint-%d/' % appoint
+        savepath = 'E:/LIDC/Npy/Wavelet-db2/Appoint-%d/' % appoint
         os.makedirs(savepath)
         for part in ['cA.csv', 'cD.csv', 'cH.csv', 'cV.csv']:
             trainData, trainLabel, testData, testLabel = LIDC_Loader_Wavelet(
-                nodulePath='E:/LIDC/LIDC-Nodule-Wavelet/db4/Csv/',
-                nonNodulePath='E:/LIDC/LIDC-NonNodule-Wavelet/db4/Csv/',
+                nodulePath='E:/LIDC/LIDC-Nodule-Wavelet/db2/Csv/',
+                nonNodulePath='E:/LIDC/LIDC-NonNodule-Wavelet/db2/Csv/',
                 part=part, appoint=appoint)
             numpy.save(savepath + part[0:part.find('.')] + '-Train.npy', trainData)
             numpy.save(savepath + part[0:part.find('.')] + '-Test.npy', testData)

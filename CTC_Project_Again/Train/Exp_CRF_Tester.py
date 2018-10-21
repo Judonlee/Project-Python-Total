@@ -4,9 +4,9 @@ from CTC_Project_Again.Model.CRF_BLSTM_Test import CRF_BLSTM
 import os
 
 if __name__ == '__main__':
-    bands = 40
+    bands = 60
 
-    for appoint in range(10):
+    for appoint in range(6):
         loadpath = 'D:/ProjectData/Project-CTC-Data/Records-CRF-BLSTM-Improve/Bands-' + str(bands) + '-' + str(
             appoint) + '/'
         savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CRF-BLSTM-Improve/Bands-' + str(bands) + '-' + str(
