@@ -4,12 +4,13 @@ from CTC_Project_Again.Model.CRF_BLSTM_Test import CRF_BLSTM
 import os
 
 if __name__ == '__main__':
-    bands = 60
+    bands = 30
 
-    for appoint in range(6):
-        loadpath = 'D:/ProjectData/Project-CTC-Data/Records-CRF-BLSTM-Improve/Bands-' + str(bands) + '-' + str(
+    for appoint in range(4):
+        loadpath = 'D:/ProjectData/Project-CTC-Data/Records-CRF-BLSTM-Improve-Choosed-WA/Bands-' + str(
+            bands) + '-' + str(
             appoint) + '/'
-        savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CRF-BLSTM-Improve/Bands-' + str(bands) + '-' + str(
+        savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CRF-Choosed-WA/Bands-' + str(bands) + '-' + str(
             appoint) + '/'
         if os.path.exists(savepath): continue
         os.makedirs(savepath)
@@ -18,8 +19,8 @@ if __name__ == '__main__':
             IEMOCAP_Loader_Npy(
                 loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper-Improve/Bands-%d-%d/' % (bands, appoint))
         trainSeqLabel, testSeqLabel = IEMOCAP_SeqLabelLoader(
-            loadpath='D:/ProjectData/Project-CTC-Data/CTC-SeqLabel-Class5-Improve/Bands-' + str(bands) + '-' + str(
-                appoint) + '/')
+            loadpath='D:/ProjectData/Project-CTC-Data/CTC-SeqLabel-Class5-Improve-Choosed-WA/Bands-' + str(
+                bands) + '-' + str(appoint) + '/')
 
         for episode in range(100):
             if os.path.exists(savepath + '%04d.csv' % episode):

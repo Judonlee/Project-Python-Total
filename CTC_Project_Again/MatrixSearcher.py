@@ -3,14 +3,13 @@ import numpy
 from pprint import pprint
 
 if __name__ == '__main__':
-    bands = 120
-    matrixList = []
+    bands = 30
     WAList, UAList = [], []
-    for appoint in range(10):
-        loadpath = 'D:/ProjectData/Records-Result-CTC-CMU-New-Test/Bands-%d-%d/SoftMax/' \
-                   % (bands, appoint)
+    for appoint in range(1):
+        loadpath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CRF-Choosed-WA/Bands-%d-%d/' % (bands, appoint)
         UATrace, WATrace = [], []
 
+        matrixList = []
         maxUAmatrix, maxWAmatrix = [], []
         for filename in os.listdir(loadpath):
             data = numpy.genfromtxt(fname=loadpath + filename, dtype=float, delimiter=',')
@@ -29,14 +28,15 @@ if __name__ == '__main__':
                 maxWAmatrix = data.copy()
             if UA == max(UATrace):
                 maxUAmatrix = data.copy()
+            matrixList.append(data)
         # print('\n')
         # print('\nAppoint =', appoint)
         print(max(WATrace), max(UATrace))
         # print(numpy.argmax(numpy.array(WATrace)), numpy.argmax(numpy.array(UATrace)))
         WAList.append(numpy.argmax(numpy.array(WATrace)))
         UAList.append(numpy.argmax(numpy.array(UATrace)))
-        # pprint(maxWAmatrix)
-        # pprint(maxUAmatrix)
+        pprint(matrixList[numpy.argmax(numpy.array(WATrace))])
+        pprint(matrixList[numpy.argmax(numpy.array(UATrace))])
 
     print('[', end='')
     for sample in WAList:
