@@ -5,7 +5,7 @@ from pprint import pprint
 if __name__ == '__main__':
     bands = 30
     WAList, UAList = [], []
-    for appoint in range(1):
+    for appoint in range(8):
         loadpath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CRF-Choosed-WA/Bands-%d-%d/' % (bands, appoint)
         UATrace, WATrace = [], []
 
@@ -35,8 +35,8 @@ if __name__ == '__main__':
         # print(numpy.argmax(numpy.array(WATrace)), numpy.argmax(numpy.array(UATrace)))
         WAList.append(numpy.argmax(numpy.array(WATrace)))
         UAList.append(numpy.argmax(numpy.array(UATrace)))
-        pprint(matrixList[numpy.argmax(numpy.array(WATrace))])
-        pprint(matrixList[numpy.argmax(numpy.array(UATrace))])
+        # pprint(matrixList[numpy.argmax(numpy.array(WATrace))])
+        # pprint(matrixList[numpy.argmax(numpy.array(UATrace))])
 
     print('[', end='')
     for sample in WAList:

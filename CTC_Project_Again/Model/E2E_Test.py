@@ -36,6 +36,8 @@ class E2E_FinalPooling(NeuralNetwork_Base):
             name='Layer1st_MaxPooling')
         self.parameters['Layer1st_DropOut'] = tensorflow.nn.dropout(x=self.parameters['Layer1st_MaxPooling'],
                                                                     keep_prob=self.dropOutRate, name='Layer1st_DropOut')
+        self.parameters['Layer1st_Result'] = tensorflow.nn.tanh(self.parameters['Layer1st_DropOut'],
+                                                                name='Layer1st_Result')
 
         self.parameters['Layer2nd_Conv'] = tensorflow.layers.conv1d(inputs=self.parameters['Layer1st_DropOut'],
                                                                     filters=6, kernel_size=128, padding='SAME',
@@ -44,6 +46,8 @@ class E2E_FinalPooling(NeuralNetwork_Base):
             inputs=self.parameters['Layer2nd_Conv'], pool_size=8, strides=8, padding='SAME', name='Layer2nd_MaxPooling')
         self.parameters['Layer2nd_DropOut'] = tensorflow.nn.dropout(x=self.parameters['Layer2nd_MaxPooling'],
                                                                     keep_prob=self.dropOutRate, name='Layer2nd_DropOut')
+        self.parameters['Layer2nd_Result'] = tensorflow.nn.tanh(self.parameters['Layer2nd_DropOut'],
+                                                                name='Layer2nd_Result')
 
         self.parameters['Layer3rd_Conv'] = tensorflow.layers.conv1d(inputs=self.parameters['Layer2nd_DropOut'],
                                                                     filters=6, kernel_size=256, padding='SAME',
@@ -52,7 +56,8 @@ class E2E_FinalPooling(NeuralNetwork_Base):
             inputs=self.parameters['Layer3rd_Conv'], pool_size=8, strides=8, padding='SAME', name='Layer3rd_MaxPooling')
         self.parameters['Layer3rd_DropOut'] = tensorflow.nn.dropout(x=self.parameters['Layer3rd_MaxPooling'],
                                                                     keep_prob=self.dropOutRate, name='Layer3rd_DropOut')
-
+        self.parameters['Layer3rd_Result'] = tensorflow.nn.tanh(self.parameters['Layer3rd_DropOut'],
+                                                                name='Layer3rd_Result')
         ############################################################################################
         # BLSTM Part
         ############################################################################################
@@ -104,6 +109,37 @@ class E2E_FinalPooling(NeuralNetwork_Base):
             totalLoss += loss
             startPosition += self.batchSize
         return totalLoss
+
+    def Test(self, testData, testLabel, testSeq):
+        startPosition = 0
+        totalPredict = []
+        while startPosition < len(testData):
+            batchSeq = testSeq[startPosition:startPosition + self.batchSize]
+            batchData = []
+
+            dataShape = 0
+            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
+                if len(testData[index]) > dataShape: dataShape = len(testData[index])
+            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
+                currentData = numpy.concatenate(
+                    (testData[index], numpy.zeros(dataShape - len(testData[index]))), axis=0)
+                batchData.append(currentData)
+            batchData = numpy.array(batchData)
+            batchData = batchData[:, :, numpy.newaxis]
+            # print(numpy.shape(batchData))
+
+            predict = self.session.run(fetches=self.parameters['Layer5th_Logits'],
+                                       feed_dict={self.dataInput: batchData, self.seqLenInput: batchSeq,
+                                                  self.dropOutRate: 0})
+            totalPredict.extend(predict)
+            print('\rBatch %d/%d' % (startPosition, len(testData)), end='')
+            startPosition += self.batchSize
+        # print(numpy.shape(testLabel), numpy.shape(totalPredict))
+        print()
+        matrix = numpy.zeros((self.numClass, self.numClass))
+        for index in range(len(totalPredict)):
+            matrix[numpy.argmax(numpy.array(testLabel[index]))][numpy.argmax(numpy.array(totalPredict[index]))] += 1
+        print(matrix)
 
 
 if __name__ == '__main__':

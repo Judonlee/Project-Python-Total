@@ -6,11 +6,11 @@ import os
 if __name__ == '__main__':
     bands = 30
 
-    for appoint in range(4):
-        loadpath = 'D:/ProjectData/Project-CTC-Data/Records-CRF-BLSTM-Improve-Choosed-WA/Bands-' + str(
+    for appoint in range(8):
+        loadpath = 'D:/ProjectData/Project-CTC-Data/Records-CRF-BLSTM-Improve-Choosed-UA/Bands-' + str(
             bands) + '-' + str(
             appoint) + '/'
-        savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CRF-Choosed-WA/Bands-' + str(bands) + '-' + str(
+        savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CRF-Choosed-UA/Bands-' + str(bands) + '-' + str(
             appoint) + '/'
         if os.path.exists(savepath): continue
         os.makedirs(savepath)

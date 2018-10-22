@@ -1,5 +1,7 @@
 from LIDC_Project.Loader.LIDC_Loader import LIDC_Loader_Npy
 from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.naive_bayes import GaussianNB
 import numpy
 import os
 from sklearn.decomposition import PCA
@@ -9,7 +11,7 @@ from sklearn.preprocessing import scale
 if __name__ == '__main__':
     for appoint in range(10):
         part = ['cA', 'cD', 'cH', 'cV']
-        # part = ['cV']
+        #part = ['cV']
         conf = 'db4'
         trainData, testData = [], []
         trainLabel = numpy.load('E:/LIDC/Npy/Wavelet-' + conf + '/Appoint-%d/TrainLabel.npy' % appoint)
@@ -48,7 +50,7 @@ if __name__ == '__main__':
         totalData = scale(totalData)
         trainData = totalData[0:len(trainData)]
         testData = totalData[len(trainData):]
-        clf = SVC()
+        clf = GaussianNB()
         clf.fit(trainData, trainLabel)
         result = clf.predict(testData)
 
