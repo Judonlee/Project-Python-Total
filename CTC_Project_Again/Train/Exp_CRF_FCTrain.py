@@ -8,8 +8,9 @@ if __name__ == '__main__':
 
     for bands in [30, 40, 60, 80, 100, 120]:
         for appoint in range(10):
-            netPath = 'D:/ProjectData/Project-CTC-Data/NetworkParameter-CTC-Class5/Bands-%d-%d/WA' % (bands, appoint)
-            savepath = 'Records-BLSTM-CTC-CRF/Bands-%d-%d/' % (bands, appoint)
+            netPath = 'D:/ProjectData/Project-CTC-Data/Records-CTC-CMU-New-Choosed/Bands-%d-%d/WA' % (
+            bands, appoint)
+            savepath = 'Records-BLSTM-CTC-CRF-Improve-UA/Bands-%d-%d/' % (bands, appoint)
 
             if os.path.exists(savepath): continue
             os.makedirs(savepath)
@@ -18,7 +19,7 @@ if __name__ == '__main__':
             with graph.as_default():
                 trainData, trainLabel, trainSeq, trainScription, testData, testLabel, testSeq, testScription = \
                     IEMOCAP_Loader_Npy(
-                        loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper/Bands-%d-%d/' % (bands, appoint))
+                        loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper-Improve/Bands-%d-%d/' % (bands, appoint))
 
                 classifier = CTC_CRF_Reuse(trainData=trainData, trainLabel=trainScription, trainSeqLength=trainSeq,
                                            featureShape=bands, numClass=5, batchSize=64, startFlag=True)

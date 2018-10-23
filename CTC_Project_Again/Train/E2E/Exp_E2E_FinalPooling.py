@@ -7,7 +7,7 @@ import matplotlib.pylab as plt
 
 if __name__ == '__main__':
     for appoint in range(10):
-        # loadpath = 'D:/ProjectData/IEMOCAP/OriginVoice-Npy/Appoint-%d/' % appoint
+        loadpath = 'D:/ProjectData/IEMOCAP/OriginVoice-Npy/Appoint-%d/' % appoint
         # savepath = 'Records-E2E-Origin/Appoint-%d/' % appoint
         # os.makedirs(savepath)
 
