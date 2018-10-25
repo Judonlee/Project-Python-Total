@@ -4,9 +4,9 @@ from CTC_Project_Again.Model.CTC_CRF_Reuse_BLSTM_NotTrain import CTC_CRF_Reuse
 import os
 
 if __name__ == '__main__':
-    bands = 30
+    bands = 60
 
-    for appoint in range(8, 10):
+    for appoint in range(10):
         loadpath = 'D:/ProjectData/Records-BLSTM-CTC-CRF-Improve-WA/Bands-%d-%d/' % (bands, appoint)
         savepath = 'D:/ProjectData/Records-Result-BLSTM-CTC-CRF-Improve-WA/Bands-%d-%d/' % (bands, appoint)
         if os.path.exists(savepath): continue
@@ -16,7 +16,7 @@ if __name__ == '__main__':
             IEMOCAP_Loader_Npy(
                 loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper-Improve/Bands-%d-%d/' % (bands, appoint))
         trainSeqLabel, testSeqLabel = IEMOCAP_SeqLabelLoader(
-            loadpath='D:/ProjectData/Project-CTC-Data/CTC-SeqLabel-Class5-Improve-Choosed-UA/Bands-' + str(
+            loadpath='D:/ProjectData/Project-CTC-Data/CTC-SeqLabel-Class5-Improve-Choosed-WA/Bands-' + str(
                 bands) + '-' + str(appoint) + '/')
 
         for episode in range(100):

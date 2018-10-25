@@ -6,10 +6,10 @@ import os
 if __name__ == '__main__':
     bands = 40
 
-    for appoint in range(6):
-        loadpath = 'D:/ProjectData/Project-CTC-Data/Records-CRF-BLSTM-Improve-Choosed-WA/Bands-' + str(
+    for appoint in range(10):
+        loadpath = 'D:/ProjectData/Project-CTC-Data/Records-CRF-BLSTM-Improve-Choosed-UA/Bands-' + str(
             bands) + '-' + str(appoint) + '/'
-        savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CRF-Choosed-WA/Bands-' + str(bands) + '-' + str(
+        savepath = 'D:/ProjectData/Project-CTC-Data/Records-Result-CRF-Choosed-UA/Bands-' + str(bands) + '-' + str(
             appoint) + '/'
         if os.path.exists(savepath): continue
         os.makedirs(savepath)
@@ -18,7 +18,7 @@ if __name__ == '__main__':
             IEMOCAP_Loader_Npy(
                 loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper-Improve/Bands-%d-%d/' % (bands, appoint))
         trainSeqLabel, testSeqLabel = IEMOCAP_SeqLabelLoader(
-            loadpath='D:/ProjectData/Project-CTC-Data/CTC-SeqLabel-Class5-Improve-Choosed-WA/Bands-' + str(
+            loadpath='D:/ProjectData/Project-CTC-Data/CTC-SeqLabel-Class5-Improve-Choosed-UA/Bands-' + str(
                 bands) + '-' + str(appoint) + '/')
 
         for episode in range(100):
