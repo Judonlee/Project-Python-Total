@@ -1,6 +1,7 @@
 import tensorflow
 from CTC_Project_Again.Model.CTC import CTC
 import tensorflow.contrib.rnn as rnn
+import numpy
 
 
 class CTC_BLSTM(CTC):
@@ -69,3 +70,23 @@ class CTC_BLSTM(CTC):
         self.decode, self.logProbability = tensorflow.nn.ctc_beam_search_decoder(
             inputs=self.parameters['Logits_TimeMajor'], sequence_length=self.seqLenInput, merge_repeated=False)
         self.decodeDense = tensorflow.sparse_tensor_to_dense(sp_input=self.decode[0])
+
+    def Visualization(self, testData, testSeq):
+        startPosition = 0
+        totalLogits = []
+        while startPosition < len(testData):
+            print('\rTesting %d/%d' % (startPosition, len(testSeq)), end='')
+            batchData = []
+            batachSeq = testSeq[startPosition:startPosition + self.batchSize]
+
+            maxLen = max(testSeq[startPosition:startPosition + self.batchSize])
+            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
+                currentData = numpy.concatenate(
+                    (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))), axis=0)
+                batchData.append(currentData)
+
+            result = self.session.run(fetches=self.parameters['RNN_Concat'],
+                                      feed_dict={self.dataInput: batchData, self.seqLenInput: batachSeq})
+            totalLogits.extend(result)
+            startPosition += self.batchSize
+        return totalLogits

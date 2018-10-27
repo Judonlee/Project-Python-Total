@@ -2,6 +2,7 @@ from LIDC_Project.Loader.LIDC_Loader import LIDC_Loader_Npy
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import AdaBoostClassifier
 import numpy
 import os
 from sklearn.decomposition import PCA
@@ -15,7 +16,7 @@ if __name__ == '__main__':
         #     os.makedirs(savepath)
 
         trainData, trainLabel, testData, testLabel = LIDC_Loader_Npy(
-            loadpath='E:/LIDC/Npy/LBP_P=24_R=3/Appoint-%d/' % appoint)
+            loadpath='E:/LIDC/Npy/OriginCsv/Appoint-%d/' % appoint)
 
         totalNumber = numpy.sum(testLabel, axis=0)[0]
 
@@ -38,7 +39,7 @@ if __name__ == '__main__':
         testData = totalData[len(trainData):]
         # print(trainData[0:5])
 
-        clf = GaussianNB()
+        clf = AdaBoostClassifier()
         clf.fit(trainData, trainLabel)
         # joblib.dump(clf, savepath + 'Parameter.m')
         result = clf.predict(testData)

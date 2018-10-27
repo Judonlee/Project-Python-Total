@@ -3,10 +3,10 @@ import numpy
 from pprint import pprint
 
 if __name__ == '__main__':
-    bands = 80
+    bands = 120
     WAList, UAList = [], []
-    for appoint in range(8):
-        loadpath = 'D:/ProjectData/Unknown/Records-Result-BLSTM-CTC-CRF-Improve-WA/Bands-%d-%d/' % (
+    for appoint in range(10):
+        loadpath = 'D:/ProjectData/Records-Result-BLSTM-CTC-CRF-Improve-UA/Bands-%d-%d/' % (
             bands, appoint)
         UATrace, WATrace = [], []
 
