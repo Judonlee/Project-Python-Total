@@ -6,10 +6,10 @@ import os
 
 if __name__ == '__main__':
     # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-
-    for bands in [30, 40, 60, 80, 100, 120]:
-        for appoint in range(10):
-            savepath = 'Records-CRF-BLSTM-Improve/Bands-' + str(bands) + '-' + str(appoint) + '/'
+    part = 'WA'
+    for bands in [80]:
+        for appoint in [7]:
+            savepath = 'Records-CRF-BLSTM-Improve-Choosed-' + part + '/Bands-' + str(bands) + '-' + str(appoint) + '/'
 
             if os.path.exists(savepath): continue
             os.makedirs(savepath)
@@ -18,7 +18,8 @@ if __name__ == '__main__':
                 IEMOCAP_Loader_Npy(
                     loadpath='D:/ProjectData/Project-CTC-Data/Npy-TotalWrapper-Improve/Bands-%d-%d/' % (bands, appoint))
             trainSeqLabel, testSeqLabel = IEMOCAP_SeqLabelLoader(
-                loadpath='D:/ProjectData/Project-CTC-Data/CTC-SeqLabel-Class5-Improve/Bands-%d-%d/' % (bands, appoint))
+                loadpath='D:/ProjectData/Project-CTC-Data/CTC-SeqLabel-Class5-Improve-Choosed-' + part + '/Bands-%d-%d/' % (
+                    bands, appoint))
 
             dataClass = DataClass_TrainTest_Sequence(trainData=trainData, trainLabel=trainSeqLabel, trainSeq=trainSeq,
                                                      testData=testData, testLabel=testSeqLabel, testSeq=testSeq)
