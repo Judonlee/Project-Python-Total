@@ -38,19 +38,22 @@ def OpenSmileCall_Single(loadpath, confPath, savepath):
 
 
 if __name__ == '__main__':
-    loadpath = 'D:\\ProjectData\\IEMOCAP\\IEMOCAP-Voices\\'
+    loadpath = 'D:\\ProjectData\\IEMOCAP\\IEMOCAP-Voices-Choosed\\'
 
-    confList = ['avec2011', 'avec2013', 'ComParE', 'emobase', 'IS09', 'IS10', 'IS11', 'IS12', 'IS13']
-    confPath = ['avec2011.conf', 'avec2013.conf', 'ComParE_2016.conf', 'emobase.conf', 'IS09_emotion.conf',
-                'IS10_paraling.conf', 'IS11_speaker_state.conf', 'IS12_speaker_trait.conf', 'IS13_ComParE.conf']
-    for confIndex in range(8, len(confList)):
-        savepath = 'D:\\ProjectData\\IEMOCAP\\IEMOCAP-Features\\' + confList[confIndex] + '-Sequence\\'
+    confList = ['ComParE', 'IS09', 'IS10', 'IS13']
+    confPath = ['ComParE_2016.conf', 'IS09_emotion.conf', 'IS10_paraling.conf', 'IS13_ComParE.conf']
+    # confPath = ['ComParE_2016.conf', 'IS09_emotion.conf', 'IS10_paraling.conf', 'IS13_ComParE.conf', 'chroma_fft.conf',
+    #             'chroma_filt.conf']
+
+    for confIndex in range(len(confList)):
+        savepath = 'D:\\ProjectData\\IEMOCAP\\IEMOCAP-Seq-Features\\' + confList[confIndex] + '\\'
         for indexA in os.listdir(loadpath):
             for indexB in os.listdir(loadpath + indexA):
                 for indexC in os.listdir(loadpath + indexA + '\\' + indexB):
                     for indexD in ['ang', 'hap', 'exc', 'neu', 'sad']:
-                        if not os.path.exists(savepath + indexA + '\\' + indexB + '\\' + indexC + '\\' + indexD):
-                            os.makedirs(savepath + indexA + '\\' + indexB + '\\' + indexC + '\\' + indexD)
+                        if os.path.exists(savepath + indexA + '\\' + indexB + '\\' + indexC + '\\' + indexD): continue
+                        os.makedirs(savepath + indexA + '\\' + indexB + '\\' + indexC + '\\' + indexD)
+
                         for indexE in os.listdir(loadpath + indexA + '\\' + indexB + '\\' + indexC + '\\' + indexD):
                             print(confList[confIndex], indexA, indexB, indexC, indexD, indexE)
                             if os.path.exists(
@@ -59,4 +62,4 @@ if __name__ == '__main__':
                                 loadpath=loadpath + indexA + '\\' + indexB + '\\' + indexC + '\\' + indexD + '\\' + indexE,
                                 confPath=confPath[confIndex],
                                 savepath=savepath + indexA + '\\' + indexB + '\\' + indexC + '\\' + indexD + '\\' + indexE + '.csv')
-                            # exit()
+                            exit()
