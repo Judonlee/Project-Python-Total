@@ -1,19 +1,19 @@
-from LIDC_Project.Loader.LIDC_Loader import LIDC_Loader_Npy
 from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.naive_bayes import GaussianNB
-from sklearn.ensemble import AdaBoostClassifier
 import numpy
-import os
 from sklearn.decomposition import PCA
-from sklearn.externals import joblib
 from sklearn.preprocessing import scale
+from scipy import interp
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pylab as plt
 
 if __name__ == '__main__':
+    mean_fpr = numpy.linspace(0, 1, 100)
+    mean_tpr = 0.0
+    part = ['cA', 'cD', 'cH', 'cV']
+    # part = ['cV']
+    conf = 'db4'
+    aucList = []
     for appoint in range(10):
-        part = ['cA', 'cD', 'cH', 'cV']
-        #part = ['cV']
-        conf = 'db4'
         trainData, testData = [], []
         trainLabel = numpy.load('E:/LIDC/Npy/Wavelet-' + conf + '/Appoint-%d/TrainLabel.npy' % appoint)
         testLabel = numpy.load('E:/LIDC/Npy/Wavelet-' + conf + '/Appoint-%d/TestLabel.npy' % appoint)
@@ -51,16 +51,25 @@ if __name__ == '__main__':
         totalData = scale(totalData)
         trainData = totalData[0:len(trainData)]
         testData = totalData[len(trainData):]
-        clf = AdaBoostClassifier()
+        clf = SVC(probability=True)
         clf.fit(trainData, trainLabel)
-        result = clf.predict(testData)
+        probability = clf.predict_proba(testData)
+        fpr, tpr, thresholds = roc_curve(testLabel, probability[:, 1])
+        mean_tpr += interp(mean_fpr, fpr, tpr)  # 对mean_tpr在mean_fpr处进行插值，通过scipy包调用interp()函数
+        mean_tpr[0] = 0.0  # 初始处为0
+        roc_auc = auc(fpr, tpr)
+        plt.plot(fpr, tpr, lw=1, label='ROC fold %d' % appoint)
+        aucList.append(roc_auc)
 
-        matrix = numpy.zeros((2, 2))
-        for index in range(len(result)):
-            matrix[testLabel[index]][result[index]] += 1
-        print(conf, part, appoint)
-        for indexX in range(2):
-            for indexY in range(2):
-                if indexY != 0: print(',', end='')
-                print(matrix[indexX][indexY], end='')
-            print()
+    name = '' + conf
+    for sample in part:
+        name = name + '-' + sample
+
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title(name)
+    plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), label='Luck')
+    plt.legend()
+    plt.show()
+    for sample in aucList:
+        print(sample)
