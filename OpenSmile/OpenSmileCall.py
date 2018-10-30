@@ -40,8 +40,9 @@ def OpenSmileCall_Single(loadpath, confPath, savepath):
 if __name__ == '__main__':
     loadpath = 'D:\\ProjectData\\IEMOCAP\\IEMOCAP-Voices-Choosed\\'
 
-    confList = ['ComParE', 'IS09', 'IS10', 'IS13']
-    confPath = ['ComParE_2016.conf', 'IS09_emotion.conf', 'IS10_paraling.conf', 'IS13_ComParE.conf']
+    confList = ['ComParE', 'IS09', 'IS10', 'IS13', 'eGeMAPSv01a', 'GeMAPSv01a']
+    confPath = ['ComParE_2016.conf', 'IS09_emotion.conf', 'IS10_paraling.conf', 'IS13_ComParE.conf',
+                'gemaps\\eGeMAPSv01a.conf', 'gemaps\\GeMAPSv01a.conf']
     # confPath = ['ComParE_2016.conf', 'IS09_emotion.conf', 'IS10_paraling.conf', 'IS13_ComParE.conf', 'chroma_fft.conf',
     #             'chroma_filt.conf']
 
@@ -62,4 +63,4 @@ if __name__ == '__main__':
                                 loadpath=loadpath + indexA + '\\' + indexB + '\\' + indexC + '\\' + indexD + '\\' + indexE,
                                 confPath=confPath[confIndex],
                                 savepath=savepath + indexA + '\\' + indexB + '\\' + indexC + '\\' + indexD + '\\' + indexE + '.csv')
-                            exit()
+                            # exit()
