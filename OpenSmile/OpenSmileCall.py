@@ -4,8 +4,8 @@ import os
 def OpenSmileCall_Sequence(loadpath, confPath, savepath):
     commandPath = r'D:\OpenSmile\opensmile-2.3.0-Sequence\bin\Win32\SMILExtract_Release'
     confPath = 'D:\\OpenSmile\\opensmile-2.3.0-Sequence\\config\\' + confPath
-    os.system(commandPath + ' -C ' + confPath + ' -I ' + loadpath + ' -O ' + savepath + '.csv')
-    '''
+    os.system(commandPath + ' -C ' + confPath + ' -I ' + loadpath + ' -O ' + savepath + '.current')
+
     loadfile = open(savepath + '.current', 'r')
     data = loadfile.readlines()
     loadfile.close()
@@ -16,7 +16,7 @@ def OpenSmileCall_Sequence(loadpath, confPath, savepath):
         if len(sample) < 5: continue
         file.write(sample[sample.find(',') + 1:-3] + '\n')
     file.close()
-    os.remove(savepath + '.current')'''
+    os.remove(savepath + '.current')
 
 
 def OpenSmileCall_Single(loadpath, confPath, savepath):
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     # confPath = ['ComParE_2016.conf', 'IS09_emotion.conf', 'IS10_paraling.conf', 'IS13_ComParE.conf', 'chroma_fft.conf',
     #             'chroma_filt.conf']
 
-    for confIndex in range(len(confList)):
+    for confIndex in range(3, len(confList)):
         savepath = 'D:\\ProjectData\\IEMOCAP\\IEMOCAP-Seq-Features\\' + confList[confIndex] + '\\'
         for indexA in os.listdir(loadpath):
             for indexB in os.listdir(loadpath + indexA):
@@ -63,4 +63,4 @@ if __name__ == '__main__':
                                 loadpath=loadpath + indexA + '\\' + indexB + '\\' + indexC + '\\' + indexD + '\\' + indexE,
                                 confPath=confPath[confIndex],
                                 savepath=savepath + indexA + '\\' + indexB + '\\' + indexC + '\\' + indexD + '\\' + indexE + '.csv')
-                            # exit()
+                            exit()

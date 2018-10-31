@@ -1,8 +1,6 @@
-from CTC_Project_Again.Loader.IEMOCAP_Loader import IEMOCAP_Loader_Npy
+import numpy
 
 if __name__ == '__main__':
-    loadpath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Features/GeMAPSv01a-Npy/Appoint-0/'
-
-    trainData, trainLabel, trainSeq, trainScription, testData, testLabel, testSeq, testScription = \
-        IEMOCAP_Loader_Npy(loadpath=loadpath)
-
+    loadpath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Seq-Features/IS13/improve/Female/Session1/ang/Ses01F_impro01_F012.wav.csv'
+    totalData = numpy.genfromtxt(loadpath, dtype=float, delimiter=',')
+    print(numpy.shape(totalData))

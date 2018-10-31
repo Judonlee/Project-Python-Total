@@ -3,8 +3,8 @@ import numpy
 from sklearn.preprocessing import scale
 
 if __name__ == '__main__':
-    loadpath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Features/IS09/'
-    savepath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Features/IS09-Normalized/'
+    loadpath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Features/IS10/'
+    savepath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Features/IS10-Normalized/'
     totalData = []
     for indexA in os.listdir(loadpath):
         for indexB in os.listdir(loadpath + indexA):
