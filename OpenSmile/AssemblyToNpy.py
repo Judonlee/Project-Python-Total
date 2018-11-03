@@ -3,8 +3,8 @@ import numpy
 
 if __name__ == '__main__':
     for appoint in range(10):
-        loadpath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Features/IS09-Normalized/'
-        savepath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Features/IS09-Npy/Appoint-%d/' % appoint
+        loadpath = 'D:/ProjectData/IEMOCAP/IEMOCAP-OpenSmile/IS09-MMNor/'
+        savepath = 'D:/ProjectData/IEMOCAP/IEMOCAP-OpenSmile/IS09-MMNpy/Appoint-%d/' % appoint
 
         os.makedirs(savepath)
         trainData, trainLabel, trainSeq, testData, testLabel, testSeq = [], [], [], [], [], []

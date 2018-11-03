@@ -3,16 +3,16 @@ import numpy
 from pprint import pprint
 
 if __name__ == '__main__':
-    bands = 120
+    conf = 'IS09'
     WAList, UAList = [], []
-    for appoint in range(10):
-        loadpath = 'D:/ProjectData/Project-CTC-Data/Records-Result-BLSTM-CTC-CRF-Attention-WA/Bands-%d-%d/' % (
-            bands, appoint)
+    for appoint in range(4):
+        loadpath = 'D:/ProjectData/Records-OpenSmile/%s-Appoint-%d/Logits/' % (conf, appoint)
         UATrace, WATrace = [], []
 
         matrixList = []
         maxUAmatrix, maxWAmatrix = [], []
         for filename in os.listdir(loadpath):
+            if os.path.isdir(loadpath + filename): continue
             data = numpy.genfromtxt(fname=loadpath + filename, dtype=float, delimiter=',')
             # print(data)
             WA, UA = 0, 0
