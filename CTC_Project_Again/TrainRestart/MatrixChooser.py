@@ -2,12 +2,15 @@ import os
 import numpy
 
 if __name__ == '__main__':
-    bans = 40
-    part = 'SoftMax'
+    bans = 30
+    part = 'Logits'
     for gender in ['Female', 'Male']:
         for session in range(1, 6):
+            if session > 2:
+                print()
+                continue
             UATrace, WATrace = [], []
-            loadpath = 'D:/ProjectData/BrandNewCTC/Data-Result-Changed-Left/Bands-%d-Session-%d-%s/%s/' % (
+            loadpath = 'D:/ProjectData/BrandNewCTC/Data-Result-Changed-Left-TripleBLSTM/Bands-%d-Session-%d-%s/%s/' % (
                 bans, session, gender, part)
             if not os.path.exists(loadpath): continue
             for file in os.listdir(loadpath):
@@ -23,7 +26,7 @@ if __name__ == '__main__':
                 UATrace.append(UA)
                 WATrace.append(WA)
 
-            loadpath = 'D:/ProjectData/BrandNewCTC/Data-Result-Changed-Right/Bands-%d-Session-%d-%s/%s/' % (
+            loadpath = 'D:/ProjectData/BrandNewCTC/Data-Result-Changed-Left-TripleBLSTM/Bands-%d-Session-%d-%s/%s/' % (
                 bans, session, gender, part)
             if not os.path.exists(loadpath): continue
             for file in os.listdir(loadpath):
@@ -38,4 +41,4 @@ if __name__ == '__main__':
                 # print(WA, UA, sum(sum(data)))
                 UATrace.append(UA)
                 WATrace.append(WA)
-            print(max(UATrace), max(WATrace))
+            print(max(UATrace), '\t', max(WATrace))
