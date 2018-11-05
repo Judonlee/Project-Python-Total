@@ -6,9 +6,6 @@ if __name__ == '__main__':
     part = 'Logits'
     for gender in ['Female', 'Male']:
         for session in range(1, 6):
-            if session > 2:
-                print()
-                continue
             UATrace, WATrace = [], []
             loadpath = 'D:/ProjectData/BrandNewCTC/Data-Result-Changed-Left-TripleBLSTM/Bands-%d-Session-%d-%s/%s/' % (
                 bans, session, gender, part)

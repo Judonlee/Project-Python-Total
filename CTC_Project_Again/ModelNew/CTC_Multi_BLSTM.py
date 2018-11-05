@@ -199,7 +199,7 @@ class CTC_Multi_BLSTM(NeuralNetwork_Base):
         for index in range(len(totalPredictSoftMax)):
             matrixSoftMax[numpy.argmax(numpy.array(testLabel[index]))][
                 numpy.argmax(numpy.array(totalPredictSoftMax[index]))] += 1
-        print(matrixDecode)
-        print(matrixLogits)
-        print(matrixSoftMax)
+        # print(matrixDecode)
+        # print(matrixLogits)
+        # print(matrixSoftMax)
         return matrixDecode, matrixLogits, matrixSoftMax

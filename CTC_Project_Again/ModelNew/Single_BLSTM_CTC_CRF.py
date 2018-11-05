@@ -1,11 +1,12 @@
 import tensorflow
-from __Base.BaseClass import NeuralNetwork_Base
+from CTC_Project_Again.ModelNew.CTC_Single_Origin import CTC_BLSTM
 import numpy
 from __Base.Shuffle import Shuffle
 import tensorflow.contrib.rnn as rnn
+import tensorflow.contrib.crf as crf
 
 
-class CTC_BLSTM(NeuralNetwork_Base):
+class BLSTM_CTC_CRF(CTC_BLSTM):
     def __init__(self, trainData, trainLabel, trainSeqLength, featureShape, numClass, hiddenNodules=128, batchSize=64,
                  learningRate=1e-3, startFlag=True, graphRevealFlag=False, graphPath='logs/', occupyRate=-1):
         '''
@@ -16,13 +17,10 @@ class CTC_BLSTM(NeuralNetwork_Base):
         :param numClass:        designite the number of classes
         '''
 
-        self.featureShape = featureShape
-        self.seqLen = trainSeqLength
-        self.numClass = numClass
-        self.hiddenNodules = hiddenNodules
-        super(CTC_BLSTM, self).__init__(trainData=trainData, trainLabel=trainLabel, batchSize=batchSize,
-                                        learningRate=learningRate, startFlag=startFlag, graphRevealFlag=graphRevealFlag,
-                                        graphPath=graphPath, occupyRate=occupyRate)
+        super(BLSTM_CTC_CRF, self).__init__(trainData=trainData, trainLabel=trainLabel, trainSeqLength=trainSeqLength,
+                                            featureShape=featureShape, numClass=numClass, hiddenNodules=hiddenNodules,
+                                            batchSize=batchSize, learningRate=learningRate, startFlag=startFlag,
+                                            graphRevealFlag=graphRevealFlag, graphPath=graphPath, occupyRate=occupyRate)
         for sample in self.parameters.keys():
             self.information += '\n' + str(sample) + str(self.parameters[sample])
 
@@ -79,7 +77,44 @@ class CTC_BLSTM(NeuralNetwork_Base):
             inputs=self.parameters['Logits_TimeMajor'], sequence_length=self.seqLenInput, merge_repeated=False)
         self.decodeDense = tensorflow.sparse_tensor_to_dense(sp_input=self.decode[0])
 
-    def Train(self):
+        ###################################################################################################
+        # CTC Sequence Label
+        ###################################################################################################
+
+        self.parameters['CTC_SeqLabel'] = tensorflow.argmax(
+            input=self.parameters['Logits_Reshape'][:, :, 0:self.numClass - 1], axis=2, name='CTC_SeqLabel')
+
+        ###################################################################################################
+        # CRF part
+        ###################################################################################################
+
+        self.parameters['CRF_Logits'] = tensorflow.layers.dense(inputs=self.parameters['RNN_Reshape'],
+                                                                units=self.numClass - 1, activation=tensorflow.nn.tanh,
+                                                                name='CRF_Logits')
+        self.parameters['CRF_Logits_Reshape'] = \
+            tensorflow.reshape(tensor=self.parameters['CRF_Logits'],
+                               shape=[self.parameters['BatchSize'], self.parameters['TimeStep'], self.numClass - 1],
+                               name='CRF_Logits_Reshape')
+
+        ###################################################################################################
+        # Conditional Random Field
+        ###################################################################################################
+
+        self.parameters['CRF_LogLikelihood'], self.parameters['CRF_TransitionParams'] = crf.crf_log_likelihood(
+            inputs=self.parameters['CRF_Logits_Reshape'], tag_indices=self.parameters['CTC_SeqLabel'],
+            sequence_lengths=self.seqLenInput)
+
+        self.parameters['CRF_Loss'] = tensorflow.reduce_mean(input_tensor=-self.parameters['CRF_LogLikelihood'],
+                                                             name='CRF_Loss')
+
+        self.CRFTrain = tensorflow.train.AdamOptimizer(learning_rate=learningRate). \
+            minimize(self.parameters['CRF_Loss'], var_list=tensorflow.global_variables()[18:])
+
+    def Load_CTC(self, loadpath):
+        saver = tensorflow.train.Saver(var_list=tensorflow.global_variables()[0:18])
+        saver.restore(self.session, loadpath)
+
+    def CRF_Train(self):
         trainData, trainLabel, trainSeq = Shuffle(data=self.data, label=self.label, seqLen=self.seqLen)
 
         startPosition = 0
@@ -104,7 +139,7 @@ class CTC_BLSTM(NeuralNetwork_Base):
                     maxlen = len(trainLabel[indexX + startPosition])
             shape = [min(self.batchSize, len(trainData) - startPosition), maxlen]
 
-            loss, _ = self.session.run(fetches=[self.parameters['Cost'], self.train],
+            loss, _ = self.session.run(fetches=[self.parameters['CRF_Loss'], self.CRFTrain],
                                        feed_dict={self.dataInput: batchData, self.labelInput: (indices, values, shape),
                                                   self.seqLenInput: batachSeq})
             totalLoss += loss
@@ -114,13 +149,13 @@ class CTC_BLSTM(NeuralNetwork_Base):
             startPosition += self.batchSize
         return totalLoss
 
-    def Test_AllMethods(self, testData, testLabel, testSeq):
+    def Test_CRF(self, testData, testLabel, testSeq):
         startPosition = 0
-        totalPredictDecode, totalPredictLogits, totalPredictSoftMax = [], [], []
+        matrix = numpy.zeros((self.numClass - 1, self.numClass - 1))
         while startPosition < len(testData):
             print('\rTesting %d/%d' % (startPosition, len(testSeq)), end='')
             batchData = []
-            batachSeq = testSeq[startPosition:startPosition + self.batchSize]
+            batchSeq = testSeq[startPosition:startPosition + self.batchSize]
 
             maxLen = max(testSeq[startPosition:startPosition + self.batchSize])
             for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
@@ -128,61 +163,20 @@ class CTC_BLSTM(NeuralNetwork_Base):
                     (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))), axis=0)
                 batchData.append(currentData)
 
-            decode, logits = self.session.run(fetches=[self.decode, self.parameters['Logits_Reshape']],
-                                              feed_dict={self.dataInput: batchData, self.seqLenInput: batachSeq})
-            ####################################################################
-            # 第一部分
-            ####################################################################
+            [logits, params] = self.session.run(
+                fetches=[self.parameters['CRF_Logits_Reshape'], self.parameters['CRF_TransitionParams']],
+                feed_dict={self.dataInput: batchData, self.seqLenInput: batchSeq})
 
-            indices, value = decode[0].indices, decode[0].values
-            result = numpy.zeros((len(batchData), self.numClass))
-            for index in range(len(value)):
-                result[indices[index][0]][value[index]] += 1
-            for sample in result:
-                totalPredictDecode.append(numpy.argmax(numpy.array(sample)))
+            for index in range(len(logits)):
+                treatLogits = logits[index][0:batchSeq[index]]
+                viterbiSequence, viterbiScore = crf.viterbi_decode(score=treatLogits, transition_params=params)
 
-            ####################################################################
-            # 第二部分
-            ####################################################################
-
-            for indexX in range(numpy.shape(logits)[0]):
-                records = numpy.zeros(self.numClass - 1)
-                for indexY in range(testSeq[startPosition + indexX]):
-                    chooseArera = logits[indexX][indexY][0:self.numClass - 1]
-                    records[numpy.argmax(numpy.array(chooseArera))] += 1
-                totalPredictLogits.append(records)
-
-            ####################################################################
-            # 第三部分
-            ####################################################################
-
-            for indexX in range(numpy.shape(logits)[0]):
-                records = numpy.zeros(self.numClass - 1)
-                for indexY in range(testSeq[startPosition + indexX]):
-                    chooseArera = logits[indexX][indexY][0:self.numClass - 1]
-                    totalSoftMax = numpy.sum(numpy.exp(chooseArera))
-                    for indexZ in range(self.numClass - 1):
-                        records[indexZ] += numpy.exp(chooseArera[indexZ]) / totalSoftMax
-
-                for indexZ in range(self.numClass - 1):
-                    records[indexZ] /= testSeq[startPosition + indexX]
-                totalPredictSoftMax.append(records)
+                counter = numpy.zeros(self.numClass)
+                for sample in viterbiSequence:
+                    counter[sample] += 1
+                matrix[numpy.argmax(numpy.array(testLabel[index + startPosition]))][
+                    numpy.argmax(numpy.array(counter))] += 1
 
             startPosition += self.batchSize
-
-        matrixDecode, matrixLogits, matrixSoftMax = numpy.zeros((self.numClass - 1, self.numClass - 1)), \
-                                                    numpy.zeros((self.numClass - 1, self.numClass - 1)), \
-                                                    numpy.zeros((self.numClass - 1, self.numClass - 1))
-
-        for index in range(len(totalPredictDecode)):
-            matrixDecode[numpy.argmax(numpy.array(testLabel[index]))][totalPredictDecode[index]] += 1
-        for index in range(len(totalPredictLogits)):
-            matrixLogits[numpy.argmax(numpy.array(testLabel[index]))][
-                numpy.argmax(numpy.array(totalPredictLogits[index]))] += 1
-        for index in range(len(totalPredictSoftMax)):
-            matrixSoftMax[numpy.argmax(numpy.array(testLabel[index]))][
-                numpy.argmax(numpy.array(totalPredictSoftMax[index]))] += 1
-        # print(matrixDecode)
-        # print(matrixLogits)
-        # print(matrixSoftMax)
-        return matrixDecode, matrixLogits, matrixSoftMax
+        print(matrix)
+        return matrix
