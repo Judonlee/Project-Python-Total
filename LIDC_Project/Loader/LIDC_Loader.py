@@ -125,7 +125,27 @@ def LIDC_Loader_Npy(loadpath):
     return trainData, trainLabel, testData, testLabel
 
 
+def LIDC_Loader_Choosed(loadpath, appoint):
+    trainData, trainLabel, testData, testLabel = [], [], [], []
+    for index in range(10):
+        currentData = numpy.load(loadpath + 'Appoint-%d-Data.npy' % index)
+        currentLabel = numpy.load(loadpath + 'Appoint-%d-Label.npy' % index)
+        print(numpy.shape(currentData), numpy.shape(currentLabel), numpy.sum(currentLabel, axis=0))
+
+        if index == appoint:
+            testData.extend(currentData)
+            testLabel.extend(currentLabel)
+        else:
+            trainData.extend(currentData)
+            trainLabel.extend(currentLabel)
+    print('\n\n')
+    print(numpy.shape(trainData), numpy.shape(trainLabel), numpy.sum(trainLabel, axis=0))
+    print(numpy.shape(testData), numpy.shape(testLabel), numpy.sum(testLabel, axis=0))
+    return trainData, trainLabel, testData, testLabel
+
+
 if __name__ == '__main__':
+    LIDC_Loader_Choosed(loadpath='D:/ProjectData/LIDC/Npy-Seperate/LBP_P=4_R=1/', appoint=0)
     # for appoint in range(10):
     #     savepath = 'E:/LIDC/Npy/LBP_P=24_R=3/Appoint-%d/' % appoint
     #     os.makedirs(savepath)
@@ -137,15 +157,16 @@ if __name__ == '__main__':
     #     numpy.save(savepath + 'TrainLabel.npy', trainLabel)
     #     numpy.save(savepath + 'TestData.npy', testData)
     #     numpy.save(savepath + 'TestLabel.npy', testLabel)
-    for appoint in range(10):
-        savepath = 'E:/LIDC/Npy/Wavelet-db2/Appoint-%d/' % appoint
-        os.makedirs(savepath)
-        for part in ['cA.csv', 'cD.csv', 'cH.csv', 'cV.csv']:
-            trainData, trainLabel, testData, testLabel = LIDC_Loader_Wavelet(
-                nodulePath='E:/LIDC/LIDC-Nodule-Wavelet/db2/Csv/',
-                nonNodulePath='E:/LIDC/LIDC-NonNodule-Wavelet/db2/Csv/',
-                part=part, appoint=appoint)
-            numpy.save(savepath + part[0:part.find('.')] + '-Train.npy', trainData)
-            numpy.save(savepath + part[0:part.find('.')] + '-Test.npy', testData)
-            numpy.save(savepath + 'TrainLabel.npy', trainLabel)
-            numpy.save(savepath + 'TestLabel.npy', testLabel)
+
+    # for appoint in range(10):
+    #     savepath = 'E:/LIDC/Npy/Wavelet-db2/Appoint-%d/' % appoint
+    #     os.makedirs(savepath)
+    #     for part in ['cA.csv', 'cD.csv', 'cH.csv', 'cV.csv']:
+    #         trainData, trainLabel, testData, testLabel = LIDC_Loader_Wavelet(
+    #             nodulePath='E:/LIDC/LIDC-Nodule-Wavelet/db2/Csv/',
+    #             nonNodulePath='E:/LIDC/LIDC-NonNodule-Wavelet/db2/Csv/',
+    #             part=part, appoint=appoint)
+    #         numpy.save(savepath + part[0:part.find('.')] + '-Train.npy', trainData)
+    #         numpy.save(savepath + part[0:part.find('.')] + '-Test.npy', testData)
+    #         numpy.save(savepath + 'TrainLabel.npy', trainLabel)
+    #         numpy.save(savepath + 'TestLabel.npy', testLabel)

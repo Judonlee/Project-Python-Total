@@ -1,4 +1,4 @@
-from LIDC_Project.Loader.LIDC_Loader import LIDC_Loader_Npy
+from LIDC_Project.Loader.LIDC_Loader import LIDC_Loader_Choosed
 import numpy
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import scale
@@ -12,8 +12,8 @@ if __name__ == '__main__':
             rocList = []
             totalName.append([C, gamma])
             for appoint in range(10):
-                trainData, trainLabel, testData, testLabel = LIDC_Loader_Npy(
-                    loadpath='E:/LIDC/Npy/OriginCsv/Appoint-%d/' % appoint)
+                trainData, trainLabel, testData, testLabel = LIDC_Loader_Choosed(
+                    loadpath='D:/ProjectData/LIDC/Npy-Seperate/OriginCsv/', appoint=appoint)
 
                 totalNumber = numpy.sum(testLabel, axis=0)[0]
 
