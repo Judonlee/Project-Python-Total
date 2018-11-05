@@ -116,12 +116,12 @@ def LIDC_Loader_Wavelet(nodulePath, nonNodulePath, part, appoint=0):
 def LIDC_Loader_Npy(loadpath):
     trainData = numpy.load(loadpath + 'TrainData.npy')
     trainLabel = numpy.load(loadpath + 'TrainLabel.npy')
-    print('Train Part Load Completed')
+    # print('Train Part Load Completed')
     testData = numpy.load(loadpath + 'TestData.npy')
     testLabel = numpy.load(loadpath + 'TestLabel.npy')
-    print('Test Part Load Completed')
-    print(numpy.shape(trainData), numpy.shape(trainLabel), numpy.sum(trainLabel, axis=0),
-          numpy.shape(testData), numpy.shape(testLabel), numpy.sum(testLabel, axis=0))
+    # print('Test Part Load Completed')
+    # print(numpy.shape(trainData), numpy.shape(trainLabel), numpy.sum(trainLabel, axis=0),
+    #       numpy.shape(testData), numpy.shape(testLabel), numpy.sum(testLabel, axis=0))
     return trainData, trainLabel, testData, testLabel
 
 
