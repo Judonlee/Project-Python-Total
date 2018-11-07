@@ -7,8 +7,8 @@ if __name__ == '__main__':
     # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     for bands in [30, 40, 60, 80, 100, 120]:
         for session in range(1, 6):
-            loadpath = 'D:/ProjectData/IEMOCAP-New/Bands%d/' % bands
-            savepath = 'Data-Changed-Left-DoubleBLSTM/Bands-%d-Session-%d/' % (bands, session)
+            loadpath = 'D:/ProjectData/IEMOCAP-New-Again/Bands%d/' % bands
+            savepath = 'Data-01-Single-BLSTM/Bands-%d-Session-%d/' % (bands, session)
             if os.path.exists(savepath): continue
             os.makedirs(savepath)
             trainData, trainLabel, trainSeq, trainScription, testData, testLabel, testSeq, testScription = LoaderTotal(
@@ -17,7 +17,7 @@ if __name__ == '__main__':
             graph = tensorflow.Graph()
             with graph.as_default():
                 classifier = CTC_Multi_BLSTM(trainData=trainData, trainLabel=trainScription, trainSeqLength=trainSeq,
-                                             featureShape=bands, numClass=5, rnnLayers=2, graphRevealFlag=False,
+                                             featureShape=bands, numClass=3, rnnLayers=1, graphRevealFlag=False,
                                              batchSize=32)
                 print(classifier.information)
                 # exit()

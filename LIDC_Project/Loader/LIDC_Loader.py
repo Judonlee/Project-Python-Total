@@ -145,7 +145,7 @@ def LIDC_Loader_Choosed(loadpath, appoint):
 
 
 if __name__ == '__main__':
-    LIDC_Loader_Choosed(loadpath='D:/ProjectData/LIDC/Npy-Seperate/LBP_P=4_R=1/', appoint=0)
+    LIDC_Loader_Choosed(loadpath='D:/ProjectData/LIDC/Npy-Seperate/OriginCsv/', appoint=0)
     # for appoint in range(10):
     #     savepath = 'E:/LIDC/Npy/LBP_P=24_R=3/Appoint-%d/' % appoint
     #     os.makedirs(savepath)

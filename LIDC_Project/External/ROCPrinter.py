@@ -5,10 +5,10 @@ import matplotlib.pylab as plt
 import numpy
 
 
-def ROCPrinter(trainData, trainLabel, testData, testLabel, appoint):
+def ROCPrinter(trainData, trainLabel, testData, testLabel, appoint, C=1, gamma='auto'):
     mean_fpr = numpy.linspace(0, 1, 100)
     mean_tpr = 0.0
-    clf = SVC(probability=True)
+    clf = SVC(probability=True, C=C, gamma=gamma)
     clf.fit(trainData, trainLabel)
     probability = clf.predict_proba(testData)
     fpr, tpr, thresholds = roc_curve(testLabel, probability[:, 1])

@@ -3,11 +3,18 @@ import numpy
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import scale
 from LIDC_Project.External.ROCPrinter import ROCPrinter
+import os
+import multiprocessing as mp
+import time
 
-if __name__ == '__main__':
+
+def Treatment():
     totalRoc, totalName = [], []
     for C in [1, 10, 100, 1000]:
         for gamma in [1e-2, 1e-3, 1e-4]:
+
+            if os.path.exists('C=%d-gamma=%s.csv' % (C, str(gamma))): continue
+            file = open('C=%d-gamma=%s.csv' % (C, str(gamma)), 'w')
 
             rocList = []
             totalName.append([C, gamma])
@@ -34,13 +41,28 @@ if __name__ == '__main__':
                 testData = totalData[len(trainData):]
                 rocList.append(
                     ROCPrinter(trainData=trainData, trainLabel=trainLabel, testData=testData, testLabel=testLabel,
-                               appoint=appoint))
+                               appoint=appoint, C=C, gamma=gamma))
                 print(totalName[-1], rocList)
+                file.write(str(rocList[-1]) + ',')
+                # exit()
             totalRoc.append(rocList)
 
             print('\n\n')
             print(totalName[-1], totalRoc[-1])
             print('\n\n')
+            file.close()
 
     for index in range(len(totalRoc)):
         print(totalName[index], totalRoc[index])
+
+
+if __name__ == '__main__':
+    threadList = []
+    for _ in range(5):
+        process = mp.Process(target=Treatment)
+        process.start()
+        threadList.append(process)
+        time.sleep(5)
+
+    for process in threadList:
+        process.join()

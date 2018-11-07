@@ -3,7 +3,7 @@ import os
 
 if __name__ == '__main__':
     loadpath = 'E:/Project-CTC-Data/Csv-Normalized/Bands120/'
-    savepath = 'D:/ProjectData/IEMOCAP-New/Bands120/'
+    savepath = 'D:/ProjectData/IEMOCAP-New-Again/Bands120/'
     transcriptionPath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Transcription-CMU/'
     os.makedirs(savepath)
 
@@ -27,11 +27,13 @@ if __name__ == '__main__':
                         file.close()
                         # print(indexA, indexB, indexC, indexD, indexE, currentTranscription)
 
-                        currentScription = numpy.ones(data.count(' ') + 1)
-                        if indexD == 'ang': currentScription = currentScription * 0
-                        if indexD == 'exc' or indexD == 'hap': currentScription = currentScription * 1
-                        if indexD == 'neu': currentScription = currentScription * 2
-                        if indexD == 'sad': currentScription = currentScription * 3
+                        currentScription = [0]
+                        for index in range(data.count(' ') + 1):
+                            currentScription.append(1)
+                            currentScription.append(0)
+                        # print(data)
+                        # print(currentScription)
+                        # exit()
 
                         totalData.append(currentData)
                         totalLabel.append(currentLabel)

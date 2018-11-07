@@ -88,7 +88,8 @@ class CTC_Multi_BLSTM(NeuralNetwork_Base):
 
         self.parameters['Loss'] = tensorflow.nn.ctc_loss(labels=self.labelInput,
                                                          inputs=self.parameters['Logits_TimeMajor'],
-                                                         sequence_length=self.seqLenInput)
+                                                         sequence_length=self.seqLenInput,
+                                                         ignore_longer_outputs_than_inputs=True)
         self.parameters['Cost'] = tensorflow.reduce_mean(self.parameters['Loss'], name='Cost')
         self.train = tensorflow.train.RMSPropOptimizer(learning_rate=learningRate).minimize(
             self.parameters['Cost'])
@@ -203,3 +204,53 @@ class CTC_Multi_BLSTM(NeuralNetwork_Base):
         # print(matrixLogits)
         # print(matrixSoftMax)
         return matrixDecode, matrixLogits, matrixSoftMax
+
+    def LossCalculation(self, testData, testLabel, testSeq):
+        trainData = testData
+        trainLabel = testLabel
+        trainSeq = testSeq
+
+        startPosition = 0
+        totalLoss = 0
+        while startPosition < len(trainData):
+            batchData = []
+            batachSeq = trainSeq[startPosition:startPosition + self.batchSize]
+
+            maxLen = max(trainSeq[startPosition:startPosition + self.batchSize])
+            for index in range(startPosition, min(startPosition + self.batchSize, len(trainData))):
+                currentData = numpy.concatenate(
+                    (trainData[index], numpy.zeros((maxLen - len(trainData[index]), len(trainData[index][0])))), axis=0)
+                batchData.append(currentData)
+
+            # print(numpy.shape(batchData))
+            # print(trainSeq[0:self.batchSize])
+            # for index in range(self.batchSize):
+            #     print(numpy.shape(trainLabel[index]), trainSeq[index])
+            # exit()
+
+            indices, values = [], []
+            maxlen = 0
+            for indexX in range(min(self.batchSize, len(trainData) - startPosition)):
+                for indexY in range(len(trainLabel[indexX + startPosition])):
+                    indices.append([indexX, indexY])
+                    values.append(int(trainLabel[indexX + startPosition][indexY]))
+                if maxlen < len(trainLabel[indexX + startPosition]):
+                    maxlen = len(trainLabel[indexX + startPosition])
+            shape = [min(self.batchSize, len(trainData) - startPosition), maxlen]
+
+            # print(indices)
+            # print(values)
+            # print(shape)
+            # print(numpy.shape(indices), numpy.shape(values))
+            # exit()
+
+            loss = self.session.run(fetches=self.parameters['Cost'],
+                                    feed_dict={self.dataInput: batchData, self.labelInput: (indices, values, shape),
+                                               self.seqLenInput: batachSeq})
+            totalLoss += loss * min(self.batchSize, len(trainData) - startPosition)
+
+            output = '\rBatch : %d/%d \t Loss : %f' % (startPosition, len(trainData), loss)
+            print(output, end='')
+            # exit()
+            startPosition += self.batchSize
+        return totalLoss
