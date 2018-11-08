@@ -161,3 +161,37 @@ class BLSTM_CTC_CRF(CTC_Multi_BLSTM):
             print(output, end='')
             startPosition += self.batchSize
         return totalLoss
+
+    def Test_CRF(self, testData, testLabel, testSeq):
+        startPosition = 0
+        matrix = numpy.zeros((self.numClass, self.numClass))
+        while startPosition < len(testData):
+            print('\rTesting %d/%d' % (startPosition, len(testSeq)), end='')
+            batchData = []
+            batchSeq = testSeq[startPosition:startPosition + self.batchSize]
+
+            maxLen = max(testSeq[startPosition:startPosition + self.batchSize])
+            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
+                currentData = numpy.concatenate(
+                    (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))), axis=0)
+                batchData.append(currentData)
+
+            [logits, params] = self.session.run(
+                fetches=[self.parameters['CRF_Logits_Reshape'], self.parameters['CRF_TransitionParams']],
+                feed_dict={self.dataInput: batchData, self.seqLenInput: batchSeq})
+
+            for index in range(len(logits)):
+                treatLogits = logits[index][0:batchSeq[index]]
+                viterbiSequence, viterbiScore = crf.viterbi_decode(score=treatLogits, transition_params=params)
+
+                counter = numpy.zeros(self.numClass + 1)
+                for sample in viterbiSequence:
+                    counter[sample] += 1
+                # print(counter)
+                # exit()
+                matrix[numpy.argmax(numpy.array(testLabel[index + startPosition]))][
+                    numpy.argmax(numpy.array(counter[1:]))] += 1
+
+            startPosition += self.batchSize
+        print(matrix)
+        return matrix
