@@ -254,3 +254,27 @@ class CTC_Multi_BLSTM(NeuralNetwork_Base):
             # exit()
             startPosition += self.batchSize
         return totalLoss
+
+    def LogitsOutput(self, testData, testSeq):
+        startPosition = 0
+        totalLogits = []
+        while startPosition < len(testData):
+            batchData = []
+            batachSeq = testSeq[startPosition:startPosition + self.batchSize]
+
+            maxLen = max(testSeq[startPosition:startPosition + self.batchSize])
+            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
+                currentData = numpy.concatenate(
+                    (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))), axis=0)
+                batchData.append(currentData)
+
+            logits = self.session.run(fetches=self.parameters['Logits_Reshape'],
+                                      feed_dict={self.dataInput: batchData, self.seqLenInput: batachSeq})
+            logits = numpy.argmax(numpy.array(logits[:, :, 0:2]), axis=2)
+            # print(numpy.shape(logits))
+            # exit()
+            totalLogits.extend(logits)
+            output = '\rBatch : %d/%d' % (startPosition, len(testData))
+            print(output, end='')
+            startPosition += self.batchSize
+        return totalLogits
