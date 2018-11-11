@@ -1,19 +1,19 @@
 import tensorflow
 import numpy
 from CTC_Project_Again.Loader.IEMOCAP_Loader_New import LoaderTotal
-from CTC_Project_Again.ModelNew.BLSTM_CTC_CRF import BLSTM_CTC_CRF
+from CTC_Project_Again.ModelNew.BLSTM_CTC_CRF_BLSTM_Concat import BLSTM_CTC_CRF
 import os
 
 if __name__ == '__main__':
 
     for bands in [30]:
-        for session in range(1, 4):
+        for session in range(3, 6):
             loadpath = 'D:/ProjectData/IEMOCAP-New/Bands%d/' % bands
-            netpath = 'D:/ProjectData/CTC_Changed/SameBLSTM/Result-BLSTM-CTC-CRF-Double/Bands-%d-Session-%d/' % (
+            netpath = 'D:/ProjectData/CTC_Changed/Result-BLSTM-CTC-CRF-Single-Concat/Bands-%d-Session-%d/' % (
                 bands, session)
 
             for gender in ['Female', 'Male']:
-                savepath = 'D:/ProjectData/CTC_Changed/SameBLSTM/Result-Result-BLSTM-CTC-CRF-Double/Bands-%d-Session-%d-%s/' % (
+                savepath = 'D:/ProjectData/CTC_Changed/Result-Result-BLSTM-CTC-CRF-Single-Concat/Bands-%d-Session-%d-%s/' % (
                     bands, session, gender)
 
                 if os.path.exists(savepath): continue

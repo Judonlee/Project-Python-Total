@@ -4,7 +4,7 @@ import os
 if __name__ == '__main__':
     for gender in ['Female', 'Male']:
         for session in range(1, 6):
-            loadpath = 'D:/GitHub/CTC_Project_Again/TrainRestart/Tester/Result_Triple_BLSTM_CTC_CRF/Bands-30-Session-%d-%s/' % (
+            loadpath = 'D:/ProjectData/CTC_Changed/Result-Result-BLSTM-CTC-CRF-Single-Concat/Bands-30-Session-%d-%s/' % (
                 session, gender)
             if not os.path.exists(loadpath):
                 print()
@@ -24,5 +24,5 @@ if __name__ == '__main__':
 
                 if UA == max(uaList):
                     matrix = data.copy()
-            print(max(uaList))
+            print(max(waList), max(uaList))
             # print(matrix)
