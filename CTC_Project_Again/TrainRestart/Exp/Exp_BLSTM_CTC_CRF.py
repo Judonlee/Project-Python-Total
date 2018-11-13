@@ -4,15 +4,12 @@ from CTC_Project_Again.ModelNew.BLSTM_CTC_CRF import BLSTM_CTC_CRF
 import os
 
 if __name__ == '__main__':
-    part = 'Single'
-    usedEpisode = 99
     for bands in [30]:
         for session in range(1, 6):
             for gender in ['Female', 'Male']:
                 loadpath = 'D:/ProjectData/IEMOCAP-New-Again/Bands%d/' % bands
-                netpath = 'D:/ProjectData/BrandNewCTC/Data-01-%s-BLSTM/Bands-%d-Session-%d/' % (
-                    part, bands, session)
-                savepath = 'Result-BLSTM-CTC-CRF-%s/Bands-%d-Session-%d/' % (part, bands, session)
+                netpath = 'D:/ProjectData/Determination/CTC/Data-01-Double-BLSTM/Bands-30-Session-0/0099-Network'
+                savepath = 'CRF/Bands-%d-Session-%d/' % (bands, session)
                 if os.path.exists(savepath): continue
                 os.makedirs(savepath)
 
@@ -21,11 +18,11 @@ if __name__ == '__main__':
 
                 graph = tensorflow.Graph()
                 with graph.as_default():
-                    classifier = BLSTM_CTC_CRF(trainData=trainData, trainSeqLabel=trainScription,
-                                               trainGroundLabel=trainLabel, trainSeqLength=trainSeq,
-                                               featureShape=bands, numClass=4, rnnLayers=1, graphRevealFlag=False,
+                    classifier = BLSTM_CTC_CRF(trainData=testData, trainSeqLabel=testScription,
+                                               trainGroundLabel=testLabel, trainSeqLength=testSeq,
+                                               featureShape=bands, numClass=4, rnnLayers=2, graphRevealFlag=False,
                                                batchSize=32, startFlag=True)
-                    classifier.Load_CTC(loadpath=netpath + '%04d-Network' % usedEpisode)
+                    classifier.Load_CTC(loadpath=netpath)
                     print(classifier.information)
 
                     for epoch in range(100):
