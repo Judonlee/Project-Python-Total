@@ -1,6 +1,6 @@
 from CTC_Target.Loader.IEMOCAP_Loader import Load, Load_Part
 import tensorflow
-from CTC_Target.Model.CTC_BLSTM_COMA import CTC_COMA_Attention
+from CTC_Target.Model.CTC_BLSTM_GA import CTC_Multi_GA
 import os
 import numpy
 

@@ -13,7 +13,7 @@ if __name__ == '__main__':
                 continue
 
             WAList, UAList = [], []
-            for episode in range(100):
+            for episode in range(99):
                 filename = '%04d.csv' % episode
                 data = numpy.genfromtxt(fname=loadpath + appoint + filename, dtype=float, delimiter=',')
                 WA, UA = 0, 0
