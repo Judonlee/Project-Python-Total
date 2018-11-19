@@ -6,9 +6,9 @@ import numpy
 
 if __name__ == '__main__':
     bands = 30
-    localAttentionScope = 5
+    localAttentionScope = 7
     loadpath = 'D:/ProjectData/CTC_Target/Features/Bands%d/' % bands
-    for session in range(5, 6):
+    for session in range(4, 6):
         for gender in ['Female', 'Male']:
             savepath = 'Result-CTC-COMA-%d-Part/Bands-%d-Session-%d-%s/' % (localAttentionScope, bands, session, gender)
             netpath = 'D:/ProjectData/CTC_Target/CTC-COMA-' + str(

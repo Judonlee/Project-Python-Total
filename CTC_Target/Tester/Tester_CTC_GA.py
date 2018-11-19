@@ -6,13 +6,11 @@ import numpy
 
 if __name__ == '__main__':
     bands = 30
-    localAttentionScope = 5
     loadpath = 'D:/ProjectData/CTC_Target/Features/Bands%d/' % bands
-    for session in range(5, 6):
+    for session in range(3, 5):
         for gender in ['Female', 'Male']:
-            savepath = 'Result-CTC-COMA-%d-Part/Bands-%d-Session-%d-%s/' % (localAttentionScope, bands, session, gender)
-            netpath = 'D:/ProjectData/CTC_Target/CTC-COMA-' + str(
-                localAttentionScope) + '/Bands-%d-Session-%d-%s/%04d-Network'
+            savepath = 'Result-CTC-GA/Bands-%d-Session-%d-%s/' % (bands, session, gender)
+            netpath = 'D:/ProjectData/CTC_Target/CTC-GA/Bands-%d-Session-%d-%s/%04d-Network'
             if os.path.exists(savepath): continue
 
             os.makedirs(savepath + 'Decode')
@@ -25,14 +23,12 @@ if __name__ == '__main__':
             for episode in range(100):
                 graph = tensorflow.Graph()
                 with graph.as_default():
-                    classifier = CTC_COMA_Attention(trainData=None, trainLabel=None, trainSeqLength=None,
-                                                    featureShape=bands, numClass=5, rnnLayers=2, graphRevealFlag=False,
-                                                    startFlag=False, attentionScope=localAttentionScope)
+                    classifier = CTC_Multi_GA(trainData=None, trainLabel=None, trainSeqLength=None, featureShape=bands,
+                                              numClass=5, rnnLayers=2, graphRevealFlag=False, startFlag=False)
                     print('\nEpisode %d/100' % episode)
                     classifier.Load(loadpath=netpath % (bands, session, gender, episode))
-                    matrixDecode, matrixLogits, matrixSoftMax = classifier.Test_AllMethods(testData=testData,
-                                                                                           testLabel=testlabel,
-                                                                                           testSeq=testSeq)
+                    matrixDecode, matrixLogits, matrixSoftMax = classifier.Test_AllMethods(
+                        testData=testData, testLabel=testlabel, testSeq=testSeq)
                     print('\n\n')
                     print(matrixDecode)
                     print(matrixLogits)

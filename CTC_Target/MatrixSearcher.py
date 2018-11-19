@@ -2,9 +2,9 @@ import numpy
 import os
 
 if __name__ == '__main__':
-    loadpath = 'D:/ProjectData/CTC_Target/Result-CTC-COMA-5-Part/'
+    loadpath = 'D:/ProjectData/CTC_Target/Result-CTC-GA/'
     bands = 30
-    usedPart = 'SoftMax'
+    usedPart = 'Logits'
     for gender in ['Female', 'Male']:
         for session in range(1, 6):
             appoint = 'Bands-%d-Session-%d-%s/%s/' % (bands, session, gender, usedPart)
@@ -13,7 +13,7 @@ if __name__ == '__main__':
                 continue
 
             WAList, UAList = [], []
-            for episode in range(99):
+            for episode in range(100):
                 filename = '%04d.csv' % episode
                 data = numpy.genfromtxt(fname=loadpath + appoint + filename, dtype=float, delimiter=',')
                 WA, UA = 0, 0
@@ -27,4 +27,4 @@ if __name__ == '__main__':
                 # exit()
                 WAList.append(WA)
                 UAList.append(UA)
-            print(max(WAList), max(UAList))
+            print(max(WAList), '\t', max(UAList))

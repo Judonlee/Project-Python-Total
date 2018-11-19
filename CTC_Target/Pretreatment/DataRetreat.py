@@ -2,7 +2,7 @@ import numpy
 import os
 
 if __name__ == '__main__':
-    datapath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Normalized/Bands30/improve/'
+    datapath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Normalized/Bands40/improve/'
     transcriptPath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Transcription-CMU/improve/'
     for indexA in os.listdir(datapath):
         for indexB in os.listdir(os.path.join(datapath, indexA)):
