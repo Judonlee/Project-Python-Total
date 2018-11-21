@@ -2,8 +2,8 @@ import numpy
 import os
 
 if __name__ == '__main__':
-    loadpath = 'D:/ProjectData/CTC_Target/Result-CTC-GA/'
-    bands = 30
+    loadpath = 'D:/ProjectData/CTC_Target/Result-CTC-Origin/'
+    bands = 40
     usedPart = 'Logits'
     for gender in ['Female', 'Male']:
         for session in range(1, 6):

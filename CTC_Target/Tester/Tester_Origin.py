@@ -5,11 +5,11 @@ import os
 import numpy
 
 if __name__ == '__main__':
-    bands = 30
+    bands = 40
     loadpath = 'D:/ProjectData/CTC_Target/Features/Bands%d/' % bands
-    for session in range(1, 6):
+    for session in range(5, 6):
         for gender in ['Female', 'Male']:
-            savepath = 'Result-CTC-Origin/Bands-%d-Session-%d/' % (bands, session)
+            savepath = 'Result-CTC-Origin/Bands-%d-Session-%d-%s/' % (bands, session, gender)
             netpath = 'D:/ProjectData/CTC_Target/CTC-Origin/Bands-%d-Session-%d/%04d-Network'
             if os.path.exists(savepath): continue
 

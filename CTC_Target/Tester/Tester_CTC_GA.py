@@ -7,7 +7,7 @@ import numpy
 if __name__ == '__main__':
     bands = 30
     loadpath = 'D:/ProjectData/CTC_Target/Features/Bands%d/' % bands
-    for session in range(3, 5):
+    for session in range(5, 6):
         for gender in ['Female', 'Male']:
             savepath = 'Result-CTC-GA/Bands-%d-Session-%d-%s/' % (bands, session, gender)
             netpath = 'D:/ProjectData/CTC_Target/CTC-GA/Bands-%d-Session-%d-%s/%04d-Network'
