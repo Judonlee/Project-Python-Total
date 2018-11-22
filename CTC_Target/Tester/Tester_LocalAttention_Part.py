@@ -6,12 +6,12 @@ import numpy
 
 if __name__ == '__main__':
     bands = 40
-    localAttentionScope = 5
-    loadpath = 'D:/ProjectData/CTC_Target/Features/Bands%d/' % bands
-    for session in range(1, 3):
+    localAttentionScope = 7
+    loadpath = 'E:/CTC_Target/Features/Bands%d/' % bands
+    for session in range(1, 5):
         for gender in ['Female', 'Male']:
             savepath = 'Result-CTC-LA-%d-Part/Bands-%d-Session-%d-%s/' % (localAttentionScope, bands, session, gender)
-            netpath = 'D:/ProjectData/CTC_Target/CTC-LC-Attention-' + str(
+            netpath = 'E:/CTC_Target/CTC-LC-Attention-' + str(
                 localAttentionScope) + '-Part/Bands-%d-Session-%d-%s/%04d-Network'
             if os.path.exists(savepath): continue
 
