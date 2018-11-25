@@ -2,36 +2,18 @@ import numpy
 import os
 
 if __name__ == '__main__':
-    loadpath = 'D:/ProjectData/CTC_Target/Result-CTC-Origin/'
-    bands = 30
-    usedPart = 'Logits'
-    for session in range(1, 6):
-        FemaleUAList, FemaleWAList, MaleUAList, MaleWAList = [], [], [], []
-        for episode in range(100):
-            appoint = 'Bands-%d-Session-%d-%s/%s/' % (bands, session, 'Female', usedPart)
-            filename = '%04d.csv' % episode
-            data = numpy.genfromtxt(fname=loadpath + appoint + filename, dtype=float, delimiter=',')
-            WA, UA = 0, 0
-            for index in range(len(data)):
-                WA += data[index][index]
-                UA += data[index][index] / sum(data[index])
-            WA = WA / sum(sum(data))
-            UA = UA / len(data)
-            FemaleUAList.append(UA)
-            FemaleWAList.append(WA)
 
-            appoint = 'Bands-%d-Session-%d-%s/%s/' % (bands, session, 'Male', usedPart)
-            filename = '%04d.csv' % episode
-            data = numpy.genfromtxt(fname=loadpath + appoint + filename, dtype=float, delimiter=',')
-            WA, UA = 0, 0
-            for index in range(len(data)):
-                WA += data[index][index]
-                UA += data[index][index] / sum(data[index])
-            WA = WA / sum(sum(data))
-            UA = UA / len(data)
-            MaleUAList.append(UA)
-            MaleWAList.append(WA)
+    data = numpy.array([[11.7, 2.7, 1.2, 1.4, 3.3],
+                        [2.7, 12.5, 2.7, 0.8, 1.6],
+                        [1.7, 3.0, 9.9, 1.5, 2.5],
+                        [1.3, 1.3, 2.5, 10.3, 4.4],
+                        [2.7, 2.0, 1.9, 4.8, 9.7]])
+    WA, UA = 0, 0
+    for index in range(len(data)):
+        WA += data[index][index]
+        UA += data[index][index] / sum(data[index])
 
-        # print(max(FemaleWAList), max(FemaleUAList), max(MaleWAList), max(MaleUAList))
-        print(FemaleWAList[numpy.argmax(MaleWAList)], FemaleUAList[numpy.argmax(MaleWAList)],
-              MaleWAList[numpy.argmax(FemaleUAList)], MaleUAList[numpy.argmax(FemaleWAList)])
+    # print(sum(data))
+    WA = WA / sum(sum(data))
+    UA = UA / len(data)
+    print(WA, UA)
