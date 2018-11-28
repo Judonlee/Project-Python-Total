@@ -237,6 +237,79 @@ class CTC_LC_Attention(CTC_Multi_BLSTM):
         # print(matrixSoftMax)
         return matrixDecode, matrixLogits, matrixSoftMax
 
+    def Test_AllMethodsWithLen(self, testData, testLabel, testSeq):
+        startPosition = 0
+        totalPredictDecode, totalPredictLogits, totalPredictSoftMax = [], [], []
+        while startPosition < len(testData):
+            print('\rTesting %d/%d' % (startPosition, len(testSeq)), end='')
+            batchData = []
+            batachSeq = testSeq[startPosition:startPosition + self.batchSize]
+
+            maxLen = max(testSeq[startPosition:startPosition + self.batchSize]) + self.attentionScope
+            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
+                currentData = numpy.concatenate(
+                    (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))), axis=0)
+                batchData.append(currentData)
+
+            decode, logits = self.session.run(fetches=[self.decode, self.parameters['Logits_Reshape']],
+                                              feed_dict={self.dataInput: batchData, self.seqLenInput: batachSeq})
+            ####################################################################
+            # 第一部分
+            ####################################################################
+
+            indices, value = decode[0].indices, decode[0].values
+            result = numpy.zeros((len(batchData), self.numClass))
+            for index in range(len(value)):
+                result[indices[index][0]][value[index]] += 1
+            for sample in result:
+                totalPredictDecode.append(numpy.argmax(numpy.array(sample)))
+
+            ####################################################################
+            # 第二部分
+            ####################################################################
+
+            for indexX in range(numpy.shape(logits)[0]):
+                records = numpy.zeros(self.numClass - 1)
+                for indexY in range(testSeq[startPosition + indexX]):
+                    chooseArera = logits[indexX][indexY][0:self.numClass - 1]
+                    records[numpy.argmax(numpy.array(chooseArera))] += 1
+                totalPredictLogits.append(records)
+
+            ####################################################################
+            # 第三部分
+            ####################################################################
+
+            for indexX in range(numpy.shape(logits)[0]):
+                records = numpy.zeros(self.numClass - 1)
+                for indexY in range(testSeq[startPosition + indexX]):
+                    chooseArera = logits[indexX][indexY][0:self.numClass - 1]
+                    totalSoftMax = numpy.sum(numpy.exp(chooseArera))
+                    for indexZ in range(self.numClass - 1):
+                        records[indexZ] += numpy.exp(chooseArera[indexZ]) / totalSoftMax
+
+                for indexZ in range(self.numClass - 1):
+                    records[indexZ] /= testSeq[startPosition + indexX]
+                totalPredictSoftMax.append(records)
+
+            startPosition += self.batchSize
+
+        matrixDecode, matrixLogits, matrixSoftMax = numpy.zeros((self.numClass - 1, self.numClass - 1)), \
+                                                    numpy.zeros((self.numClass - 1, self.numClass - 1)), \
+                                                    numpy.zeros((self.numClass - 1, self.numClass - 1))
+
+        for index in range(len(totalPredictDecode)):
+            matrixDecode[numpy.argmax(numpy.array(testLabel[index]))][totalPredictDecode[index]] += testSeq[index]
+        for index in range(len(totalPredictLogits)):
+            matrixLogits[numpy.argmax(numpy.array(testLabel[index]))][
+                numpy.argmax(numpy.array(totalPredictLogits[index]))] += testSeq[index]
+        for index in range(len(totalPredictSoftMax)):
+            matrixSoftMax[numpy.argmax(numpy.array(testLabel[index]))][
+                numpy.argmax(numpy.array(totalPredictSoftMax[index]))] += testSeq[index]
+        # print(matrixDecode)
+        # print(matrixLogits)
+        # print(matrixSoftMax)
+        return matrixDecode, matrixLogits, matrixSoftMax
+
 
 if __name__ == '__main__':
     bands = 30

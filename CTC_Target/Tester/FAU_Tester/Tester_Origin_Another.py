@@ -7,7 +7,7 @@ import numpy
 if __name__ == '__main__':
     bands = 30
     loadpath = 'E:/CTC_Target_FAU/Features/Bands%d/' % bands
-    savepath = 'Result-CTC-Origin/Bands-%d/' % bands
+    savepath = 'Result-CTC-Origin-Another/Bands-%d/' % bands
     netpath = 'E:/CTC_Target_FAU/CTC-Origin-FAU/Bands-%d/%04d-Network'
     if os.path.exists(savepath): exit()
 
@@ -26,9 +26,9 @@ if __name__ == '__main__':
                                          startFlag=False)
             print('\nEpisode %d/100' % episode)
             classifier.Load(loadpath=netpath % (bands, episode))
-            matrixDecode, matrixLogits, matrixSoftMax = classifier.Test_AllMethods(testData=testData,
-                                                                                   testLabel=testLabel,
-                                                                                   testSeq=testSeq)
+            matrixDecode, matrixLogits, matrixSoftMax = classifier.Test_AllMethodsWithLen(testData=testData,
+                                                                                          testLabel=testLabel,
+                                                                                          testSeq=testSeq)
             print('\n\n')
             print(matrixDecode)
             print(matrixLogits)
