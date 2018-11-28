@@ -2,7 +2,7 @@ import numpy
 import os
 
 if __name__ == '__main__':
-    loadpath = 'E:/CTC_Target/Result-CTC-COMA-5-Part/'
+    loadpath = 'E:/CTC_Target/Result-CTC-FA/'
     bands = 40
     usedPart = 'Logits'
     for gender in ['Female', 'Male']:

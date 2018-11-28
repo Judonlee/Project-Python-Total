@@ -4,11 +4,11 @@ from CTC_Target.Model.CTC_BLSTM_FA import CTC_Multi_FA
 import os
 
 if __name__ == '__main__':
-    bands = 30
-    loadpath = 'D:/ProjectData/CTC_Target/Features/Bands%d/' % bands
-    for session in range(1, 6):
-        for gender in ['Female', 'Male']:
-            savepath = 'D:/ProjectData/CTC_Target/CTC-FA/Bands-%d-Session-%d-%s/' % (bands, session, gender)
+    bands = 40
+    loadpath = 'E:/CTC_Target/Features/Bands%d/' % bands
+    for session in range(5, 6):
+        for gender in ['Male']:
+            savepath = 'E:/CTC_Target/CTC-FA/Bands-%d-Session-%d-%s/' % (bands, session, gender)
             if os.path.exists(savepath): continue
             os.makedirs(savepath)
             trainData, trainLabel, trainSeq, trainScription, testData, testlabel, testSeq, testScription = Load_Part(

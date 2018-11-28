@@ -3,8 +3,8 @@ import os
 import numpy
 
 if __name__ == '__main__':
-    loadpath = 'D:\\ProjectData\\IEMOCAP-Reextraction\\Bands120\\'
-    savepath = 'D:\\ProjectData\\IEMOCAP-Normalized\\Bands120\\'
+    loadpath = 'D:\\ProjectData\\IEMOCAP\\IEMOCAP-Seq-Features\\IS10\\'
+    savepath = 'D:\\ProjectData\\IEMOCAP\\IEMOCAP-Seq-Features\\IS10-Normalized\\'
 
     totalData = []
 

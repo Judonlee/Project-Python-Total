@@ -2,8 +2,10 @@ import numpy
 import os
 
 if __name__ == '__main__':
-    datapath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Normalized/Bands40/improve/'
+    datapath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Seq-Features/IS09-Normalized/improve/'
     transcriptPath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Transcription-CMU/improve/'
+    savepath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Seq-Features/IS09-Npy/'
+    os.makedirs(savepath)
     for indexA in os.listdir(datapath):
         for indexB in os.listdir(os.path.join(datapath, indexA)):
             partData, partSeq, partLabel, partTranscription = [], [], [], []
@@ -39,7 +41,7 @@ if __name__ == '__main__':
 
             print(numpy.shape(partData), numpy.shape(partSeq), numpy.shape(partLabel), numpy.shape(partTranscription),
                   numpy.sum(partLabel, axis=0))
-            numpy.save('%s-%s-Data.npy' % (indexA, indexB), partData)
-            numpy.save('%s-%s-Seq.npy' % (indexA, indexB), partSeq)
-            numpy.save('%s-%s-Label.npy' % (indexA, indexB), partLabel)
-            numpy.save('%s-%s-Transcription.npy' % (indexA, indexB), partTranscription)
+            numpy.save(savepath + '%s-%s-Data.npy' % (indexA, indexB), partData)
+            numpy.save(savepath + '%s-%s-Seq.npy' % (indexA, indexB), partSeq)
+            numpy.save(savepath + '%s-%s-Label.npy' % (indexA, indexB), partLabel)
+            numpy.save(savepath + '%s-%s-Transcription.npy' % (indexA, indexB), partTranscription)
