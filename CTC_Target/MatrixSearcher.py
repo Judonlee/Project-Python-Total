@@ -2,12 +2,12 @@ import numpy
 import os
 
 if __name__ == '__main__':
-    loadpath = 'E:/CTC_Target/Result-CTC-FA/'
-    bands = 40
-    usedPart = 'Logits'
+    loadpath = 'E:/CTC_Target/Result-CTC-Origin/'
+    part = 'MFCC'
+    usedPart = 'SoftMax'
     for gender in ['Female', 'Male']:
         for session in range(1, 6):
-            appoint = 'Bands-%d-Session-%d-%s/%s/' % (bands, session, gender, usedPart)
+            appoint = '%s-Session-%d-%s/%s/' % (part, session, gender, usedPart)
             if not os.path.exists(loadpath + appoint):
                 print()
                 continue

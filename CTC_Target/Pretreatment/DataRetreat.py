@@ -2,9 +2,9 @@ import numpy
 import os
 
 if __name__ == '__main__':
-    datapath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Seq-Features/IS09-Normalized/improve/'
+    datapath = 'D:/ProjectData/IEMOCAP/MFCC-Normalized/improve/'
     transcriptPath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Transcription-CMU/improve/'
-    savepath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Seq-Features/IS09-Npy/'
+    savepath = 'D:/ProjectData/IEMOCAP/MFCC-Normalized-Npy/'
     os.makedirs(savepath)
     for indexA in os.listdir(datapath):
         for indexB in os.listdir(os.path.join(datapath, indexA)):

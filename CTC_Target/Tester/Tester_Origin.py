@@ -5,12 +5,12 @@ import os
 import numpy
 
 if __name__ == '__main__':
-    bands = 40
-    loadpath = 'D:/ProjectData/CTC_Target/Features/Bands%d/' % bands
-    for session in range(5, 6):
+    part = 'MFCC'
+    loadpath = 'E:/CTC_Target/Features/%s/' % part
+    for session in range(1, 6):
         for gender in ['Female', 'Male']:
-            savepath = 'Result-CTC-Origin/Bands-%d-Session-%d-%s/' % (bands, session, gender)
-            netpath = 'D:/ProjectData/CTC_Target/CTC-Origin/Bands-%d-Session-%d/%04d-Network'
+            savepath = 'Result-CTC-Origin/%s-Session-%d-%s/' % (part, session, gender)
+            netpath = 'E:/CTC_Target/CTC-Origin/%s-Session-%d/%04d-Network'
             if os.path.exists(savepath): continue
 
             os.makedirs(savepath + 'Decode')
@@ -27,10 +27,10 @@ if __name__ == '__main__':
                 graph = tensorflow.Graph()
                 with graph.as_default():
                     classifier = CTC_Multi_BLSTM(trainData=None, trainLabel=None, trainSeqLength=None,
-                                                 featureShape=bands, numClass=5, rnnLayers=2, graphRevealFlag=False,
-                                                 startFlag=False)
+                                                 featureShape=numpy.shape(testData[0])[1], numClass=5, rnnLayers=2,
+                                                 graphRevealFlag=False, startFlag=False)
                     print('\nEpisode %d/100' % episode)
-                    classifier.Load(loadpath=netpath % (bands, session, episode))
+                    classifier.Load(loadpath=netpath % (part, session, episode))
                     matrixDecode, matrixLogits, matrixSoftMax = classifier.Test_AllMethods(testData=testData,
                                                                                            testLabel=testLabel,
                                                                                            testSeq=testSeq)

@@ -46,7 +46,7 @@ if __name__ == '__main__':
     # confPath = ['ComParE_2016.conf', 'IS09_emotion.conf', 'IS10_paraling.conf', 'IS13_ComParE.conf', 'chroma_fft.conf',
     #             'chroma_filt.conf']
 
-    for confIndex in range(len(confList)):
+    for confIndex in range(4, 6):
         savepath = 'D:\\ProjectData\\IEMOCAP\\IEMOCAP-Seq-Features\\' + confList[confIndex] + '\\'
         for indexA in ['improve']:
             for indexB in os.listdir(loadpath + indexA):

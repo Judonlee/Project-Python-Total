@@ -2,7 +2,7 @@ import numpy
 
 if __name__ == '__main__':
     for part in ['Decode', 'Logits', 'SoftMax']:
-        loadpath = 'E:/CTC_Target_FAU/Result-CTC-Origin-Another/Bands-40/%s/' % part
+        loadpath = 'E:/CTC_Target_FAU/Another/Result-CTC-FA-Another/Bands-40/%s/' % part
 
         WARList, UARList, WAPList, UAPList = [], [], [], []
         for episode in range(100):
