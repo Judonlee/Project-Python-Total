@@ -3,8 +3,8 @@ import os
 
 if __name__ == '__main__':
     loadpath = 'E:/CTC_Target/Result-CTC-Origin/'
-    part = 'MFCC'
-    usedPart = 'SoftMax'
+    part = 'GeMAPSv01a'
+    usedPart = 'Logits'
     for gender in ['Female', 'Male']:
         for session in range(1, 6):
             appoint = '%s-Session-%d-%s/%s/' % (part, session, gender, usedPart)

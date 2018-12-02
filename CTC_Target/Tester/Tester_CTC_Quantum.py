@@ -1,39 +1,35 @@
-from CTC_Target.Loader.IEMOCAP_Loader import Load
+from CTC_Target.Loader.IEMOCAP_Loader import Load, Load_Part
 import tensorflow
-from CTC_Target.Model.CTC_Multi_BLSTM import CTC_Multi_BLSTM
+from CTC_Target.Model.CTC_BLSTM_QuantumAttention import CTC_QuantumAttention
 import os
 import numpy
 
 if __name__ == '__main__':
-    part = 'GeMAPSv01a'
-    loadpath = 'E:/CTC_Target/Features/%s/' % part
-    for session in range(1, 6):
+    bands = 30
+    loadpath = 'E:/CTC_Target/Features/Bands%d/' % bands
+    for session in range(1, 3):
         for gender in ['Female', 'Male']:
-            savepath = 'Result-CTC-Origin/%s-Session-%d-%s/' % (part, session, gender)
-            netpath = 'E:/CTC_Target/CTC-Origin/%s-Session-%d/%04d-Network'
+            savepath = 'Result-CTC-Quantum/Bands-%d-Session-%d-%s/' % (bands, session, gender)
+            netpath = 'E:/CTC_Target/CTC-Quantum/Bands%d-Session-%d-%s/%04d-Network'
             if os.path.exists(savepath): continue
 
             os.makedirs(savepath + 'Decode')
             os.makedirs(savepath + 'Logits')
             os.makedirs(savepath + 'SoftMax')
 
-            # trainData, trainLabel, trainSeq, trainScription, testData, testlabel, testSeq, testScription = Load(
-            #     loadpath=loadpath, appoint=session)
-            testData = numpy.load(loadpath + '%s-Session%d-Data.npy' % (gender, session))
-            testLabel = numpy.load(loadpath + '%s-Session%d-Label.npy' % (gender, session))
-            testSeq = numpy.load(loadpath + '%s-Session%d-Seq.npy' % (gender, session))
+            trainData, trainLabel, trainSeq, trainScription, testData, testlabel, testSeq, testScription = Load_Part(
+                loadpath=loadpath, appointGender=gender, appointSession=session)
 
             for episode in range(100):
                 graph = tensorflow.Graph()
                 with graph.as_default():
-                    classifier = CTC_Multi_BLSTM(trainData=None, trainLabel=None, trainSeqLength=None,
-                                                 featureShape=numpy.shape(testData[0])[1], numClass=5, rnnLayers=2,
-                                                 graphRevealFlag=False, startFlag=False)
+                    classifier = CTC_QuantumAttention(trainData=None, trainLabel=None, trainSeqLength=None,
+                                                      featureShape=bands, numClass=5, rnnLayers=2,
+                                                      graphRevealFlag=False, startFlag=False)
                     print('\nEpisode %d/100' % episode)
-                    classifier.Load(loadpath=netpath % (part, session, episode))
-                    matrixDecode, matrixLogits, matrixSoftMax = classifier.Test_AllMethods(testData=testData,
-                                                                                           testLabel=testLabel,
-                                                                                           testSeq=testSeq)
+                    classifier.Load(loadpath=netpath % (bands, session, gender, episode))
+                    matrixDecode, matrixLogits, matrixSoftMax = classifier.Test_AllMethods(
+                        testData=testData, testLabel=testlabel, testSeq=testSeq)
                     print('\n\n')
                     print(matrixDecode)
                     print(matrixLogits)

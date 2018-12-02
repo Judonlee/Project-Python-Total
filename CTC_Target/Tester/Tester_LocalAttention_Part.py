@@ -6,23 +6,24 @@ import numpy
 
 if __name__ == '__main__':
     part = 'MFCC'
-    localAttentionScope = 5
+    localAttentionScope = 3
     loadpath = 'E:/CTC_Target/Features/%s/' % part
-    for session in range(1, 2):
+    for session in range(5, 6):
         for gender in ['Female', 'Male']:
             savepath = 'Result-CTC-LA-%d-Part/%s-Session-%d-%s/' % (localAttentionScope, part, session, gender)
             netpath = 'E:/CTC_Target/CTC-LC-Attention-' + str(
-                localAttentionScope) + '/%s-Session-%d-%s/%04d-Network'
-            if os.path.exists(savepath): continue
-
-            os.makedirs(savepath + 'Decode')
-            os.makedirs(savepath + 'Logits')
-            os.makedirs(savepath + 'SoftMax')
+                localAttentionScope) + '-Part/%s-Session-%d-%s/%04d-Network'
+            # if os.path.exists(savepath): continue
+            #
+            # os.makedirs(savepath + 'Decode')
+            # os.makedirs(savepath + 'Logits')
+            # os.makedirs(savepath + 'SoftMax')
 
             trainData, trainLabel, trainSeq, trainScription, testData, testlabel, testSeq, testScription = Load_Part(
                 loadpath=loadpath, appointGender=gender, appointSession=session)
 
             for episode in range(100):
+                if os.path.exists(savepath + 'Decode/%04d.csv' % episode): continue
                 graph = tensorflow.Graph()
                 with graph.as_default():
                     classifier = CTC_LC_Attention(trainData=None, trainLabel=None, trainSeqLength=None,
