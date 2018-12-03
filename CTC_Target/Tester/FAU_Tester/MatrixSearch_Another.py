@@ -2,7 +2,7 @@ import numpy
 
 if __name__ == '__main__':
     for part in ['Decode', 'Logits', 'SoftMax']:
-        loadpath = 'E:/CTC_Target_FAU/Result-CTC-Origin/Bands-30/%s/' % part
+        loadpath = 'E:/CTC_Target_FAU/Result-CTC-Quantum-Another/Bands-30/%s/' % part
 
         WARList, UARList, WAPList, UAPList = [], [], [], []
         for episode in range(100):
@@ -14,8 +14,8 @@ if __name__ == '__main__':
                 WAP += data[index][index] / sum(data[index]) * sum(data[index]) / sum(sum(data))
                 UAP += data[index][index] / sum(data[index]) / len(data)
                 if sum(data[:, index]) != 0:
-                    WAR += data[index][index] / sum(data[index]) * sum(data[index]) / sum(sum(data))
-                    UAR += data[index][index] / sum(data[index]) / len(data)
+                    WAR += data[index][index] / sum(data[:, index]) * sum(data[index]) / sum(sum(data))
+                    UAR += data[index][index] / sum(data[:, index]) / len(data)
             # print(WAR, UAR, WAP, UAP)
             # exit()
 

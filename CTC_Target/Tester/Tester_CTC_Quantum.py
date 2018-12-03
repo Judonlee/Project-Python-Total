@@ -5,9 +5,9 @@ import os
 import numpy
 
 if __name__ == '__main__':
-    bands = 30
+    bands = 40
     loadpath = 'E:/CTC_Target/Features/Bands%d/' % bands
-    for session in range(1, 3):
+    for session in range(3, 4):
         for gender in ['Female', 'Male']:
             savepath = 'Result-CTC-Quantum/Bands-%d-Session-%d-%s/' % (bands, session, gender)
             netpath = 'E:/CTC_Target/CTC-Quantum/Bands%d-Session-%d-%s/%04d-Network'

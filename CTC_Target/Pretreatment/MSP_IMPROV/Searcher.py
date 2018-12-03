@@ -2,7 +2,7 @@ import os
 import numpy
 
 if __name__ == '__main__':
-    voicepath = 'D:/ProjectData/MSP-IMPROVE/Voice/'
+    voicepath = 'D:/ProjectData/MSP-IMPROVE/Voice-Target/read/'
     transcriptionpath = 'D:/ProjectData/MSP-IMPROVE/Transcription/'
 
     matrix = numpy.zeros((6, 4))

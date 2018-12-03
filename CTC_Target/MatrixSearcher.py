@@ -2,9 +2,9 @@ import numpy
 import os
 
 if __name__ == '__main__':
-    loadpath = 'E:/CTC_Target/Result-CTC-Origin/'
-    part = 'GeMAPSv01a'
-    usedPart = 'Logits'
+    loadpath = 'E:/CTC_Target/Result-CTC-Quantum/'
+    part = 'Bands-40'
+    usedPart = 'SoftMax'
     for gender in ['Female', 'Male']:
         for session in range(1, 6):
             appoint = '%s-Session-%d-%s/%s/' % (part, session, gender, usedPart)

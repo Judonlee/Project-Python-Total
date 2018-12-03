@@ -4,7 +4,7 @@ import os
 
 if __name__ == '__main__':
     loadpath = 'D:/ProjectData/MSP-IMPROVE/'
-    savepath = 'D:/ProjectData/MSP-IMPROVE/Voice/'
+    savepath = 'D:/ProjectData/MSP-IMPROVE/Voice-Target/read/'
 
     dictionary = {}
     currentData = numpy.genfromtxt(fname=r'D:\ProjectData\MSP-IMPROVE\Dictionary.csv', dtype=str, delimiter=',')
@@ -16,6 +16,7 @@ if __name__ == '__main__':
     for indexA in range(1, 7):
         for indexB in os.listdir(os.path.join(loadpath, 'session%d' % indexA)):
             for indexC in os.listdir(os.path.join(loadpath, 'session%d' % indexA, indexB)):
+                if indexC != 'R': continue
                 for indexD in os.listdir(os.path.join(loadpath, 'session%d' % indexA, indexB, indexC)):
                     label = dictionary[indexD[4:-4]]
                     if label == 'X' or label == 'O': continue
