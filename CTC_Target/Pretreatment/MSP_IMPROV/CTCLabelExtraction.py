@@ -9,8 +9,8 @@ if __name__ == '__main__':
     # for sample in dictionary.keys():
     #     print(sample, dictionary[sample])
 
-    loadpath = 'D:/ProjectData/MSP-IMPROVE/Transcription/'
-    savepath = 'D:/ProjectData/MSP-IMPROVE/Transcription-CMU/'
+    loadpath = 'D:/ProjectData/MSP-IMPROVE/Voice-Resample-Result-Txt/'
+    savepath = 'D:/ProjectData/MSP-IMPROVE/Voice-Resample-Result-Txt-CMU/'
 
     for indexA in os.listdir(loadpath):
         for indexB in os.listdir(os.path.join(loadpath, indexA)):

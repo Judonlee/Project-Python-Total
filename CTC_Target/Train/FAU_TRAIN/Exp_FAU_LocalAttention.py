@@ -2,16 +2,20 @@ from CTC_Target.Loader.IEMOCAP_Loader import Load_FAU
 import tensorflow
 from CTC_Target.Model.CTC_BLSTM_LC_Attention import CTC_LC_Attention
 import os
+from CTC_Target.Train.FAU_TRAIN.LabelBalance import LabelBalance
 
 if __name__ == '__main__':
     for bands in [30, 40]:
         for attentionScope in [3, 5, 7]:
-            loadpath = 'D:/ProjectData/FAU-AEC-Treated/Features/Bands%d/' % bands
+            loadpath = '/mnt/external/Bobs/CTC_Target_FAU/Features/Bands%d/' % bands
             savepath = 'CTC-LA-%d/Bands-%d/' % (attentionScope, bands)
             if os.path.exists(savepath): continue
             os.makedirs(savepath)
             trainData, trainLabel, trainSeq, trainScription, testData, testlabel, testSeq, testScription = Load_FAU(
                 loadpath=loadpath)
+            trainData, trainLabel, trainSeq, trainScription = LabelBalance(trainData=trainData, trainLabel=trainLabel,
+                                                                           trainSeq=trainSeq,
+                                                                           trainScription=trainScription)
 
             graph = tensorflow.Graph()
             with graph.as_default():

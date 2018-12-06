@@ -3,8 +3,8 @@ import numpy
 
 if __name__ == '__main__':
     for part in ['cH', 'cV']:
-        nodulePath = 'E:/LIDC/TreatmentTrace/Step6-Wavelet-Nodules/db2_CSV/' + part + '/'
-        nonNodulePath = 'E:/LIDC/TreatmentTrace/Step6-Wavelet-NonNodules/db2_CSV/' + part + '/'
+        nodulePath = 'E:/LIDC/TreatmentTrace/Step5-NodulesCsv-Seperate/'
+        nonNodulePath = 'E:/LIDC/TreatmentTrace/Step5-NonNodulesCsv/'
         savePath = 'E:/LIDC/TreatmentTrace/Step7-TotalNpy/Wavelet_db2/' + part + '/'
         if not os.path.exists(savePath): os.makedirs(savePath)
 

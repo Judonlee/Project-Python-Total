@@ -69,6 +69,58 @@ def Load_FAU(loadpath):
     return trainData, trainLabel, trainSeq, trainTranscription, testData, testLabel, testSeq, testTranscription
 
 
+def Load_MSP(loadpath, appointSession):
+    trainData, trainLabel, trainSeq, trainScription, testData, testlabel, testSeq, testScription = [], [], [], [], [], [], [], []
+    for session in range(1, 7):
+        for gender in ['F', 'M']:
+            data = numpy.load(loadpath + 'Session%d-%s-Data.npy' % (session, gender))
+            label = numpy.load(loadpath + 'Session%d-%s-Label.npy' % (session, gender))
+            seq = numpy.load(loadpath + 'Session%d-%s-Seq.npy' % (session, gender))
+            scription = numpy.load(loadpath + 'Session%d-%s-Transcription.npy' % (session, gender))
+
+            if session == appointSession:
+                testData.extend(data)
+                testlabel.extend(label)
+                testSeq.extend(seq)
+                testScription.extend(scription)
+            else:
+                trainData.extend(data)
+                trainLabel.extend(label)
+                trainSeq.extend(seq)
+                trainScription.extend(scription)
+    print(numpy.shape(trainData), numpy.shape(trainLabel), numpy.shape(trainSeq), numpy.shape(trainScription),
+          numpy.sum(trainLabel, axis=0))
+    print(numpy.shape(testData), numpy.shape(testlabel), numpy.shape(testSeq), numpy.shape(testScription),
+          numpy.sum(testlabel, axis=0))
+    return trainData, trainLabel, trainSeq, trainScription, testData, testlabel, testSeq, testScription
+
+
+def Load_MSP_Part(loadpath, appointGender, appointSession):
+    trainData, trainLabel, trainSeq, trainScription, testData, testlabel, testSeq, testScription = [], [], [], [], [], [], [], []
+    for gender in ['F', 'M']:
+        for session in range(1, 7):
+            data = numpy.load(loadpath + 'Session%d-%s-Data.npy' % (session, gender))
+            label = numpy.load(loadpath + 'Session%d-%s-Label.npy' % (session, gender))
+            seq = numpy.load(loadpath + 'Session%d-%s-Seq.npy' % (session, gender))
+            scription = numpy.load(loadpath + 'Session%d-%s-Transcription.npy' % (session, gender))
+
+            if gender == appointGender and session == appointSession:
+                testData.extend(data)
+                testlabel.extend(label)
+                testSeq.extend(seq)
+                testScription.extend(scription)
+            else:
+                trainData.extend(data)
+                trainLabel.extend(label)
+                trainSeq.extend(seq)
+                trainScription.extend(scription)
+    print(numpy.shape(trainData), numpy.shape(trainLabel), numpy.shape(trainSeq), numpy.shape(trainScription),
+          numpy.sum(trainLabel, axis=0))
+    print(numpy.shape(testData), numpy.shape(testlabel), numpy.shape(testSeq), numpy.shape(testScription),
+          numpy.sum(testlabel, axis=0))
+    return trainData, trainLabel, trainSeq, trainScription, testData, testlabel, testSeq, testScription
+
+
 if __name__ == '__main__':
-    loadpath = 'D:/ProjectData/FAU-AEC-Treated/Features/Bands30/'
-    Load_FAU(loadpath=loadpath)
+    loadpath = 'D:/ProjectData/MSP-IMPROVE/Feature/Bands-30/'
+    Load_MSP(loadpath=loadpath, appointSession=1)

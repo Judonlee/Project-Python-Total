@@ -3,16 +3,17 @@ import numpy
 from skimage.feature import local_binary_pattern
 import matplotlib.pylab as plt
 
-POINT = 4
-RADIUS = 1
+POINT = 24
+RADIUS = 3
 if __name__ == '__main__':
-    loadpath = 'E:/LIDC/TreatmentTrace/Step5-NodulesCsv/'
-    csvSavepath = 'E:/LIDC/TreatmentTrace/Step6-LBP/P=%d_R=%d_CSV/' % (POINT, RADIUS)
-    pngSavepath = 'E:/LIDC/TreatmentTrace/Step6-LBP/P=%d_R=%d_PNG/' % (POINT, RADIUS)
+    loadpath = 'E:/LIDC/TreatmentTrace/Step5-NodulesCsv-Seperate/'
+    csvSavepath = 'D:/LIDC/TreatmentTrace/Step6-LBP-Nodules-Seperate/P=%d_R=%d_CSV/' % (POINT, RADIUS)
+    pngSavepath = 'D:/LIDC/TreatmentTrace/Step6-LBP-Nodules-Seperate/P=%d_R=%d_PNG/' % (POINT, RADIUS)
     for indexA in os.listdir(loadpath):
+        if os.path.exists(os.path.join(csvSavepath, indexA)): continue
+        os.makedirs(os.path.join(csvSavepath, indexA))
         print(indexA)
         for indexB in os.listdir(os.path.join(loadpath, indexA)):
-            if os.path.exists(os.path.join(csvSavepath, indexA, indexB)): continue
             os.makedirs(os.path.join(csvSavepath, indexA, indexB))
             os.makedirs(os.path.join(pngSavepath, indexA, indexB))
 

@@ -5,15 +5,17 @@ import pywt
 
 WAVELET_CONF = 'db1'
 if __name__ == '__main__':
-    loadpath = 'E:/LIDC/TreatmentTrace/Step5-NodulesCsv/'
-    csvSavepath = 'E:/LIDC/TreatmentTrace/Step6-Wavelet/%s_CSV/' % WAVELET_CONF
-    pngSavepath = 'E:/LIDC/TreatmentTrace/Step6-Wavelet/%s_PNG/' % WAVELET_CONF
+    loadpath = 'E:/LIDC/TreatmentTrace/Step5-NodulesCsv-Seperate/'
+    csvSavepath = 'D:/LIDC/TreatmentTrace/Step6-Wavelet-Nodules-Seperate/%s_CSV/' % WAVELET_CONF
+    pngSavepath = 'D:/LIDC/TreatmentTrace/Step6-Wavelet-Nodules-Seperate/%s_PNG/' % WAVELET_CONF
     for indexA in os.listdir(loadpath):
         print(indexA)
         for indexB in os.listdir(os.path.join(loadpath, indexA)):
             if os.path.exists(os.path.join(csvSavepath, 'cA', indexA, indexB)): continue
+            os.makedirs(os.path.join(csvSavepath, 'cA', indexA, indexB))
+            os.makedirs(os.path.join(pngSavepath, 'cA', indexA, indexB))
 
-            for part in ['cA', 'cH', 'cV', 'cD']:
+            for part in ['cH', 'cV', 'cD']:
                 os.makedirs(os.path.join(csvSavepath, part, indexA, indexB))
                 os.makedirs(os.path.join(pngSavepath, part, indexA, indexB))
 

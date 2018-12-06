@@ -2,22 +2,23 @@ import os
 import numpy
 
 if __name__ == '__main__':
-    voicepath = 'D:/ProjectData/MSP-IMPROVE/Voice-Target/read/'
-    transcriptionpath = 'D:/ProjectData/MSP-IMPROVE/Transcription/'
+    featurePath = 'D:/ProjectData/MSP-IMPROVE/Voice-Normalized/Bands-30/'
+    transcriptPath = 'D:/ProjectData/MSP-IMPROVE/Transcription-CMU/'
 
-    matrix = numpy.zeros((6, 4))
-    for indexA in os.listdir(voicepath):
-        for indexB in os.listdir(os.path.join(voicepath, indexA)):
-            for indexC in os.listdir(os.path.join(voicepath, indexA, indexB)):
-                for indexD in os.listdir(os.path.join(voicepath, indexA, indexB, indexC)):
-                    if not os.path.exists(os.path.join(transcriptionpath, indexA, indexB, indexC,
-                                                       indexD[0:indexD.find('.')] + '.txt')):
+    for indexA in os.listdir(featurePath):
+        for indexB in os.listdir(os.path.join(featurePath, indexA)):
+            print(indexA, indexB)
+            for indexC in os.listdir(os.path.join(featurePath, indexA, indexB)):
+                for indexD in os.listdir(os.path.join(featurePath, indexA, indexB, indexC)):
+                    feature = numpy.genfromtxt(os.path.join(featurePath, indexA, indexB, indexC, indexD), dtype=float,
+                                               delimiter=',')
+                    with open(os.path.join(transcriptPath, indexA, indexB, indexC, indexD[0:indexD.find('.')] + '.txt'),
+                              'r') as file:
+                        transcriptionData = file.read()
+
+                    tranScriptionReal = numpy.ones(transcriptionData.count(' ') + 1)
+                    # print(numpy.shape(feature), len(tranScriptionReal))
+                    if numpy.shape(feature)[0] < len(tranScriptionReal):
                         print(indexA, indexB, indexC, indexD)
-                        matrix[int(indexA[-1]) - 1][['A', 'H', 'N', 'S'].index(indexC)] += 1
-                        # counter += 1
-                    # print(indexA, indexB, indexC)
-    # print(counter)
-    for indexX in range(numpy.shape(matrix)[0]):
-        for indexY in range(numpy.shape(matrix)[1]):
-            print(matrix[indexX][indexY], end='\t')
-        print()
+                        # exit()
+                    # exit()
