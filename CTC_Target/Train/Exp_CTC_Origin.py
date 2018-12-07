@@ -1,17 +1,18 @@
-from CTC_Target.Loader.IEMOCAP_Loader import Load
+from CTC_Target.Loader.IEMOCAP_Loader import Load, LoadSpecialLabel
 import tensorflow
 from CTC_Target.Model.CTC_Multi_BLSTM import CTC_Multi_BLSTM
 import os
 
 if __name__ == '__main__':
-    for part in ['MFCC', 'eGeMAPSv01a', 'GeMAPSv01a']:
+    transcriptionPath = 'E:/CTC_Target/Features/PronouncingDictionaryDouble/'
+    for part in ['Bands30', 'Bands40']:
         loadpath = 'E:/CTC_Target/Features/%s/' % part
         for session in range(1, 6):
-            savepath = 'CTC-Origin/%s-Session-%d/' % (part, session)
+            savepath = 'CTC-Origin_PDW/%s-Session-%d/' % (part, session)
             if os.path.exists(savepath): continue
             os.makedirs(savepath)
-            trainData, trainLabel, trainSeq, trainScription, testData, testlabel, testSeq, testScription = Load(
-                loadpath=loadpath, appoint=session)
+            trainData, trainLabel, trainSeq, trainScription, testData, testlabel, testSeq, testScription = LoadSpecialLabel(
+                loadpath=loadpath, appoint=session, transcriptionpath=transcriptionPath)
 
             graph = tensorflow.Graph()
             with graph.as_default():

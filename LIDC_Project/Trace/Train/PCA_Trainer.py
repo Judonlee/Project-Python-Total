@@ -7,15 +7,17 @@ import numpy
 import os
 
 if __name__ == '__main__':
-    used = 'OriginCsv'
+    used = 'Wavelet_db1\\cV'
     classifier = 'SVM'
     # SVM    Tree    Gaussian    AdaBoost
-    for pcaPart in range(5, 200, 5):
+    for pcaPart in range(10, 200, 1):
         savepath = 'E:/LIDC/TreatmentTrace/Step8-Result/%s-%s-%04d/' % (used, classifier, pcaPart)
 
-        if os.path.exists(savepath): continue
-        os.makedirs(savepath)
+        # if os.path.exists(savepath): continue
+        # os.makedirs(savepath)
         for appoint in range(10):
+            print('Batch :', appoint)
+            if os.path.exists(savepath + 'Batch%d.csv' % appoint): continue
             trainData, trainLabel, testData, testLabel = LoadPart(
                 loadpath='E:/LIDC/TreatmentTrace/Step7-TotalNpy/%s/' % used,
                 appoint=appoint)
@@ -45,3 +47,4 @@ if __name__ == '__main__':
                         if indexY != 0: file.write(',')
                         file.write(str(predict[indexX][indexY]))
                     file.write('\n')
+        exit()

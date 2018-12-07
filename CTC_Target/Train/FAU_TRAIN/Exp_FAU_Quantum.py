@@ -3,6 +3,7 @@ import tensorflow
 from CTC_Target.Model.CTC_BLSTM_QuantumAttention import CTC_QuantumAttention
 import os
 import numpy
+from CTC_Target.Train.FAU_TRAIN.LabelBalance import LabelBalance
 
 if __name__ == '__main__':
     for bands in [30, 40]:
@@ -12,6 +13,8 @@ if __name__ == '__main__':
         os.makedirs(savepath)
         trainData, trainLabel, trainSeq, trainScription, testData, testlabel, testSeq, testScription = Load_FAU(
             loadpath=loadpath)
+        trainData, trainLabel, trainSeq, trainScription = LabelBalance(trainData=trainData, trainLabel=trainLabel,
+                                                                       trainSeq=trainSeq, trainScription=trainScription)
 
         graph = tensorflow.Graph()
         with graph.as_default():

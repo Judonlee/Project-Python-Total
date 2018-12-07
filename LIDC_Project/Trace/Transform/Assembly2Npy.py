@@ -2,10 +2,10 @@ import os
 import numpy
 
 if __name__ == '__main__':
-    for part in ['cH', 'cV']:
-        nodulePath = 'E:/LIDC/TreatmentTrace/Step5-NodulesCsv-Seperate/'
-        nonNodulePath = 'E:/LIDC/TreatmentTrace/Step5-NonNodulesCsv/'
-        savePath = 'E:/LIDC/TreatmentTrace/Step7-TotalNpy/Wavelet_db2/' + part + '/'
+    for part in ['cA', 'cD', 'cH', 'cV']:
+        nodulePath = 'D:/LIDC/TreatmentTrace/Step6-Wavelet-Nodules-Seperate/db4_CSV/%s/' % part
+        nonNodulePath = 'E:/LIDC/TreatmentTrace/Step6-Wavelet-NonNodules/db4_CSV/%s/' % part
+        savePath = 'E:/LIDC/TreatmentTrace/Step7-TotalNpy/Wavelet_db4/' + part + '/'
         if not os.path.exists(savePath): os.makedirs(savePath)
 
         for appoint in range(10):
@@ -19,7 +19,7 @@ if __name__ == '__main__':
                         if counter % 10 == appoint:
                             data = numpy.genfromtxt(fname=os.path.join(nodulePath, indexA, indexB, indexC), dtype=float,
                                                     delimiter=',')
-                            label = [1, 0]
+                            label = [0, 1]
                             partData.append(data)
                             partLabel.append(label)
                         counter += 1
@@ -31,7 +31,7 @@ if __name__ == '__main__':
                     if counter % 10 == appoint:
                         data = numpy.genfromtxt(fname=os.path.join(nonNodulePath, indexA, indexB), dtype=float,
                                                 delimiter=',')
-                        label = [0, 1]
+                        label = [1, 0]
                         partData.append(data)
                         partLabel.append(label)
                     counter += 1

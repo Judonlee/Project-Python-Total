@@ -3,8 +3,8 @@ import os
 
 if __name__ == '__main__':
     datapath = 'D:/ProjectData/IEMOCAP/MFCC-Normalized/improve/'
-    transcriptPath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Transcription-CMU/improve/'
-    savepath = 'D:/ProjectData/IEMOCAP/MFCC-Normalized-Npy/'
+    transcriptPath = 'D:/ProjectData/IEMOCAP/IEMOCAP-Transcription/improve/'
+    savepath = 'E:/CTC_Target/Features/WordNumber/'
     os.makedirs(savepath)
     for indexA in os.listdir(datapath):
         for indexB in os.listdir(os.path.join(datapath, indexA)):
@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
             print(numpy.shape(partData), numpy.shape(partSeq), numpy.shape(partLabel), numpy.shape(partTranscription),
                   numpy.sum(partLabel, axis=0))
-            numpy.save(savepath + '%s-%s-Data.npy' % (indexA, indexB), partData)
-            numpy.save(savepath + '%s-%s-Seq.npy' % (indexA, indexB), partSeq)
-            numpy.save(savepath + '%s-%s-Label.npy' % (indexA, indexB), partLabel)
+            # numpy.save(savepath + '%s-%s-Data.npy' % (indexA, indexB), partData)
+            # numpy.save(savepath + '%s-%s-Seq.npy' % (indexA, indexB), partSeq)
+            # numpy.save(savepath + '%s-%s-Label.npy' % (indexA, indexB), partLabel)
             numpy.save(savepath + '%s-%s-Transcription.npy' % (indexA, indexB), partTranscription)
