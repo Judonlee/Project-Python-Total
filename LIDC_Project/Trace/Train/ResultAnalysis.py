@@ -8,10 +8,10 @@ MATRIX_START_X = 4
 MATRIX_START_Y = 7
 
 if __name__ == '__main__':
-    searchPath = 'E:/LIDC/TreatmentTrace/Step8-Result/'
+    searchPath = 'E:/LIDC/TreatmentTrace/Wavelet_db4/'
     for part in os.listdir(searchPath):
         loadpath = searchPath + part + '/'
-        savepath = 'E:/LIDC/TreatmentTrace/Step9-Analysis/'
+        savepath = 'E:/LIDC/TreatmentTrace/Wavelet_db4_Result/'
         if not os.path.exists(savepath): os.makedirs(savepath)
         savename = part
 

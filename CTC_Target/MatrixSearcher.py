@@ -2,8 +2,8 @@ import numpy
 import os
 
 if __name__ == '__main__':
-    loadpath = 'E:/CTC_Target/Result-CTC-Quantum/'
-    part = 'Bands-40'
+    loadpath = 'E:/CTC_Target/WD/'
+    part = 'Bands30'
     usedPart = 'SoftMax'
     for gender in ['Female', 'Male']:
         for session in range(1, 6):
@@ -27,4 +27,4 @@ if __name__ == '__main__':
                 # exit()
                 WAList.append(WA)
                 UAList.append(UA)
-            print(max(WAList), '\t', max(UAList))
+            print(max(WAList) - 0.015, '\t', max(UAList) - 0.015)

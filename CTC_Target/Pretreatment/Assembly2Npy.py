@@ -3,7 +3,7 @@ import os
 
 if __name__ == '__main__':
     loadPath = 'D:/ProjectData/FAU-AEC-Treated/IS2009-Class5-Csv-Normalized/Bands-40/Mont/'
-    transcriptionPath = 'D:/ProjectData/FAU-AEC-Treated/Transcription-Pronouncing/'
+    transcriptionPath = 'D:/ProjectData/FAU-AEC-Treated/Transcription/'
     totalData, totalLabel, totalTranscription, totalSeq = [], [], [], []
     for indexA in os.listdir(loadPath):
         for indexB in os.listdir(os.path.join(loadPath, indexA)):

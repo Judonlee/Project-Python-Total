@@ -5,7 +5,7 @@ import os
 import numpy
 
 if __name__ == '__main__':
-    for part in ['MFCC','eGeMAPSv01a', 'GeMAPSv01a']:
+    for part in ['MFCC', 'eGeMAPSv01a', 'GeMAPSv01a']:
         loadpath = 'E:/CTC_Target/Features/%s/' % part
         for session in range(1, 6):
             for gender in ['Female', 'Male']:
@@ -19,7 +19,8 @@ if __name__ == '__main__':
                 with graph.as_default():
                     classifier = CTC_LC_Attention(trainData=trainData, trainLabel=trainScription,
                                                   trainSeqLength=trainSeq, featureShape=numpy.shape(trainData[0])[1],
-                                                  numClass=5, rnnLayers=2, graphRevealFlag=False, attentionScope=5)
+                                                  numClass=5, rnnLayers=2, graphRevealFlag=False, attentionScope=5,
+                                                  startFlag=False)
                     print(classifier.information)
                     for episode in range(100):
                         print('\nEpisode %d/100 : Total Loss = %f\n' % (episode, classifier.Train()), end='')

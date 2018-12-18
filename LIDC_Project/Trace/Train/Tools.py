@@ -72,8 +72,8 @@ def Result_Calculation(testLabel, probability):
     print(matrix)
 
     Precision = 0
-    Sensitivity = matrix[0][0] / sum(matrix[0])
-    Specificity = matrix[0][0] / sum(matrix[:, 0])
+    Sensitivity = matrix[1][1] / sum(matrix[1])
+    Specificity = matrix[1][1] / sum(matrix[:, 1])
     for index in range(len(matrix)):
         Precision += matrix[index][index]
     Precision /= sum(sum(matrix))

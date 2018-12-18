@@ -95,6 +95,22 @@ def Load_FAU(loadpath):
     return trainData, trainLabel, trainSeq, trainTranscription, testData, testLabel, testSeq, testTranscription
 
 
+def Load_FAU_Transcription(loadpath, transcriptionpath):
+    trainData = numpy.load(loadpath + 'Ohm-Data.npy')
+    trainLabel = numpy.load(loadpath + 'Ohm-Label.npy')
+    trainSeq = numpy.load(loadpath + 'Ohm-Seq.npy')
+    trainTranscription = numpy.load(transcriptionpath + 'Ohm-Transcription.npy')
+    testData = numpy.load(loadpath + 'Mont-Data.npy')
+    testLabel = numpy.load(loadpath + 'Mont-Label.npy')
+    testSeq = numpy.load(loadpath + 'Mont-Seq.npy')
+    testTranscription = numpy.load(transcriptionpath + 'Mont-Transcription.npy')
+    print(numpy.shape(trainData), numpy.shape(trainLabel), numpy.shape(trainSeq), numpy.shape(trainTranscription),
+          numpy.sum(trainLabel, axis=0))
+    print(numpy.shape(testData), numpy.shape(testLabel), numpy.shape(testSeq), numpy.shape(testTranscription),
+          numpy.sum(testLabel, axis=0))
+    return trainData, trainLabel, trainSeq, trainTranscription, testData, testLabel, testSeq, testTranscription
+
+
 def Load_MSP(loadpath, appointSession):
     trainData, trainLabel, trainSeq, trainScription, testData, testlabel, testSeq, testScription = [], [], [], [], [], [], [], []
     for session in range(1, 7):

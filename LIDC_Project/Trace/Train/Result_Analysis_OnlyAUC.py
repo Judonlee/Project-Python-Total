@@ -11,7 +11,7 @@ if __name__ == '__main__':
                 testLabel = numpy.argmax(testLabel, axis=1)
 
                 probability = numpy.genfromtxt(
-                    os.path.join('E:/BaiduNetdiskDownload/Step8-Result/Step8-Result/OriginCsv-SVM-%04d/Batch%d.csv' % (
+                    os.path.join('E:/BaiduNetdiskDownload/Step8-Result-DX/Step8-Result-DX/OriginCsv-SVM-%04d/Batch%d.csv' % (
                         indexA, indexB)), dtype=float, delimiter=',')
                 auc = AUC_Calculation(testLabel=testLabel, probability=probability)
                 print(auc)

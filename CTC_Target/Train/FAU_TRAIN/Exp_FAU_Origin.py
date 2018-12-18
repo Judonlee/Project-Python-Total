@@ -1,17 +1,18 @@
-from CTC_Target.Loader.IEMOCAP_Loader import Load_FAU
+from CTC_Target.Loader.IEMOCAP_Loader import Load_FAU, Load_FAU_Transcription
 import tensorflow
 from CTC_Target.Model.CTC_Multi_BLSTM import CTC_Multi_BLSTM
 import os
 from CTC_Target.Train.FAU_TRAIN.LabelBalance import LabelBalance
 
 if __name__ == '__main__':
-    for bands in [30, 40]:
+    for bands in [40]:
         loadpath = 'E:/CTC_Target_FAU/Features/Bands%d/' % bands
+        transcriptionpath = 'E:/CTC_Target_FAU/Features/PronounceNumberDouble/'
         savepath = 'CTC-Origin-FAU/Bands-%d/' % (bands)
         if os.path.exists(savepath): continue
         os.makedirs(savepath)
-        trainData, trainLabel, trainSeq, trainScription, testData, testlabel, testSeq, testScription = Load_FAU(
-            loadpath=loadpath)
+        trainData, trainLabel, trainSeq, trainScription, testData, testlabel, testSeq, testScription = \
+            Load_FAU_Transcription(loadpath=loadpath, transcriptionpath=transcriptionpath)
         trainData, trainLabel, trainSeq, trainScription = LabelBalance(trainData=trainData, trainLabel=trainLabel,
                                                                        trainSeq=trainSeq, trainScription=trainScription)
         # exit()

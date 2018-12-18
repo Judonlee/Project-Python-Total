@@ -11,12 +11,17 @@ def treatment():
     used = 'OriginCsv'
     classifier = 'SVM'
     # SVM    Tree    Gaussian    AdaBoost
-    for pcaPart in range(5, 200, 5):
-        savepath = 'Step8-Result/%s-%s-%04d/' % (used, classifier, pcaPart)
+    for pcaPart in range(1, 100):
+        savepath = 'E:/BaiduNetdiskDownload/Train/Step8-Result/%s-%s-%04d/' % (used, classifier, pcaPart)
 
-        if os.path.exists(savepath): continue
-        os.makedirs(savepath)
+        # if os.path.exists(savepath): continue
+        # os.makedirs(savepath)
         for appoint in range(10):
+            if os.path.exists(savepath + 'Batch%d.csv' % appoint): continue
+            if not os.path.exists(savepath): exit()
+            with open(savepath + 'Batch%d.csv' % appoint, 'w'):
+                pass
+            print('PCA Part :', pcaPart, appoint)
             trainData, trainLabel, testData, testLabel = LoadPart(
                 loadpath='E:/LIDC/TreatmentTrace/Step7-TotalNpy/%s/' % used,
                 appoint=appoint)
@@ -25,7 +30,7 @@ def treatment():
             testData = numpy.reshape(testData, [-1, numpy.shape(testData)[1] * numpy.shape(testData)[2]])
             testLabel = numpy.argmax(testLabel, axis=1)
 
-            trainData, testData = PCA_Treatment(trainData=trainData, testData=testData)
+            trainData, testData = PCA_Treatment(trainData=trainData, testData=testData, componentNumber=pcaPart)
 
             print(numpy.shape(trainData), numpy.shape(trainLabel), numpy.shape(testData), numpy.shape(testLabel))
 

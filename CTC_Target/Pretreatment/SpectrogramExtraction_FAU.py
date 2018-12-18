@@ -4,7 +4,7 @@ from scipy import signal
 import numpy
 
 if __name__ == '__main__':
-    m_bands = 40
+    m_bands = 100
     loadpath = 'D:\\ProjectData\\FAU-AEC-Treated\\IS2009-Class5\\'
     savepath = 'D:\\ProjectData\\FAU-AEC-Treated\\IS2009-Class5-Csv\\Bands-%d\\' % m_bands
 
