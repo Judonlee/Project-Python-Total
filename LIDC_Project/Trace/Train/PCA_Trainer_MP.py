@@ -9,13 +9,12 @@ import os
 
 def treatment():
     used = 'OriginCsv'
-    classifier = 'SVM'
+    classifier = 'Tree'
     # SVM    Tree    Gaussian    AdaBoost
-    for pcaPart in range(1, 100):
-        savepath = 'E:/BaiduNetdiskDownload/Train/Step8-Result/%s-%s-%04d/' % (used, classifier, pcaPart)
+    for pcaPart in range(1, 200):
+        savepath = 'E:/LIDC-Result/Step8-Result/%s-%s-%04d/' % (used, classifier, pcaPart)
 
-        # if os.path.exists(savepath): continue
-        # os.makedirs(savepath)
+        if not os.path.exists(savepath): os.makedirs(savepath)
         for appoint in range(10):
             if os.path.exists(savepath + 'Batch%d.csv' % appoint): continue
             if not os.path.exists(savepath): exit()
@@ -54,4 +53,4 @@ def treatment():
 
 
 if __name__ == '__main__':
-    MP_Treatment(function=treatment, times=5)
+    MP_Treatment(function=treatment, times=2)
