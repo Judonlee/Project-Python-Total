@@ -1,30 +1,39 @@
-import os
+import matplotlib.pylab as plt
 import numpy
-from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier
-from pprint import pprint
 
 if __name__ == '__main__':
-    loadpath = 'Bands30/'
-    savepath = 'Bands30.csv'
-    trainData = numpy.load(loadpath + 'TrainData.npy')
-    trainLabel = numpy.load(loadpath + 'TrainLabel.npy')
-    testData = numpy.load(loadpath + 'TestData.npy')
-    testLabel = numpy.load(loadpath + 'TestLabel.npy')
-    print(numpy.shape(trainData), numpy.shape(trainLabel), numpy.shape(testData), numpy.shape(testLabel))
+    loadpath = 'D:/Project-Matlab/Treatment/新建文件夹/%s/Ratio%d.txt'
+    for ratio in range(50, 100, 10):
+        totalData = numpy.tile([[5]], [30, 91]).tolist()
+        for counter in range(30, 301, 1):
+            current = []
+            if counter % 100 != 0:
+                data = numpy.genfromtxt(loadpath % (str(counter / 100), ratio), dtype=float, delimiter=',')
+            else:
+                data = numpy.genfromtxt(loadpath % (str(int(counter / 100)), ratio), dtype=float, delimiter=',')
+            print(counter, numpy.shape(numpy.reshape(data, [-1])))
+            current.extend(numpy.reshape(data, [-1]))
+            totalData.append(current)
+        print(numpy.shape(totalData))
+        totalData = numpy.array(totalData)
+        totalData = numpy.transpose(totalData, [1, 0])
+        print(numpy.average(numpy.reshape(totalData, [-1])))
 
-    clf = DecisionTreeClassifier()
-    clf.fit(trainData, trainLabel)
-    predict = clf.predict(testData)
+        # part1 = plt.subplot(330 + ratio / 10)
+        plt.imshow(totalData, cmap='gray')
+        plt.colorbar()
 
-    matrix = numpy.zeros((5, 5))
-    for index in range(len(predict)):
-        matrix[int(testLabel[index])][int(predict[index])] += 1
-    pprint(matrix)
+        plt.xlabel('Slope')
+        plt.ylabel('XNob')
+        plt.title('Ratio %d' % ratio)
+        plt.show()
+        exit()
+    #plt.colorbar().set_label('Epsilon15NAR:Epsilon15NXR')
+    # plt.colorbar()
+    # plt.show()
 
-    with open(savepath, 'w') as file:
-        for indexA in range(numpy.shape(matrix)[0]):
-            for indexB in range(numpy.shape(matrix)[1]):
-                if indexB != 0: file.write(',')
-                file.write(str(matrix[indexA][indexB]))
-            file.write('\n')
+    # plt.ylim([-5, 5])
+    # plt.plot(totalData)
+    # plt.show()
+
+    # print(totalData[:, 1])

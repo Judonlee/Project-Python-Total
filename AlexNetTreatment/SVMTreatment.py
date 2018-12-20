@@ -2,7 +2,7 @@ from sklearn.svm import SVC
 import numpy
 
 if __name__ == '__main__':
-    loadpath = 'D:/Matlab/Bands100/'
+    loadpath = 'D:/Matlab/VGG19/'
     trainData = numpy.load(loadpath + 'Ohm-Data.npy')
     trainLabel = numpy.load(loadpath + 'Ohm-Label.npy')
     testData = numpy.load(loadpath + 'Mont-Data.npy')

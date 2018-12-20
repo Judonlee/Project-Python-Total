@@ -1,11 +1,11 @@
 import numpy
 
 if __name__ == '__main__':
-    usedPart = 'Mont'
+    usedPart = 'Ohm'
     data, label = [], []
-    savepath = 'D:/Matlab/Bands100/'
+    savepath = 'D:/Matlab/VGG19/'
     for index in range(5):
-        currentData = numpy.genfromtxt('D:\Matlab\Bands30\%s-%d.csv' % (usedPart, index), dtype=float, delimiter=',')
+        currentData = numpy.genfromtxt('D:\Matlab\VGG19\%s-%d.csv' % (usedPart, index), dtype=float, delimiter=',')
         currentLabel = numpy.tile([index], [numpy.shape(currentData)[0]])
         print(numpy.shape(currentData), numpy.shape(currentLabel))
         data.extend(currentData)
