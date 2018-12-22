@@ -11,7 +11,7 @@ def treatment():
     used = 'OriginCsv'
     classifier = 'Tree'
     # SVM    Tree    Gaussian    AdaBoost
-    for pcaPart in range(1, 200):
+    for pcaPart in range(1, 100):
         savepath = 'E:/LIDC-Result/Step8-Result/%s-%s-%04d/' % (used, classifier, pcaPart)
 
         if not os.path.exists(savepath): os.makedirs(savepath)
@@ -53,4 +53,4 @@ def treatment():
 
 
 if __name__ == '__main__':
-    MP_Treatment(function=treatment, times=2)
+    MP_Treatment(function=treatment, times=3)

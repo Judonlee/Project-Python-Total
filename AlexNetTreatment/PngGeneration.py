@@ -5,9 +5,10 @@ import os
 THRESHOLD = 500
 
 if __name__ == '__main__':
-    loadfile = 'E:/OneUseData/FAU/bands-40/ohm-std.npy'
-    labelfile = 'E:/OneUseData/FAU/bands-40/ohm-label.npy'
-    savepath = 'D:/OneUseData/FAU-Png/Bands40-224/Ohm/'
+    bands = 100
+    loadfile = 'E:/OneUseData/FAU/bands-%d/mont-std.npy' % bands
+    labelfile = 'E:/OneUseData/FAU/bands-%d/mont-label.npy' % bands
+    savepath = 'D:/OneUseData/FAU-Png/Bands%d-224/Mont/' % bands
 
     counter = 0
     data = numpy.load(loadfile)

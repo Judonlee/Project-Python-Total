@@ -7,7 +7,7 @@ if __name__ == '__main__':
     for part in ['Bands-30', 'Bands-40']:
         loadpath = 'D:/ProjectData/MSP-IMPROVE/Feature/%s/' % part
         for scope in [3, 5, 7]:
-            for session in range(1, 6):
+            for session in range(1, 7):
                 for gender in ['F', 'M']:
                     savepath = 'CTC-MSP-LA-%d/%s-Session-%d-%s/' % (scope, part, session, gender)
                     if os.path.exists(savepath): continue
