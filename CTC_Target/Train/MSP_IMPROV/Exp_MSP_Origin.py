@@ -4,10 +4,10 @@ from CTC_Target.Model.CTC_Multi_BLSTM import CTC_Multi_BLSTM
 import os
 
 if __name__ == '__main__':
-    for part in ['Bands-30', 'Bands-40']:
-        loadpath = 'D:/ProjectData/MSP-IMPROVE/Feature/%s/' % part
-        for session in range(1, 6):
-            savepath = 'CTC-MSP-Origin/%s-Session-%d/' % (part, session)
+    for part in ['Bands-30']:
+        loadpath = 'E:/CTC_Target_MSP/Feature/%s/' % part
+        for session in range(6, 7):
+            savepath = 'E:/CTC_Target_MSP/CTC-MSP-Origin/%s-Session-%d/' % (part, session)
             if os.path.exists(savepath): continue
             os.makedirs(savepath)
             trainData, trainLabel, trainSeq, trainScription, testData, testlabel, testSeq, testScription = Load_MSP(

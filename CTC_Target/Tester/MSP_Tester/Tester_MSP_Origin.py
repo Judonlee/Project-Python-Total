@@ -7,10 +7,10 @@ import numpy
 if __name__ == '__main__':
     bands = 30
 
-    for session in range(1, 2):
+    for session in range(6, 7):
         for gender in ['F', 'M']:
             loadpath = 'E:/CTC_Target_MSP/Feature/Bands-%d/' % bands
-            savepath = 'Result-CTC-Origin-MSP/Bands-%d/Session-%d-%s' % (bands, session, gender)
+            savepath = 'Result-CTC-Origin-MSP/Bands-%d/Session-%d-%s/' % (bands, session, gender)
             netpath = 'E:/CTC_Target_MSP/CTC-MSP-Origin/Bands-%d-Session-%d/%04d-Network'
             if os.path.exists(savepath): continue
 

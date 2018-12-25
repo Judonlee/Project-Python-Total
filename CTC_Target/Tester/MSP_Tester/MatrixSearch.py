@@ -4,7 +4,7 @@ import os
 if __name__ == '__main__':
     for gender in ['F', 'M']:
         for session in range(1, 7):
-            loadpath = 'E:/CTC_Target_MSP/Result-CTC-Origin-MSP/Bands-30/Session-%d-%s/SoftMax/' % (session, gender)
+            loadpath = 'E:/CTC_Target_MSP/Result-CTC-LA-5/Bands-30/Session-%d-%s/Logits/' % (session, gender)
 
             if not os.path.exists(loadpath):
                 print()
@@ -12,6 +12,7 @@ if __name__ == '__main__':
             WAList, UAList = [], []
             for episode in range(100):
                 filename = '%04d.csv' % episode
+                if not os.path.exists(loadpath + filename): break
                 data = numpy.genfromtxt(fname=loadpath + filename, dtype=float, delimiter=',')
                 WA, UA = 0, 0
                 for index in range(len(data)):

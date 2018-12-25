@@ -5,8 +5,8 @@ import os
 
 if __name__ == '__main__':
     part = 'Bands-30'
-    session = 5
-    startPosition = 78
+    session = 6
+    startPosition = 13
     loadpath = 'E:/CTC_Target_MSP/Feature/%s/' % part
     savepath = 'E:/CTC_Target_MSP/CTC-MSP-Origin/%s-Session-%d/' % (part, session)
 

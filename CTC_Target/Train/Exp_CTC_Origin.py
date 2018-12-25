@@ -7,12 +7,12 @@ if __name__ == '__main__':
     transcriptionPath = 'E:/CTC_Target/Features/PronouncingDictionaryDouble/'
     for part in ['Bands30', 'Bands40']:
         loadpath = 'E:/CTC_Target/Features/%s/' % part
-        for session in range(1, 6):
-            savepath = 'CTC-Origin_PDW/%s-Session-%d/' % (part, session)
+        for session in range(0, 1):
+            savepath = 'E:/CTC-Transform/IEMOCAP-Total/%s-Session-%d/' % (part, session)
             if os.path.exists(savepath): continue
             os.makedirs(savepath)
-            trainData, trainLabel, trainSeq, trainScription, testData, testlabel, testSeq, testScription = LoadSpecialLabel(
-                loadpath=loadpath, appoint=session, transcriptionpath=transcriptionPath)
+            trainData, trainLabel, trainSeq, trainScription, testData, testlabel, testSeq, testScription = Load(
+                loadpath=loadpath, appoint=session)
 
             graph = tensorflow.Graph()
             with graph.as_default():
