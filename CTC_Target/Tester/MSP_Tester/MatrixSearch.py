@@ -2,9 +2,10 @@ import numpy
 import os
 
 if __name__ == '__main__':
+    counter = 0
     for gender in ['F', 'M']:
         for session in range(1, 7):
-            loadpath = 'E:/CTC_Target_MSP/Result-CTC-LA-5/Bands-30/Session-%d-%s/Logits/' % (session, gender)
+            loadpath = 'E:/CTC_Target_MSP/Result-CTC-Origin-MSP/Bands-30/Session-%d-%s/SoftMax/' % (session, gender)
 
             if not os.path.exists(loadpath):
                 print()
@@ -14,6 +15,7 @@ if __name__ == '__main__':
                 filename = '%04d.csv' % episode
                 if not os.path.exists(loadpath + filename): break
                 data = numpy.genfromtxt(fname=loadpath + filename, dtype=float, delimiter=',')
+                counter += numpy.sum(data)
                 WA, UA = 0, 0
                 for index in range(len(data)):
                     WA += data[index][index]
@@ -24,3 +26,4 @@ if __name__ == '__main__':
                 WAList.append(WA)
                 UAList.append(UA)
             print(max(WAList), '\t', max(UAList))
+    print(counter)

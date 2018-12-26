@@ -1,39 +1,26 @@
-import matplotlib.pylab as plt
-import numpy
+from pprint import pprint
 
 if __name__ == '__main__':
-    loadpath = 'D:/Project-Matlab/Treatment/新建文件夹/%s/Ratio%d.txt'
-    for ratio in range(50, 100, 10):
-        totalData = numpy.tile([[5]], [30, 91]).tolist()
-        for counter in range(30, 301, 1):
-            current = []
-            if counter % 100 != 0:
-                data = numpy.genfromtxt(loadpath % (str(counter / 100), ratio), dtype=float, delimiter=',')
-            else:
-                data = numpy.genfromtxt(loadpath % (str(int(counter / 100)), ratio), dtype=float, delimiter=',')
-            print(counter, numpy.shape(numpy.reshape(data, [-1])))
-            current.extend(numpy.reshape(data, [-1]))
-            totalData.append(current)
-        print(numpy.shape(totalData))
-        totalData = numpy.array(totalData)
-        totalData = numpy.transpose(totalData, [1, 0])
-        print(numpy.average(numpy.reshape(totalData, [-1])))
+    for a in range(2):
+        for b in range(2):
+            for c in range(2):
+                for d in range(2):
+                    list = [[a, b, c, d]]
+                    for x in range(3):
+                        data = []
+                        for y in range(4 - x - 1):
+                            if list[x][y] == list[x][y + 1]:
+                                data.append(1)
+                            else:
+                                data.append(0)
+                        list.append(data)
+                    # pprint(list)
+                    # exit()
 
-        # part1 = plt.subplot(330 + ratio / 10)
-        plt.imshow(totalData, cmap='gray')
-        plt.colorbar()
-
-        plt.xlabel('Slope')
-        plt.ylabel('XNob')
-        plt.title('Ratio %d' % ratio)
-        plt.show()
-        exit()
-    #plt.colorbar().set_label('Epsilon15NAR:Epsilon15NXR')
-    # plt.colorbar()
-    # plt.show()
-
-    # plt.ylim([-5, 5])
-    # plt.plot(totalData)
-    # plt.show()
-
-    # print(totalData[:, 1])
+                    counter = 0
+                    for x in range(len(list)):
+                        for y in range(len(list[x])):
+                            counter += list[x][y]
+                    # print(counter)
+                    if counter == 5:
+                        pprint(list)

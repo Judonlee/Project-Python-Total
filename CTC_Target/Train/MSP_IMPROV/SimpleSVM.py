@@ -25,13 +25,13 @@ def Loader(loadpath, appointSession, appointGender):
 
 
 def Treatment():
-    loadpath = 'D:/ProjectData/MSP-IMPROVE/OpenSmile/IS12-Npy/'
+    loadpath = '/mnt/external/Bobs/CTC_Target_MSP/Feature/IS13-Npy/'
     for cSearch in range(12):
         for gammaSearch in range(-15, -3, 1):
             c = numpy.power(2, cSearch)
             gamma = 1 / numpy.power(2, -gammaSearch)
             print(c, gamma)
-            savepath = 'D:/ProjectData/MSP-IMPROVE/OpenSmile/IS12-Result/C=%f,Gamma=%f/' % (c, gamma)
+            savepath = 'IS13-Result/C=%f,Gamma=%f/' % (c, gamma)
             if not os.path.exists(savepath): os.makedirs(savepath)
             for appointSession in range(1, 7):
                 for appointGender in ['F', 'M']:
@@ -65,7 +65,7 @@ def Treatment():
 
 if __name__ == '__main__':
     processList = []
-    for index in range(10):
+    for index in range(6):
         p = mp.Process(target=Treatment)
         processList.append(p)
         p.start()
