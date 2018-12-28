@@ -3,8 +3,8 @@ import os
 
 if __name__ == '__main__':
     loadpath = 'D:/ProjectData/MSP-IMPROVE/Voice/'
-    savepath = 'D:/ProjectData/MSP-IMPROVE/OpenSmile/emobase/'
-    conf = 'emobase.conf'
+    savepath = 'D:/ProjectData/MSP-IMPROVE/OpenSmile/eGeMAPSv01a/'
+    conf = 'gemaps/eGeMAPSv01a.conf'
     for indexA in os.listdir(loadpath):
         for indexB in os.listdir(os.path.join(loadpath, indexA)):
             for indexC in os.listdir(os.path.join(loadpath, indexA, indexB)):

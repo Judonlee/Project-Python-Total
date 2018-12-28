@@ -5,8 +5,8 @@ if __name__ == '__main__':
     counter = 0
     for gender in ['F', 'M']:
         for session in range(1, 7):
-            loadpath = 'E:/CTC_Target_MSP/Result-CTC-Origin-MSP/Bands-30/Session-%d-%s/SoftMax/' % (session, gender)
-
+            loadpath = 'E:/CTC_Target_MSP/DNN-DropOut/eGeMAPSv01a-Result/Session%d-%s/' % (session, gender)
+            # print(loadpath)
             if not os.path.exists(loadpath):
                 print()
                 continue

@@ -2,8 +2,8 @@ import os
 import numpy
 
 if __name__ == '__main__':
-    loadpath = 'D:/ProjectData/MSP-IMPROVE/OpenSmile/IS12-Normalization/'
-    savepath = 'D:/ProjectData/MSP-IMPROVE/OpenSmile/IS12-Npy/'
+    loadpath = 'D:/ProjectData/MSP-IMPROVE/OpenSmile/eGeMAPSv01a-Normalization/'
+    savepath = 'D:/ProjectData/MSP-IMPROVE/OpenSmile/eGeMAPSv01a-Npy/'
     if not os.path.exists(savepath): os.makedirs(savepath)
     for indexA in os.listdir(loadpath):
         for indexB in os.listdir(os.path.join(loadpath, indexA)):

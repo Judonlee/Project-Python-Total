@@ -3,8 +3,8 @@ import numpy
 from sklearn.preprocessing import scale
 
 if __name__ == '__main__':
-    loadpath = 'D:/ProjectData/MSP-IMPROVE/OpenSmile/emobase/'
-    savepath = 'D:/ProjectData/MSP-IMPROVE/OpenSmile/emobase-Normalization/'
+    loadpath = 'D:/ProjectData/MSP-IMPROVE/OpenSmile/eGeMAPSv01a/'
+    savepath = 'D:/ProjectData/MSP-IMPROVE/OpenSmile/eGeMAPSv01a-Normalization/'
     totalData = []
 
     for indexA in os.listdir(loadpath):

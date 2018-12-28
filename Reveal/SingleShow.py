@@ -5,12 +5,12 @@ import math
 
 if __name__ == '__main__':
     drift = 'Epsilon15NXR'
-    fold = 'Epsilon15NAR-Epsilon15NXR-Expand'
-    errorValue = -4
+    fold = 'Epsilon15NXR-Epsilon18NXR-Expand'
 
-    loadpath = 'D:/Project-Matlab/Treatment/新建文件夹/%s-Drifted/%s/%s/Ratio%d.txt'
-    for ratio in range(50, 60, 10):
-        totalData = numpy.tile([[-999]], [30, 397]).tolist()
+    for ratio in range(10, 100, 10):
+        loadpath = 'D:/Project-Matlab/Treatment/新建文件夹/%s-Drifted/%s/%s/Ratio%d.txt'
+
+        totalData = numpy.tile([[-999]], [30, 301]).tolist()
         for counter in range(30, 301, 1):
             current = []
             if counter % 100 != 0:
@@ -38,7 +38,7 @@ if __name__ == '__main__':
         for indexA in range(numpy.shape(totalData)[0]):
             for indexB in range(numpy.shape(totalData)[1]):
                 if totalData[indexA][indexB] == math.log(999):
-                    totalData[indexA][indexB] = errorValue
+                    totalData[indexA][indexB] = minSize - (maxSize - minSize) / 2
 
         print(max(numpy.reshape(totalData, -1)), min(numpy.reshape(totalData, -1)))
 
@@ -73,7 +73,7 @@ if __name__ == '__main__':
         plt.title('Ratio %d' % ratio)
 
         plt.xticks([0, 50, 100, 150, 200, 250, 300], ['0.0', '0.5', '1.0', '1.5', '2.0', '2.5', '3.0'])
-        plt.yticks([0, 100, 200, 300, 400], ['0.00', '0.25', '0.50', '0.75', '1.00'])
+        plt.yticks([0, 75, 150, 225, 300], ['0.00', '0.25', '0.50', '0.75', '1.00'])
         plt.savefig('Ratio-%d.png' % ratio)
         plt.show()
         # exit()
