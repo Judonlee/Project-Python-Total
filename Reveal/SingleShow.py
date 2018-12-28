@@ -7,6 +7,9 @@ if __name__ == '__main__':
     drift = 'Epsilon15NXR'
     fold = 'Epsilon15NXR-Epsilon18NXR-Expand'
 
+    maxValue = 15
+    minValue = -15
+
     for ratio in range(10, 100, 10):
         loadpath = 'D:/Project-Matlab/Treatment/新建文件夹/%s-Drifted/%s/%s/Ratio%d.txt'
 
@@ -38,10 +41,11 @@ if __name__ == '__main__':
         for indexA in range(numpy.shape(totalData)[0]):
             for indexB in range(numpy.shape(totalData)[1]):
                 if totalData[indexA][indexB] == math.log(999):
-                    totalData[indexA][indexB] = minSize - (maxSize - minSize) / 2
+                    # totalData[indexA][indexB] = minSize - (maxSize - minSize) / 2
+                    totalData[indexA][indexB] = minValue - 5
 
         print(max(numpy.reshape(totalData, -1)), min(numpy.reshape(totalData, -1)))
-
+        totalData[0][0] = 15
         ####################################################################
         # maxResult = max(numpy.reshape(totalData, -1))
         # totalData = numpy.tile([[maxResult]], [numpy.shape(totalData)[0], numpy.shape(totalData)[1]]) - totalData
@@ -62,11 +66,14 @@ if __name__ == '__main__':
         # colorbar.set_ticks([minSize, (minSize + numpy.max(totalData)) / 2, numpy.max(totalData)])
         # norm = colors.Normalize(vmin=minSize, vmax=numpy.max(totalData))
         # colorbar.set_clim(vmin=minSize,vmax=numpy.max(totalData))
-        colorbar.set_ticks(numpy.linspace(minSize, numpy.max(totalData), 3))
-        colorbar.set_ticklabels(
-            ['%.2f' % minSize, '%.2f' % ((minSize + numpy.max(totalData)) / 2),
-             '%.2f' % numpy.max(totalData)])
+        # colorbar.set_ticks(numpy.linspace(minSize, numpy.max(totalData), 3))
+        # colorbar.set_ticklabels(
+        #     ['%.2f' % minSize, '%.2f' % ((minSize + numpy.max(totalData)) / 2),
+        #      '%.2f' % numpy.max(totalData)])
         # position
+
+        colorbar.set_clim(vmin=-15, vmax=15)
+        colorbar.set_ticks(numpy.linspace(-15, 15, 11))
 
         plt.xlabel('Slope')
         plt.ylabel('Exchange ratio')

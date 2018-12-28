@@ -2,7 +2,7 @@ import numpy
 import os
 
 if __name__ == '__main__':
-    loadpath = 'E:/CTC_Target_MSP/Result-SVM/IS11-Result/'
+    loadpath = 'E:/CTC_Target_MSP/Result-SVM/eGeMAPSv01a-Result/'
     for cSearch in range(12):
         for gammaSearch in range(-15, -3, 1):
             c = numpy.power(2, cSearch)

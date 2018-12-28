@@ -4,7 +4,7 @@ from CTC_Target.Model.CTC_Multi_BLSTM import CTC_Multi_BLSTM
 import os
 
 if __name__ == '__main__':
-    transcriptionPath = 'E:/CTC_Target/Features/PronouncingDictionaryDouble/'
+
     for part in ['Bands30', 'Bands40']:
         loadpath = 'E:/CTC_Target/Features/%s/' % part
         for session in range(0, 1):
