@@ -4,7 +4,7 @@ import numpy
 import math
 
 if __name__ == '__main__':
-    drift = 'Epsilon15NXR'
+    drift = 'Epsilon18NXR'
     fold = 'Epsilon15NXR-Epsilon18NXR-Expand'
 
     maxValue = 15
