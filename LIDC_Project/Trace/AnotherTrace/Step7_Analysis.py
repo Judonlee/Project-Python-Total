@@ -20,6 +20,7 @@ if __name__ == '__main__':
     savePath = 'E:/LIDC/AnotherTrace/Step5-SeparateCondition/'
 
     counter = 0
+    dictionary = {}
     for one_use in os.listdir(instancePath):
         instanceName = one_use[0:one_use.find('.csv')]
         print('Treating \t %s' % instanceName)
@@ -44,12 +45,32 @@ if __name__ == '__main__':
                 if distance > THRESHOLD: continue
 
                 character = numpy.genfromtxt(
-                    fname=os.path.join(characterPath, instanceName, compareNodule[0], 'OnlyIndividual.txt'),
+                    fname=os.path.join(characterPath, instanceName, compareNodule[0], 'SeparateConditionFlag.txt'),
                     dtype=int, delimiter=',')
                 if character == 1:
-                    # counter += PositionAnalysis(
-                    #     filename=os.path.join(characterPath, instanceName, compareNodule[0], 'Position.csv'))
+                    positionShape = PositionAnalysis(
+                        filename=os.path.join(characterPath, instanceName, compareNodule[0], 'Position.csv'))
+                    counter += positionShape
+                    if positionShape in dictionary:
+                        dictionary[positionShape] += 1
+                    else:
+                        dictionary[positionShape] = 1
                     # counter += 1
-                    flag = True
-        if flag: counter += 1
+                    # flag = True
+        # if flag: counter += 1
     print(counter)
+
+    # import matplotlib.pylab as plt
+    #
+    # # dictionary = [(k, dictionary[k]) for k in sorted(dictionary.keys())]
+    #
+    # newDictionary = []
+    # for key in sorted(dictionary.keys()):
+    #     newDictionary.append([key, dictionary[key]])
+    # newDictionary = numpy.array(newDictionary)
+    #
+    # rect = plt.bar(newDictionary[:, 0], newDictionary[:, 1])
+    # plt.xlabel('Nodule\'s Section Number')
+    # plt.ylabel('Nodule Number')
+    # plt.title('Separate Condition Nodule Number Analysis')
+    # plt.show()
