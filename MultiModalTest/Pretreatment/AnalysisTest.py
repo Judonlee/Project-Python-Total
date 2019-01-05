@@ -26,5 +26,8 @@ if __name__ == '__main__':
     # print(counter)
     print(dictionary)
 
-    for sample in dictionary.keys():
-        print(sample, '\t', dictionary[sample])
+    counter = 0
+    for sample in sorted(dictionary.keys()):
+        # print(sample, '\t', dictionary[sample])
+        print('"%s":%d' % (sample, counter),end=',')
+        counter += 1
