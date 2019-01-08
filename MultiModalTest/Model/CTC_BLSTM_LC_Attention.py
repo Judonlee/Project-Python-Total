@@ -1,31 +1,21 @@
 import tensorflow
-from __Base.BaseClass import NeuralNetwork_Base
+from MultiModalTest.Model.CTC_Multi_BLSTM import CTC_Multi_BLSTM
 import numpy
 from __Base.Shuffle import Shuffle
 
 
-class CTC_Multi_BLSTM(NeuralNetwork_Base):
-    def __init__(self, trainData, trainLabel, trainSeqLength, featureShape, numClass, rnnLayers, hiddenNodules=128,
-                 batchSize=32, startFlag=True, graphRevealFlag=False, graphPath='logs/', occupyRate=-1):
-        '''
-        :param trainLabel:      In this case, trainLabel is the targets.
-        :param trainSeqLength:  In this case, the trainSeqLength are needed which is the length of each cases.
-        :param featureShape:    designate how many features in one vector.
-        :param hiddenNodules:   designite the number of hidden nodules.
-        :param numClass:        designite the number of classes
-        '''
-
-        self.featureShape = featureShape
-        self.seqLen = trainSeqLength
-        self.numClass = numClass
-        self.hiddenNodules = hiddenNodules
-        self.rnnLayers = rnnLayers
-        super(CTC_Multi_BLSTM, self).__init__(trainData=trainData, trainLabel=trainLabel, batchSize=batchSize,
-                                              learningRate=0, startFlag=startFlag, graphRevealFlag=graphRevealFlag,
-                                              graphPath=graphPath, occupyRate=occupyRate)
+class CTC_LC_Attention(CTC_Multi_BLSTM):
+    def __init__(self, trainData, trainLabel, trainSeqLength, featureShape, numClass, rnnLayers, attentionScope,
+                 hiddenNodules=128, batchSize=32, startFlag=True, graphRevealFlag=False, graphPath='logs/',
+                 occupyRate=-1):
+        self.attentionScope = attentionScope
+        super(CTC_LC_Attention, self).__init__(
+            trainData=trainData, trainLabel=trainLabel, trainSeqLength=trainSeqLength, featureShape=featureShape,
+            numClass=numClass, rnnLayers=rnnLayers, hiddenNodules=hiddenNodules, batchSize=batchSize,
+            startFlag=startFlag, graphRevealFlag=graphRevealFlag, graphPath=graphPath, occupyRate=occupyRate)
         self.information = ''
         for sample in self.parameters.keys():
-            self.information += '\n' + str(sample) + str(self.parameters[sample])
+            self.information += '\n' + str(sample) + '\t' + str(self.parameters[sample])
 
     def BuildNetwork(self, learningRate):
         self.dataInput = tensorflow.placeholder(dtype=tensorflow.float32, shape=[None, None, self.featureShape],
@@ -66,12 +56,53 @@ class CTC_Multi_BLSTM(NeuralNetwork_Base):
             (self.parameters['RNN_Output_Forward'], self.parameters['RNN_Output_Backward']), axis=2)
 
         ###################################################################################################
-        # Logits
+        # Logits & Attention
         ###################################################################################################
 
         self.parameters['RNN_Reshape'] = tensorflow.reshape(tensor=self.parameters['RNN_Concat'],
                                                             shape=[-1, 2 * self.hiddenNodules], name='RNN_Reshape')
-        self.parameters['Logits'] = tensorflow.layers.dense(inputs=self.parameters['RNN_Reshape'], units=self.numClass,
+
+        self.parameters['Attention_Value'] = tensorflow.layers.dense(inputs=self.parameters['RNN_Reshape'], units=1,
+                                                                     activation=tensorflow.nn.tanh,
+                                                                     name='Attention_Value')
+        with tensorflow.name_scope('Attention_Concat'):
+            self.parameters['Attention_Concat'] = tensorflow.concat(values=[
+                self.parameters['Attention_Value'][0:-self.attentionScope],
+                self.parameters['Attention_Value'][1:-self.attentionScope + 1]], axis=1)
+
+            for concatCounter in range(2, self.attentionScope):
+                self.parameters['Attention_Concat'] = tensorflow.concat(
+                    values=[self.parameters['Attention_Concat'],
+                            self.parameters['Attention_Value'][concatCounter:-self.attentionScope + concatCounter]],
+                    axis=1)
+
+        self.parameters['Attention_Evaluate'] = tensorflow.nn.softmax(logits=self.parameters['Attention_Concat'],
+                                                                      name='Attention_Evaluate')
+
+        with tensorflow.name_scope('AttentionAdd'):
+            self.parameters['MultiPart_%04d' % 0] = tensorflow.tile(input=self.parameters['Attention_Evaluate'][:, 0:1],
+                                                                    multiples=[1, 2 * self.hiddenNodules],
+                                                                    name='MultiPart_%04d' % 0)
+            self.parameters['RNN_WithAttention_Total'] = tensorflow.multiply(
+                x=self.parameters['RNN_Reshape'][0:-self.attentionScope], y=self.parameters['MultiPart_%04d' % 0])
+
+            for MultiCounter in range(1, self.attentionScope):
+                self.parameters['MultiPart_%04d' % MultiCounter] = tensorflow.tile(
+                    input=self.parameters['Attention_Evaluate'][:, MultiCounter:MultiCounter + 1],
+                    multiples=[1, 2 * self.hiddenNodules],
+                    name='MultiPart_%04d' % 0)
+                self.parameters['RNN_WithAttention_%04d' % MultiCounter] = tensorflow.multiply(
+                    x=self.parameters['RNN_Reshape'][MultiCounter:-self.attentionScope + MultiCounter],
+                    y=self.parameters['MultiPart_%04d' % MultiCounter])
+                self.parameters['RNN_WithAttention_Total'] = tensorflow.add(
+                    x=self.parameters['RNN_WithAttention_Total'],
+                    y=self.parameters['RNN_WithAttention_%04d' % MultiCounter])
+
+        self.parameters['RNN_Final'] = tensorflow.concat(
+            values=[self.parameters['RNN_WithAttention_Total'],
+                    tensorflow.zeros(shape=[self.attentionScope, 2 * self.hiddenNodules])], axis=0)
+
+        self.parameters['Logits'] = tensorflow.layers.dense(inputs=self.parameters['RNN_Final'], units=self.numClass,
                                                             activation=None)
         self.parameters['Logits_Reshape'] = \
             tensorflow.reshape(tensor=self.parameters['Logits'],
@@ -105,7 +136,7 @@ class CTC_Multi_BLSTM(NeuralNetwork_Base):
             batchData = []
             batachSeq = trainSeq[startPosition:startPosition + self.batchSize]
 
-            maxLen = max(trainSeq[startPosition:startPosition + self.batchSize])
+            maxLen = max(trainSeq[startPosition:startPosition + self.batchSize]) + self.attentionScope
             for index in range(startPosition, min(startPosition + self.batchSize, len(trainData))):
                 currentData = numpy.concatenate(
                     (trainData[index], numpy.zeros((maxLen - len(trainData[index]), len(trainData[index][0])))), axis=0)
@@ -138,7 +169,7 @@ class CTC_Multi_BLSTM(NeuralNetwork_Base):
             batchData = []
             batachSeq = testSeq[startPosition:startPosition + self.batchSize]
 
-            maxLen = max(testSeq[startPosition:startPosition + self.batchSize])
+            maxLen = max(testSeq[startPosition:startPosition + self.batchSize]) + self.attentionScope
             for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
                 currentData = numpy.concatenate(
                     (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))), axis=0)
@@ -163,36 +194,3 @@ class CTC_Multi_BLSTM(NeuralNetwork_Base):
             print(output, end='')
             startPosition += self.batchSize
         return totalLoss
-
-    def Decoder(self, testData, testLabel, testSeq):
-        startPosition = 0
-        totalResult = []
-        while startPosition < len(testData):
-            batchData = []
-            batachSeq = testSeq[startPosition:startPosition + self.batchSize]
-
-            maxLen = max(testSeq[startPosition:startPosition + self.batchSize])
-            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
-                currentData = numpy.concatenate(
-                    (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))), axis=0)
-                batchData.append(currentData)
-
-            indices, values = [], []
-            maxlen = 0
-            for indexX in range(min(self.batchSize, len(testData) - startPosition)):
-                for indexY in range(len(testLabel[indexX + startPosition])):
-                    indices.append([indexX, indexY])
-                    values.append(int(testLabel[indexX + startPosition][indexY]))
-                if maxlen < len(testLabel[indexX + startPosition]):
-                    maxlen = len(testLabel[indexX + startPosition])
-            shape = [min(self.batchSize, len(testData) - startPosition), maxlen]
-
-            currentResult = self.session.run(fetches=self.decodeDense,
-                                             feed_dict={self.dataInput: batchData,
-                                                        self.labelInput: (indices, values, shape),
-                                                        self.seqLenInput: batachSeq})
-            totalResult.extend(currentResult)
-            output = '\rBatch : %d/%d' % (startPosition, len(testData))
-            print(output, end='')
-            startPosition += self.batchSize
-        return totalResult
