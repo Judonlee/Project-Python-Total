@@ -1,8 +1,15 @@
-import pyautogui
-import time
+import os
+import numpy
+import matplotlib.pylab as plt
 
-time.sleep(2)
-for _ in range(100):
-    time.sleep(1)
-    x, y = pyautogui.position()
-    pyautogui.click(x, y)
+if __name__ == '__main__':
+    loadpath = 'E:/ProjectData_SpeechRecognition/IEMOCAP-Origin-Result/Bands30/Session0/'
+    totalData = []
+    for filename in os.listdir(loadpath):
+        data = numpy.genfromtxt(fname=os.path.join(loadpath, filename), dtype=float, delimiter=',') / 2943 * 32
+        totalData.append(data)
+    plt.plot(totalData)
+    plt.xlabel('Train Episode')
+    plt.ylabel('Batch Loss')
+    plt.title('Training Loss Line')
+    plt.show()

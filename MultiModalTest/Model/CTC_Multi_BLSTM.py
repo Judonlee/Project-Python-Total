@@ -131,3 +131,36 @@ class CTC_Multi_BLSTM(NeuralNetwork_Base):
             print(output, end='')
             startPosition += self.batchSize
         return totalLoss
+
+    def LossCalculation(self, testData, testLabel, testSeq):
+        startPosition = 0
+        totalLoss = 0
+        while startPosition < len(testData):
+            batchData = []
+            batachSeq = testSeq[startPosition:startPosition + self.batchSize]
+
+            maxLen = max(testSeq[startPosition:startPosition + self.batchSize])
+            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
+                currentData = numpy.concatenate(
+                    (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))), axis=0)
+                batchData.append(currentData)
+
+            indices, values = [], []
+            maxlen = 0
+            for indexX in range(min(self.batchSize, len(testData) - startPosition)):
+                for indexY in range(len(testLabel[indexX + startPosition])):
+                    indices.append([indexX, indexY])
+                    values.append(int(testLabel[indexX + startPosition][indexY]))
+                if maxlen < len(testLabel[indexX + startPosition]):
+                    maxlen = len(testLabel[indexX + startPosition])
+            shape = [min(self.batchSize, len(testData) - startPosition), maxlen]
+
+            loss = self.session.run(fetches=self.parameters['Cost'],
+                                    feed_dict={self.dataInput: batchData, self.labelInput: (indices, values, shape),
+                                               self.seqLenInput: batachSeq})
+            totalLoss += loss
+
+            output = '\rBatch : %d/%d \t Loss : %f' % (startPosition, len(testData), loss)
+            print(output, end='')
+            startPosition += self.batchSize
+        return totalLoss
