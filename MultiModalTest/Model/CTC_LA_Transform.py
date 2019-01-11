@@ -207,3 +207,99 @@ class CTC_LA_Transform(CTC_LC_Attention):
             print(output, end='')
             startPosition += self.batchSize
         return totalLoss
+
+    def LossCalculation(self, testData, testLabel, testSeq):
+        startPosition = 0
+        totalLoss = 0
+        totalCTCLoss, totalPunishmentLoss = 0, 0
+        totalPredictDecode, totalPredictLogits, totalPredictSoftMax = [], [], []
+        while startPosition < len(testData):
+            batchData = []
+            batachSeq = testSeq[startPosition:startPosition + self.batchSize]
+
+            maxLen = max(testSeq[startPosition:startPosition + self.batchSize]) + self.attentionScope
+            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
+                currentData = numpy.concatenate(
+                    (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))),
+                    axis=0)
+                batchData.append(currentData)
+
+            indices, values = [], []
+            maxlen = 0
+            for indexX in range(min(self.batchSize, len(testData) - startPosition)):
+                for indexY in range(len(testLabel[indexX + startPosition])):
+                    indices.append([indexX, indexY])
+                    values.append(int(testLabel[indexX + startPosition][indexY]))
+                if maxlen < len(testLabel[indexX + startPosition]):
+                    maxlen = len(testLabel[indexX + startPosition])
+            shape = [min(self.batchSize, len(testData) - startPosition), maxlen]
+
+            loss, ctcloss, punishloss, logits, decode = self.session.run(
+                fetches=[self.parameters['Cost'], self.parameters['Loss'], self.parameters['PunishmentLoss'],
+                         self.parameters['Logits_Reshape'], self.decode],
+                feed_dict={self.dataInput: batchData, self.labelInput: (indices, values, shape),
+                           self.seqLenInput: batachSeq})
+            totalLoss += loss
+            totalCTCLoss += ctcloss
+            totalPunishmentLoss += punishloss
+
+            ########################################################################
+
+            ####################################################################
+            # 第一部分
+            ####################################################################
+
+            indices, value = decode[0].indices, decode[0].values
+            result = numpy.zeros((len(batchData), self.numClass))
+            for index in range(len(value)):
+                result[indices[index][0]][value[index]] += 1
+            for sample in result:
+                totalPredictDecode.append(numpy.argmax(numpy.array(sample)))
+
+            ####################################################################
+            # 第二部分
+            ####################################################################
+
+            for indexX in range(numpy.shape(logits)[0]):
+                records = numpy.zeros(self.numClass - 1)
+                for indexY in range(testSeq[startPosition + indexX]):
+                    chooseArera = logits[indexX][indexY][0:self.numClass - 1]
+                    records[numpy.argmax(numpy.array(chooseArera))] += 1
+                totalPredictLogits.append(records)
+
+            ####################################################################
+            # 第三部分
+            ####################################################################
+
+            for indexX in range(numpy.shape(logits)[0]):
+                records = numpy.zeros(self.numClass - 1)
+                for indexY in range(testSeq[startPosition + indexX]):
+                    chooseArera = logits[indexX][indexY][0:self.numClass - 1]
+                    totalSoftMax = numpy.sum(numpy.exp(chooseArera))
+                    for indexZ in range(self.numClass - 1):
+                        records[indexZ] += numpy.exp(chooseArera[indexZ]) / totalSoftMax
+
+                for indexZ in range(self.numClass - 1):
+                    records[indexZ] /= testSeq[startPosition + indexX]
+                totalPredictSoftMax.append(records)
+
+            matrixDecode, matrixLogits, matrixSoftMax = numpy.zeros((self.numClass - 1, self.numClass - 1)), \
+                                                        numpy.zeros((self.numClass - 1, self.numClass - 1)), \
+                                                        numpy.zeros((self.numClass - 1, self.numClass - 1))
+
+            for index in range(len(totalPredictDecode)):
+                matrixDecode[numpy.argmax(numpy.array(testLabel[index]))][totalPredictDecode[index]] += testSeq[index]
+            for index in range(len(totalPredictLogits)):
+                matrixLogits[numpy.argmax(numpy.array(testLabel[index]))][
+                    numpy.argmax(numpy.array(totalPredictLogits[index]))] += testSeq[index]
+            for index in range(len(totalPredictSoftMax)):
+                matrixSoftMax[numpy.argmax(numpy.array(testLabel[index]))][
+                    numpy.argmax(numpy.array(totalPredictSoftMax[index]))] += testSeq[index]
+
+            ########################################################################
+
+            output = '\rBatch : %d/%d \t Total Loss : %f \t CTC : %f \t Punishment : %f' % (
+                startPosition, len(testData), loss, ctcloss, punishloss)
+            print(output, end='')
+            startPosition += self.batchSize
+        return totalLoss, totalCTCLoss, totalPunishmentLoss, matrixDecode, matrixLogits, matrixSoftMax
