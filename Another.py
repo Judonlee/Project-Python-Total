@@ -1,15 +1,17 @@
 import numpy
+import os
 
 if __name__ == '__main__':
-    for bands in [30, 40, 60, 80, 100]:
-        data = numpy.genfromtxt('Bands%s.csv' % bands, dtype=float, delimiter=',')
-        # print(data)
-        WA, UA = 0, 0
-
-        for index in range(numpy.shape(data)[0]):
-            WA += data[index][index]
-            UA += data[index][index] / sum(data[index])
-            # print(UA)
-        WA /= sum(sum(data))
-        UA /= numpy.shape(data)[0]
-        print(WA, '\t', UA)
+    loadpathA = 'E:/ProjectData_SpeechRecognition/Features/IEMOCAP-Npy/Bands40/'
+    loadpathB = 'E:/ProjectData_SpeechRecognition/Features/IEMOCAP-Npy/Bands40-CNN/'
+    for filename in os.listdir(loadpathA):
+        if filename[-8:] != 'Data.npy': continue
+        dataA = numpy.load(loadpathA + filename)
+        dataB = numpy.load(loadpathB + filename)
+        print(filename)
+        for indexX in range(len(dataA)):
+            for indexY in range(len(dataA[indexX])):
+                for indexZ in range(len(dataA[indexX][indexY])):
+                    if dataA[indexX][indexY][indexZ] != dataB[indexX][indexY][indexZ]:
+                        print('ERROR')
+                        exit()

@@ -26,7 +26,7 @@ def LoaderLeaveOneSession(loadpath, appointSession):
     return trainData, trainLabel, trainSeq, testData, testLabel, testSeq
 
 
-def LoaderLeaveOneSpeaker(loadpath, appointSession, appointGender):
+def LoaderLeaveOneSpeaker(loadpath, appointSession, appointGender, emotionFlag=True):
     trainData, trainLabel, trainSeq, testData, testLabel, testSeq = [], [], [], [], [], []
     for gender in ['Female', 'Male']:
         for session in range(1, 6):
