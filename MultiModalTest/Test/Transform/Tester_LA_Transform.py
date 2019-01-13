@@ -1,8 +1,7 @@
 import tensorflow
 import os
-from MultiModalTest.Model.CTC_LA_Transform import CTC_LA_Transform
+from MultiModalTest.Model.Previous.CTC_LA_Transform import CTC_LA_Transform
 from MultiModalTest.Loader.IEMOCAP_Loader import LoaderLeaveOneSpeaker
-from MultiModalTest.TrainTemplate.TrainTimes200 import TrainTimes200
 
 if __name__ == '__main__':
     punishment = 1
@@ -24,25 +23,46 @@ if __name__ == '__main__':
                     trainData, trainLabel, trainSeq, testData, testLabel, testSeq = LoaderLeaveOneSpeaker(
                         loadpath=loadpath, appointSession=session, appointGender=gender)
 
-                    for episode in range(99, 100):
+                    for episode in range(200):
                         graph = tensorflow.Graph()
                         with graph.as_default():
                             classifier = CTC_LA_Transform(trainData=trainData, trainLabel=trainLabel,
                                                           trainSeqLength=trainSeq, featureShape=bands, numClass=5,
                                                           rnnLayers=2, attentionScope=attentionScope,
-                                                          graphRevealFlag=False)
+                                                          graphRevealFlag=False, startFlag=False)
                             classifier.LoadPart(loadpath=parameterpath, alpha=punishment, flag='L1',
-                                                graphRevealFlag=True)
+                                                graphRevealFlag=False)
                             print(calculatepath + '%04d-Network' % episode)
                             classifier.Load(loadpath=calculatepath + '%04d-Network' % episode)
-                            totalLoss, ctcLoss, punishmentLoss, matrixDecode, matrixLogits, matrixSoftMax = classifier.LossCalculation(
+
+                            matrixDecode, matrixLogits, matrixSoftMax = classifier.Test_AllMethods(
                                 testData=testData, testLabel=testLabel, testSeq=testSeq)
 
-                            print(matrixDecode)
-                            print(matrixLogits)
-                            print(matrixSoftMax)
+                            with open(savepath + '%04d-Decode.csv' % episode, 'w') as file:
+                                for indexX in range(len(matrixDecode)):
+                                    for indexY in range(len(matrixDecode[indexX])):
+                                        if indexY != 0: file.write(',')
+                                        file.write(str(matrixDecode[indexX][indexY]))
+                                    file.write('\n')
 
-                            with open(savepath + '%04d-TrainLoss.csv' % episode, 'w') as file:
-                                file.write(str(totalLoss[0]) + ',' + str(ctcLoss) + ',' + str(punishmentLoss[0]))
-                            exit()
+                            with open(savepath + '%04d-Logits.csv' % episode, 'w') as file:
+                                for indexX in range(len(matrixDecode)):
+                                    for indexY in range(len(matrixDecode[indexX])):
+                                        if indexY != 0: file.write(',')
+                                        file.write(str(matrixLogits[indexX][indexY]))
+                                    file.write('\n')
+
+                            with open(savepath + '%04d-SoftMax.csv' % episode, 'w') as file:
+                                for indexX in range(len(matrixDecode)):
+                                    for indexY in range(len(matrixDecode[indexX])):
+                                        if indexY != 0: file.write(',')
+                                        file.write(str(matrixSoftMax[indexX][indexY]))
+                                    file.write('\n')
+
+                            # totalLoss, ctcLoss, punishmentLoss = classifier.LossCalculation(
+                            #     testData=trainData, testLabel=trainLabel, testSeq=trainSeq)
+                            #
+                            # with open(savepath + '%04d-TrainLoss.csv' % episode, 'w') as file:
+                            #     file.write(str(totalLoss[0]) + ',' + str(ctcLoss) + ',' + str(punishmentLoss[0]))
+                            # exit()
                     # exit()

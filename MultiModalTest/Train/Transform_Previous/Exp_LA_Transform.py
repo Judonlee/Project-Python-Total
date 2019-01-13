@@ -1,7 +1,6 @@
 import tensorflow
 import os
-import numpy
-from MultiModalTest.Model.CTC_LA_Transform import CTC_LA_Transform
+from MultiModalTest.Model.Previous.CTC_LA_Transform import CTC_LA_Transform
 from MultiModalTest.Loader.IEMOCAP_Loader import LoaderLeaveOneSpeaker
 from MultiModalTest.TrainTemplate.TrainTimes200 import TrainTimes200
 
