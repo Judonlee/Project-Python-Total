@@ -72,11 +72,27 @@ class CTC_COMA_Attention(CTC_LC_Attention):
                     values=[self.parameters['SeqLink'],
                             self.parameters['RNN_Transpose'][:, concatCounter:-self.attentionScope + concatCounter, :]],
                     axis=2)
-            self.parameters['AttentionValue_Before'] = tensorflow.nn.softmax(logits=self.parameters['SeqLink'], axis=2,
-                                                                             name='AttentionValue_Before')
-            self.parameters['AttentionValue'] = tensorflow.transpose(self.parameters['AttentionValue_Before'],
-                                                                     perm=[1, 0, 2], name='AttentionValue')
 
+            ########################################################################
+
+            # self.parameters['AttentionValue_Before'] = tensorflow.nn.softmax(logits=self.parameters['SeqLink'], axis=2,
+            #                                                                  name='AttentionValue_Before')
+            # self.parameters['AttentionValue'] = tensorflow.transpose(self.parameters['AttentionValue_Before'],
+            #                                                          perm=[1, 0, 2], name='AttentionValue')
+            self.parameters['AttentionValue_Pretreatment'] = tensorflow.transpose(
+                self.parameters['SeqLink'], perm=[1, 0, 2], name='AttentionValue_Pretreatment')
+
+            self.parameters['AttentionVariable'] = tensorflow.Variable(
+                initial_value=tensorflow.random_normal(shape=[1, 2 * self.hiddenNodules, self.attentionScope],
+                                                       dtype=tensorflow.float32), name='AttentionVariable')
+            self.parameters['AttentionVariableTile'] = tensorflow.tile(
+                input=self.parameters['AttentionVariable'],
+                multiples=[self.parameters['BatchSize'] * self.parameters['TimeStep'] - self.attentionScope, 1, 1])
+            self.parameters['AttentionValue'] = tensorflow.multiply(
+                x=self.parameters['AttentionValue_Pretreatment'], y=self.parameters['AttentionVariableTile'],
+                name='AttentionValue')
+
+            ########################################################################
         ###################################################################################################
 
         with tensorflow.name_scope('WithWeights'):

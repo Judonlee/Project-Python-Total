@@ -22,5 +22,8 @@ if __name__ == '__main__':
                 with graph.as_default():
                     classifier = CTC_COMA_Attention(trainData=trainData, trainLabel=trainLabel, trainSeqLength=trainSeq,
                                                     featureShape=bands, numClass=40, rnnLayers=2,
-                                                    attentionScope=attentionScope)
+                                                    attentionScope=attentionScope, graphRevealFlag=True)
+                    print(classifier.information)
+                    # classifier.Train(learningRate=1E-3)
+                    # exit()
                     TrainTimes200(classifier=classifier, savepath=savepath)

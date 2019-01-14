@@ -132,9 +132,9 @@ class CTC_LA_Transform(CTC_LC_Attention):
 
         self.EmotionTrain = tensorflow.train.AdamOptimizer(learning_rate=self.learningRate).minimize(
             self.parameters['Emotion_TotalCost'], var_list=tensorflow.global_variables()[36:])
-        self.decode, self.logProbability = tensorflow.nn.ctc_beam_search_decoder(
+        self.emotionDecode, self.emotionLogProbability = tensorflow.nn.ctc_beam_search_decoder(
             inputs=self.parameters['Emotion_Logits_TimeMajor'], sequence_length=self.seqLenInput, merge_repeated=False)
-        self.decodeDense = tensorflow.sparse_tensor_to_dense(sp_input=self.decode[0])
+        self.emotionDecodeDense = tensorflow.sparse_tensor_to_dense(sp_input=self.emotionDecode[0])
 
     def LoadPart(self, loadpath):
         saver = tensorflow.train.Saver(var_list=tensorflow.global_variables()[0:36])
@@ -180,3 +180,100 @@ class CTC_LA_Transform(CTC_LC_Attention):
             print(output, end='')
             startPosition += self.batchSize
         return totalLoss
+
+    def TestEmotion(self, testData, testLabel, testSeq):
+        startPosition = 0
+        totalLoss, totalCTCLoss, totalPunishmentLoss = 0, 0, 0
+        totalPredictDecode, totalPredictLogits, totalPredictSoftMax = [], [], []
+
+        while startPosition < len(testData):
+            batchData = []
+            batachSeq = testSeq[startPosition:startPosition + self.batchSize]
+
+            maxLen = max(testSeq[startPosition:startPosition + self.batchSize]) + self.attentionScope
+            for index in range(startPosition, min(startPosition + self.batchSize, len(testData))):
+                currentData = numpy.concatenate(
+                    (testData[index], numpy.zeros((maxLen - len(testData[index]), len(testData[index][0])))), axis=0)
+                batchData.append(currentData)
+
+            indices, values = [], []
+            maxlen = 0
+            for indexX in range(min(self.batchSize, len(testData) - startPosition)):
+                for indexY in range(len(testLabel[indexX + startPosition])):
+                    indices.append([indexX, indexY])
+                    values.append(int(testLabel[indexX + startPosition][indexY]))
+                if maxlen < len(testLabel[indexX + startPosition]):
+                    maxlen = len(testLabel[indexX + startPosition])
+            shape = [min(self.batchSize, len(testData) - startPosition), maxlen]
+
+            loss, ctcLoss, punishmentLoss, decode, logits = self.session.run(
+                fetches=[self.parameters['Emotion_TotalCost'], self.parameters['Emotion_CTC_Loss'],
+                         self.parameters['Emotion_PunishmentLoss'], self.emotionDecode,
+                         self.parameters['Emotion_Logits_Reshape']],
+                feed_dict={self.dataInput: batchData, self.labelInput: (indices, values, shape),
+                           self.seqLenInput: batachSeq, self.punishmentInput: self.punishmentDegree})
+
+            ####################################################################
+            # 第一部分
+            ####################################################################
+
+            indices, value = decode[0].indices, decode[0].values
+            result = numpy.zeros((len(batchData), self.emotionClass))
+            for index in range(len(value)):
+                result[indices[index][0]][value[index]] += 1
+            for sample in result:
+                totalPredictDecode.append(numpy.argmax(numpy.array(sample)))
+
+            ####################################################################
+            # 第二部分
+            ####################################################################
+
+            for indexX in range(numpy.shape(logits)[0]):
+                records = numpy.zeros(self.emotionClass - 1)
+                for indexY in range(testSeq[startPosition + indexX]):
+                    chooseArera = logits[indexX][indexY][0:self.emotionClass - 1]
+                    records[numpy.argmax(numpy.array(chooseArera))] += 1
+                totalPredictLogits.append(records)
+
+            ####################################################################
+            # 第三部分
+            ####################################################################
+
+            for indexX in range(numpy.shape(logits)[0]):
+                records = numpy.zeros(self.emotionClass - 1)
+                for indexY in range(testSeq[startPosition + indexX]):
+                    chooseArera = logits[indexX][indexY][0:self.emotionClass - 1]
+                    totalSoftMax = numpy.sum(numpy.exp(chooseArera))
+                    for indexZ in range(self.emotionClass - 1):
+                        records[indexZ] += numpy.exp(chooseArera[indexZ]) / totalSoftMax
+
+                for indexZ in range(self.emotionClass - 1):
+                    records[indexZ] /= testSeq[startPosition + indexX]
+                totalPredictSoftMax.append(records)
+
+            ctcLoss = numpy.average(ctcLoss)
+            totalLoss += loss
+            totalCTCLoss += ctcLoss
+            totalPunishmentLoss += punishmentLoss
+
+            output = '\rBatch : %d/%d \t Loss : %f\tCTC : %f\tPunishment : %f' % (
+                startPosition, len(testData), loss, ctcLoss, punishmentLoss)
+            print(output, end='')
+
+            startPosition += self.batchSize
+
+        matrixDecode, matrixLogits, matrixSoftMax = numpy.zeros((self.emotionClass - 1, self.emotionClass - 1)), \
+                                                    numpy.zeros((self.emotionClass - 1, self.emotionClass - 1)), \
+                                                    numpy.zeros((self.emotionClass - 1, self.emotionClass - 1))
+
+        for index in range(len(totalPredictDecode)):
+            matrixDecode[int(testLabel[index][0])][totalPredictDecode[index]] += 1
+        for index in range(len(totalPredictLogits)):
+            matrixLogits[int(testLabel[index][0])][numpy.argmax(numpy.array(totalPredictLogits[index]))] += 1
+        for index in range(len(totalPredictSoftMax)):
+            matrixSoftMax[int(testLabel[index][0])][numpy.argmax(numpy.array(totalPredictSoftMax[index]))] += 1
+        print('\n')
+        print(matrixDecode)
+        print(matrixLogits)
+        print(matrixSoftMax)
+        return totalLoss, totalCTCLoss, totalPunishmentLoss, matrixDecode, matrixLogits, matrixSoftMax
