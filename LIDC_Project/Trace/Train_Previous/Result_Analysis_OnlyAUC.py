@@ -1,5 +1,5 @@
 import os
-from LIDC_Project.Trace.Train.Tools import AUC_Calculation
+from LIDC_Project.Trace.Train_Previous.Tools import AUC_Calculation
 import numpy
 
 if __name__ == '__main__':

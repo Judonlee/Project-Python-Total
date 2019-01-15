@@ -1,4 +1,4 @@
-from LIDC_Project.Trace.Train.Tools import LoadPart, DXSingleCalculation
+from LIDC_Project.Trace.Train_Previous.Tools import LoadPart, DXSingleCalculation
 import numpy
 import os
 

@@ -144,29 +144,22 @@ def LIDC_Loader_Choosed(loadpath, appoint):
     return trainData, trainLabel, testData, testLabel
 
 
-if __name__ == '__main__':
-    LIDC_Loader_Choosed(loadpath='D:/ProjectData/LIDC/Npy-Seperate/OriginCsv/', appoint=0)
-    # for appoint in range(10):
-    #     savepath = 'E:/LIDC/Npy/LBP_P=24_R=3/Appoint-%d/' % appoint
-    #     os.makedirs(savepath)
-    #
-    #     trainData, trainLabel, testData, testLabel = LIDC_Loader_Another(
-    #         nodulePath='E:/LIDC/LIDC-Nodules-LBP/Result_P=24_R=3/Csv/',
-    #         nonNodulePath='E:/LIDC/LIDC-NonNodules-LBP/Result_P=24_R=3/Csv/', appoint=appoint)
-    #     numpy.save(savepath + 'TrainData.npy', trainData)
-    #     numpy.save(savepath + 'TrainLabel.npy', trainLabel)
-    #     numpy.save(savepath + 'TestData.npy', testData)
-    #     numpy.save(savepath + 'TestLabel.npy', testLabel)
+def LIDC_NewLoader(loadpath, part):
+    trainData, trainLabel, testData, testLabel = [], [], [], []
+    for choosePart in range(5):
+        data = numpy.load(os.path.join(loadpath, 'Part%d-Data.npy' % choosePart))
+        label = numpy.load(os.path.join(loadpath, 'Part%d-Label.npy' % choosePart))
 
-    # for appoint in range(10):
-    #     savepath = 'E:/LIDC/Npy/Wavelet-db2/Appoint-%d/' % appoint
-    #     os.makedirs(savepath)
-    #     for part in ['cA.csv', 'cD.csv', 'cH.csv', 'cV.csv']:
-    #         trainData, trainLabel, testData, testLabel = LIDC_Loader_Wavelet(
-    #             nodulePath='E:/LIDC/LIDC-Nodule-Wavelet/db2/Csv/',
-    #             nonNodulePath='E:/LIDC/LIDC-NonNodule-Wavelet/db2/Csv/',
-    #             part=part, appoint=appoint)
-    #         numpy.save(savepath + part[0:part.find('.')] + '-Train.npy', trainData)
-    #         numpy.save(savepath + part[0:part.find('.')] + '-Test.npy', testData)
-    #         numpy.save(savepath + 'TrainLabel.npy', trainLabel)
-    #         numpy.save(savepath + 'TestLabel.npy', testLabel)
+        if choosePart == part:
+            testData = data
+            testLabel = label
+        else:
+            trainData.extend(data)
+            trainLabel.extend(label)
+    print(numpy.shape(trainData), numpy.shape(trainLabel), numpy.sum(trainLabel, axis=0), numpy.shape(testData),
+          numpy.shape(testLabel), numpy.sum(testLabel, axis=0))
+    return trainData, trainLabel, testData, testLabel
+
+
+if __name__ == '__main__':
+    LIDC_NewLoader(loadpath='D:/LIDC/Origin-Npy/', part=0)

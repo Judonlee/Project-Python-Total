@@ -1,5 +1,5 @@
 import numpy
-from LIDC_Project.Trace.Train.Tools import AUC_Calculation, Result_Calculation
+from LIDC_Project.Trace.Train_Previous.Tools import AUC_Calculation, Result_Calculation
 import xlwt
 import matplotlib.pylab as plt
 import os
