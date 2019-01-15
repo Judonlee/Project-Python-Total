@@ -8,5 +8,5 @@ if __name__ == '__main__':
         data = numpy.genfromtxt(os.path.join(loadpath, filename), dtype=int, delimiter=',')
         data = numpy.reshape(data, [-1, 4])
         for index in range(len(data)):
-            if data[index][3] > 2: totalCounter += 1
+            if data[index][3] >= 2: totalCounter += data[index][3]
     print(totalCounter)

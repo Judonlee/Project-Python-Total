@@ -13,7 +13,7 @@ def PositionAnalysis(filename):
 
 
 if __name__ == '__main__':
-    decisionName = 'OnlyIndividual.txt'
+    decisionName = 'AtLeastTwo.txt'
     nodulePath = 'E:/LIDC/TreatmentTrace/Step2-MediaPosition/'
     mediaPositionPath = 'E:/LIDC/TreatmentTrace/Step3-NoduleMedia/'
     finalDecisionPath = 'E:/LIDC/TreatmentTrace/Step4-FinalDecision/'
