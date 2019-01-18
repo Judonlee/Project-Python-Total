@@ -72,8 +72,8 @@ if __name__ == '__main__':
         #      '%.2f' % numpy.max(totalData)])
         # position
 
-        colorbar.set_clim(vmin=-15, vmax=15)
-        colorbar.set_ticks(numpy.linspace(-15, 15, 11))
+        # colorbar.set_clim(vmin=-15, vmax=15)
+        # colorbar.set_ticks(numpy.linspace(-15, 15, 11))
 
         plt.xlabel('Slope')
         plt.ylabel('Exchange ratio')
