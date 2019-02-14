@@ -13,7 +13,7 @@ def Shuffle_Part3(data, label, seq):
     return newData, newLabel, newSeq
 
 
-def Shuffle(data, label, dataLen, labelLen):
+def Shuffle_Part4(data, label, dataLen, labelLen):
     index = numpy.arange(0, len(data))
     random.shuffle(index)
     newData, newLabel, newDataLen, newLabelLen = [], [], [], []
