@@ -73,7 +73,7 @@ class EncoderDecoder_Base(NeuralNetwork_Base):
         else:
             self.attentionList = self.attention(dataInput=self.parameters['Encoder_Output'],
                                                 scopeName=self.attentionName, hiddenNoduleNumber=2 * self.hiddenNodules,
-                                                attentionScope=None, blstmFlag=True)
+                                                attentionScope=self.attentionScope, blstmFlag=True)
             self.parameters['Decoder_InitalState'] = []
             for index in range(self.rnnLayers):
                 self.parameters['Encoder_Cell_Layer%d' % index] = rnn.LSTMStateTuple(

@@ -37,7 +37,7 @@ def Load_DBLSTM(maxNumber=128, maxLen=1000):
     #                                  delimiter=',')
 
     trainData, trainSeq, trainLabel, testData, testSeq, testLabel = [], [], [], [], [], []
-    for indexA in range(len(trainLabelData))[0:2]:
+    for indexA in range(len(trainLabelData)):
         data = numpy.load(os.path.join(loadpath, 'Train', '%d.npy' % trainLabelData[indexA][0]))
 
         batchData, batchSeq, finalBatchSeq = [], [], []
@@ -60,7 +60,7 @@ def Load_DBLSTM(maxNumber=128, maxLen=1000):
         trainLabel.append(trainLabelData[indexA][2])
         print('Loading Train', trainLabelData[indexA][0], numpy.shape(batchData))
 
-    for indexA in range(len(testLabelData))[0:2]:
+    for indexA in range(len(testLabelData)):
         data = numpy.load(os.path.join(loadpath, 'Develop', '%d.npy' % testLabelData[indexA][0]))
 
         batchData, batchSeq, finalBatchSeq = [], [], []
