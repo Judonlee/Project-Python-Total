@@ -69,7 +69,15 @@ class EncoderDecoder_Base(NeuralNetwork_Base):
                     inputs=self.dataInput, sequence_length=self.dataLenInput, dtype=tensorflow.float32)
 
         if self.attention is None:
-            self.parameters['Decoder_InitalState'] = self.parameters['Encoder_FinalState']
+            self.parameters['Decoder_InitalState'] = []
+            for index in range(self.rnnLayers):
+                self.parameters['Encoder_Cell_Layer%d' % index] = rnn.LSTMStateTuple(
+                    c=tensorflow.concat([self.parameters['Encoder_FinalState'][index][0].c,
+                                         self.parameters['Encoder_FinalState'][index][1].c], axis=1),
+                    h=tensorflow.concat([self.parameters['Encoder_FinalState'][index][0].h,
+                                         self.parameters['Encoder_FinalState'][index][1].h], axis=1))
+                self.parameters['Decoder_InitalState'].append(self.parameters['Encoder_Cell_Layer%d' % index])
+            self.parameters['Decoder_InitalState'] = tuple(self.parameters['Decoder_InitalState'])
         else:
             self.attentionList = self.attention(dataInput=self.parameters['Encoder_Output'],
                                                 scopeName=self.attentionName, hiddenNoduleNumber=2 * self.hiddenNodules,
@@ -128,8 +136,6 @@ class EncoderDecoder_Base(NeuralNetwork_Base):
             self.train = tensorflow.train.AdamOptimizer(learning_rate=learningRate).minimize(self.parameters['Cost'])
 
     def ValidTest(self):
-        # trainData, trainlabel, dataSeq, labelSeq = Shuffle_Part4(
-        #     data=self.data, label=self.label, dataLen=self.dataSeq, labelLen=self.labelSeq)
         trainData, trainlabel, dataSeq, labelSeq = self.data, self.label, self.dataSeq, self.labelSeq
 
         startPosition = 0
@@ -148,13 +154,15 @@ class EncoderDecoder_Base(NeuralNetwork_Base):
             for index in range(min(self.batchSize, len(trainData) - startPosition)):
                 currentLabel = numpy.concatenate([trainlabel[startPosition + index], numpy.zeros(
                     shape=[max(batchLabelSeq) - numpy.shape(trainlabel[index + startPosition])[0]])], axis=0)
+                # print(len(trainlabel[startPosition + index]), len(currentLabel))
                 batchLabel.append(currentLabel)
 
-            loss = self.session.run(fetches=self.parameters['Cost'],
+            # print(numpy.shape(batchData), numpy.shape(batchLabel))
+            loss = self.session.run(fetches=self.parameters['Decoder_InitalState'],
                                     feed_dict={self.dataInput: batchData, self.labelInput: batchLabel,
                                                self.dataLenInput: batchDataSeq, self.labelLenInput: batchLabelSeq})
             print(loss)
-            # print(numpy.shape(loss))
+            print(numpy.shape(loss))
             exit()
 
     def Train(self, logName):
