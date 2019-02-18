@@ -41,13 +41,47 @@ def Load_EncoderDecoder():
 
 
 def Load_DBLSTM(maxSentence=128, maxLen=1000):
-    loadpath = 'D:/ProjectData/AVEC2017-Bands40/Step5_Assembly/'
+    loadpath = 'E:/ProjectData_Depression/Step5_Assembly/'
     trainData, trainLabel, trainSeq, testData, testLabel, testSeq = [], [], [], [], [], []
+
+    for indexA in ['Train', 'Develop']:
+        labelData = numpy.genfromtxt(fname=os.path.join(loadpath, '%sLabel.csv' % indexA), dtype=int, delimiter=',')
+
+        for indexB in range(numpy.shape(labelData)[0]):
+            batchData, batchLabel, batchSeq = [], labelData[indexB][2], []
+
+            currentData = numpy.load(file=os.path.join(loadpath, indexA, '%d_P_Data.npy' % labelData[indexB][0]))[
+                          0:maxSentence]
+            for indexC in range(numpy.shape(currentData)[0]):
+                batchSeq.append(min(maxLen, numpy.shape(currentData[indexC])[0]))
+            for indexC in range(numpy.shape(currentData)[0]):
+                if numpy.shape(currentData[indexC])[0] > maxLen:
+                    partData = currentData[indexC][0:maxLen]
+                else:
+                    partData = numpy.concatenate([currentData[indexC], numpy.zeros(
+                        shape=[max(batchSeq) - numpy.shape(currentData[indexC])[0],
+                               numpy.shape(currentData[indexC])[1]])], axis=0)
+                # print(numpy.shape(partData))
+                batchData.append(partData)
+            print(indexA, labelData[indexB][0], numpy.shape(batchData), batchLabel, numpy.shape(batchSeq))
+            if indexA in ['Train', 'Develop']:
+                trainData.append(batchData)
+                trainLabel.append([batchLabel])
+                trainSeq.append(batchSeq)
+            else:
+                testData.append(batchData)
+                testLabel.append([batchLabel])
+                testSeq.append(batchSeq)
+
+    print('Train Load Completed', numpy.shape(trainData), numpy.shape(trainLabel), numpy.shape(trainSeq))
+    print('Test Load Completed', numpy.shape(testData), numpy.shape(testLabel), numpy.shape(testSeq))
+    return trainData, trainLabel, trainSeq, testData, testLabel, testSeq
 
 
 if __name__ == '__main__':
-    trainData, trainLabel, trainDataSeq, trainLabelSeq, testData, testLabel, testDataSeq, testLabelSeq = Load_EncoderDecoder()
-    print(trainData[0:5])
-    print(trainLabel[0:5])
-    print(trainDataSeq[0:5])
-    print(trainLabelSeq[0:5])
+    # trainData, trainLabel, trainDataSeq, trainLabelSeq, testData, testLabel, testDataSeq, testLabelSeq = Load_EncoderDecoder()
+    # print(trainData[0:5])
+    # print(trainLabel[0:5])
+    # print(trainDataSeq[0:5])
+    # print(trainLabelSeq[0:5])
+    Load_DBLSTM()

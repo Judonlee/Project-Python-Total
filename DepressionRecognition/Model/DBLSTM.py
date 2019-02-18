@@ -121,7 +121,7 @@ class DBLSTM(NeuralNetwork_Base):
     def Valid(self):
         trainData, trainLabel, trainSeq = self.data, self.label, self.seq
 
-        result = self.session.run(fetches=self.parameters['FinalPredict'],
+        result = self.session.run(fetches=self.parameters['First_Output'],
                                   feed_dict={self.dataInput: trainData[0], self.labelInput: trainLabel[0],
                                              self.seqInput: trainSeq[0]})
         print(result)
