@@ -85,4 +85,12 @@ if __name__ == '__main__':
     # print(trainLabel[0:5])
     # print(trainDataSeq[0:5])
     # print(trainLabelSeq[0:5])
-    Load_DBLSTM()
+    trainData, trainLabel, trainSeq, testData, testLabel, testSeq = Load_DBLSTM()
+    import matplotlib.pylab as plt
+
+    data = trainData[0][0]
+    plt.figure(figsize=[10, 4])
+    data = numpy.transpose(data, [1, 0])[:, 0:100]
+    plt.imshow(data, cmap='YlOrBr')
+    plt.axis('off')
+    plt.show()

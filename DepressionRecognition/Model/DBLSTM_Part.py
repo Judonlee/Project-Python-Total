@@ -3,7 +3,8 @@ import tensorflow
 from tensorflow.contrib import rnn
 from DepressionRecognition.Model.DBLSTM import DBLSTM
 from DepressionRecognition.AttentionMechanism.LocalAttention import LocalAttentionInitializer
-from DepressionRecognition.AttentionMechanism.MonotonicAttention import MonotonicAttentionInitializer
+from DepressionRecognition.AttentionMechanism.MonotonicAttention import MonotonicAttentionInitializer, \
+    MonotonicChunkwiseAttentionInitializer
 from DepressionRecognition.Loader import Load_DBLSTM
 
 
@@ -69,7 +70,7 @@ class DBLSTM_Part(DBLSTM):
 if __name__ == '__main__':
     trainData, trainLabel, trainSeq, testData, testLabel, testSeq = Load_DBLSTM()
     classifier = DBLSTM_Part(trainData=trainData, trainLabel=trainLabel, trainSeq=trainSeq,
-                             firstAttention=MonotonicAttentionInitializer, secondAttention=None,
-                             firstAttentionScope=8, secondAttentionScope=None,
+                             firstAttention=None, secondAttention=MonotonicChunkwiseAttentionInitializer,
+                             firstAttentionScope=8, secondAttentionScope=8,
                              firstAttentionName='MA_1', secondAttentionName='MA_2')
     classifier.Valid()
