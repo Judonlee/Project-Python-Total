@@ -1,8 +1,8 @@
-from LIDC_Project.Loader.LIDC_Loader import LIDC_Loader_Choosed
+from LIDC_Project.Records.Loader.LIDC_Loader import LIDC_Loader_Choosed
 import numpy
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import scale
-from LIDC_Project.External.ROCPrinter import ROCPrinter
+from LIDC_Project.Records.External.ROCPrinter import ROCPrinter
 import os
 import multiprocessing as mp
 import time

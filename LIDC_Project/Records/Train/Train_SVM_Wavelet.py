@@ -1,12 +1,6 @@
-from LIDC_Project.Loader.LIDC_Loader import LIDC_Loader_Npy
-from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import AdaBoostClassifier
 import numpy
-import os
 from sklearn.decomposition import PCA
-from sklearn.externals import joblib
 from sklearn.preprocessing import scale
 
 if __name__ == '__main__':

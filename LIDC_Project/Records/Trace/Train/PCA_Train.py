@@ -2,9 +2,7 @@ from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import AdaBoostClassifier
-from LIDC_Project.Loader.LIDC_Loader import LIDC_NewLoader
 from LIDC_Project.Trace.Train.Tools import LoaderPCA
-import numpy
 import os
 
 USED_PART_A = 'Origin-Npy'

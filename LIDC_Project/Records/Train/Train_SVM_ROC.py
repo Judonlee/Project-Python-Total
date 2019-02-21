@@ -1,4 +1,4 @@
-from LIDC_Project.Loader.LIDC_Loader import LIDC_Loader_Npy
+from LIDC_Project.Records.Loader.LIDC_Loader import LIDC_Loader_Npy
 from sklearn.svm import SVC
 import numpy
 from sklearn.decomposition import PCA

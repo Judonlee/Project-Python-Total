@@ -1,12 +1,6 @@
-from LIDC_Project.Loader.LIDC_Loader import LIDC_Loader_Npy
-from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.naive_bayes import GaussianNB
+from LIDC_Project.Records.Loader.LIDC_Loader import LIDC_Loader_Npy
 from sklearn.ensemble import AdaBoostClassifier
 import numpy
-from LIDC_Project.External.DXScore import DXFeatureSelection
-from sklearn.preprocessing import scale
-import os
 
 if __name__ == '__main__':
     # part = ['OriginCsv', 'LBP_P=4_R=1', 'LBP_P=8_R=1', 'LBP_P=16_R=2', 'LBP_P=24_R=3']

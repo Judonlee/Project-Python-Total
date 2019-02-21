@@ -1,16 +1,8 @@
-from LIDC_Project.Loader.LIDC_Loader import LIDC_Loader_Npy
-from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.naive_bayes import GaussianNB
+from LIDC_Project.Records.Loader.LIDC_Loader import LIDC_Loader_Npy
 from sklearn.ensemble import AdaBoostClassifier
 import numpy
-import os
 from sklearn.decomposition import PCA
-from sklearn.externals import joblib
 from sklearn.preprocessing import scale
-
-from LIDC_Project.External.ROCPrinter import ROCPrinter
-import matplotlib.pylab as plt
 
 if __name__ == '__main__':
     aucList = []

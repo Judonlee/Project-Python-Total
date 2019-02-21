@@ -1,6 +1,6 @@
-from LIDC_Project.Loader.LIDC_Loader import LIDC_Loader_Choosed
+from LIDC_Project.Records.Loader.LIDC_Loader import LIDC_Loader_Choosed
 import numpy
-from LIDC_Project.External.DXScore import DXSingleCalculation
+from LIDC_Project.Records.External.DXScore import DXSingleCalculation
 
 if __name__ == '__main__':
     appoint = 0

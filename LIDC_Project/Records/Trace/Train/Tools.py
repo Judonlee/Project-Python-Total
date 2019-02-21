@@ -1,7 +1,7 @@
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import scale
 import numpy
-from LIDC_Project.Loader.LIDC_Loader import LIDC_NewLoader
+from LIDC_Project.Records.Loader.LIDC_Loader import LIDC_NewLoader
 
 
 def Normalization_Treatment(trainData, testData):
