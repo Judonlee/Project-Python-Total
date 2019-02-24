@@ -9,7 +9,7 @@ class DBLSTM(NeuralNetwork_Base):
     def __init__(self, trainData, trainLabel, trainSeq, featureShape=40, firstAttention=None, secondAttention=None,
                  firstAttentionScope=None, secondAttentionScope=None, firstAttentionName=None, secondAttentionName=None,
                  batchSize=32, rnnLayers=2, hiddenNodules=128, learningRate=1E-3, startFlag=True, graphRevealFlag=True,
-                 graphPath='logs/', occupyRate=-1):
+                 graphPath='logs/', occupyRate=-1, lossType='RMSE'):
         self.seq = trainSeq
         self.featureShape = featureShape
         self.firstAttention, self.secondAttention = firstAttention, secondAttention
@@ -18,6 +18,7 @@ class DBLSTM(NeuralNetwork_Base):
         self.firstAttentionName, self.secondAttentionName = firstAttentionName, secondAttentionName
 
         self.rnnLayers, self.hiddenNodules = rnnLayers, hiddenNodules
+        self.lossType = lossType
 
         super(DBLSTM, self).__init__(trainData=trainData, trainLabel=trainLabel, batchSize=batchSize,
                                      learningRate=learningRate, startFlag=startFlag, graphRevealFlag=graphRevealFlag,
@@ -92,8 +93,18 @@ class DBLSTM(NeuralNetwork_Base):
         self.parameters['FinalPredict'] = tensorflow.reshape(
             tensor=tensorflow.layers.dense(inputs=self.parameters['Second_FinalOutput'], units=1,
                                            activation=None, name='FinalPredict'), shape=[1])
-        self.parameters['Loss'] = tensorflow.losses.mean_squared_error(labels=self.labelInput,
-                                                                       predictions=self.parameters['FinalPredict'])
+
+        if self.lossType == 'MSE':
+            self.parameters['Loss'] = tensorflow.losses.mean_squared_error(labels=self.labelInput,
+                                                                           predictions=self.parameters['FinalPredict'])
+        if self.lossType == 'RMSE':
+            self.parameters['Loss'] = tensorflow.sqrt(
+                tensorflow.losses.mean_squared_error(labels=self.labelInput,
+                                                     predictions=self.parameters['FinalPredict']))
+        if self.lossType == 'MAE':
+            self.parameters['Loss'] = tensorflow.losses.absolute_difference(labels=self.labelInput,
+                                                                            predictions=self.parameters['FinalPredict'])
+
         self.train = tensorflow.train.AdamOptimizer(learning_rate=learningRate).minimize(self.parameters['Loss'])
 
     def Train(self, logName):
@@ -116,7 +127,7 @@ class DBLSTM(NeuralNetwork_Base):
                 print('\rTesting %d/%d' % (index, len(testData)), end='')
                 predict = self.session.run(fetches=self.parameters['FinalPredict'],
                                            feed_dict={self.dataInput: testData[index], self.seqInput: testSeq[index]})
-                file.write(str(testLabel[index]) + ',' + str(predict[0]) + '\n')
+                file.write(str(testLabel[index][0]) + ',' + str(predict[0]) + '\n')
 
     def Valid(self):
         trainData, trainLabel, trainSeq = self.data, self.label, self.seq
