@@ -4,7 +4,7 @@ import matplotlib.pylab as plt
 import os
 
 if __name__ == '__main__':
-    loadpath = 'E:/ProjectData_Depression/Result/RMSE/DBLSTM_MA_10_Second-Result/%04d.csv'
+    loadpath = 'E:/ProjectData_Depression/Result/MAE/DBLSTM_LA_2_Second-Result/%04d.csv'
     MAEList, RMSEList = [], []
     for index in range(100):
         predict, logits = [], []
@@ -17,8 +17,8 @@ if __name__ == '__main__':
             sample = sample.split(',')
             predict.append(float(sample[0]))
             logits.append(float(sample[1]))
-        MAEList.append(MAE_Calculation(label=logits, predict=predict) - 0.005 * index)
-        RMSEList.append(RMSE_Calculation(label=logits, predict=predict) - 0.005 * index)
+        MAEList.append(MAE_Calculation(label=logits, predict=predict))
+        RMSEList.append(RMSE_Calculation(label=logits, predict=predict))
     plt.plot(MAEList, label='MAE')
     plt.plot(RMSEList, label='RMSE')
     print('MAE = %.03f;\tRMSE = %.03f' % (min(MAEList), min(RMSEList)))
@@ -27,4 +27,4 @@ if __name__ == '__main__':
     plt.xlabel('Training Episode')
     plt.title('BLSTM One Layer')
     plt.legend()
-    plt.show()
+    # plt.show()

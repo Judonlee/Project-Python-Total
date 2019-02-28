@@ -36,11 +36,11 @@ def Treatment(classifyType):
 
 
 if __name__ == '__main__':
-    classifyType = 'SVC'
+    classifyType = 'AdaBoost'
     # SVC,Gaussian,Tree,AdaBoost
 
     processList = []
-    for _ in range(2):
+    for _ in range(1):
         process = multiprocessing.Process(target=Treatment, args=[classifyType])
         processList.append(process)
         process.start()

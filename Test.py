@@ -1,14 +1,16 @@
-from sklearn.datasets import load_boston
-from sklearn.ensemble import RandomForestRegressor
 import numpy as np
+from sklearn import metrics
+import matplotlib.pyplot as plt
+from sklearn.metrics import auc
 
-# Load boston housing dataset as an example
-boston = load_boston()
-X = boston["data"]
-Y = boston["target"]
-names = boston["feature_names"]
-rf = RandomForestRegressor()
-rf.fit(X, Y)
-print("Features sorted by their score:")
-print(sorted(zip(map(lambda x: round(x, 4), rf.feature_importances_), names), reverse=True))
-print(rf.feature_importances_, names)
+y = np.array([1, 1, 2, 3])
+# y为数据的真实标签
+
+scores = np.array([0.1, 0.2, 0.35, 0.8])
+
+# scores为分类其预测的得分
+
+fpr, tpr, thresholds = metrics.roc_curve(y, scores, pos_label=2)
+plt.plot(fpr, tpr)
+
+plt.show()
