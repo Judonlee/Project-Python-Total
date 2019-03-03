@@ -1,4 +1,4 @@
-from LIDC_Project.Loader import LoadPCA
+from LIDC_Project.Loader import LoadPCA, LoadDX
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree import DecisionTreeClassifier
@@ -9,11 +9,20 @@ import time
 
 
 def Treatment(classifyType):
-    for componentNumber in range(1, 201):
+    loadType = 'DX'
+    loadFeature = 'CurveletFeature'
+
+    for componentNumber in range(1, 31):
         for part in range(5):
-            savepath = 'E:/ProjectData_LIDC/Features/Step4_Result/%s/' % classifyType
+            savepath = 'E:/ProjectData_LIDC/Features/Step4_Result/%s_%s/%s/' % (loadFeature, loadType, classifyType)
             if os.path.exists(savepath + 'Component%04d-Part%d.csv' % (componentNumber, part)): continue
-            trainData, trainLabel, testData, testLabel = LoadPCA(part=part, componentNumber=componentNumber)
+
+            if loadType == 'PCA':
+                trainData, trainLabel, testData, testLabel = LoadPCA(name=loadFeature, part=part,
+                                                                     componentNumber=componentNumber)
+            if loadType == 'DX':
+                trainData, trainLabel, testData, testLabel = LoadDX(name=loadFeature, part=part,
+                                                                    componentNumber=componentNumber)
 
             if not os.path.exists(savepath): os.makedirs(savepath)
             with open(savepath + 'Component%04d-Part%d.csv' % (componentNumber, part), 'w'):
