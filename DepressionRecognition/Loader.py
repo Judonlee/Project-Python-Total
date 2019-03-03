@@ -7,7 +7,7 @@ def Load_EncoderDecoder():
     trainData, trainLabel, trainDataSeq, trainLabelSeq, testData, testLabel, testDataSeq, testLabelSeq = [], [], [], [], [], [], [], []
 
     for indexA in ['Train', 'Develop', 'Test']:
-        for indexB in os.listdir(os.path.join(loadpath, indexA)):
+        for indexB in os.listdir(os.path.join(loadpath, indexA))[0:2]:
             if indexB.find('Data') == -1: continue
             print(indexA, indexB)
 
