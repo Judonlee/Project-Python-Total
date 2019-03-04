@@ -2,8 +2,8 @@ import numpy
 from sklearn.decomposition import PCA
 
 if __name__ == '__main__':
-    loadpath = 'E:/ProjectData_LIDC/Features/Step2_Features/CurveletFeature_%d.csv.npy'
-    savepath = 'E:/ProjectData_LIDC/Features/Step3_PCA/CurveletFeature_%d.csv.npy'
+    loadpath = 'E:/ProjectData_LIDC/Features/Step2_Features/DicFeature_Restart_%d.npy'
+    savepath = 'E:/ProjectData_LIDC/Features/Step3_PCA/DicFeature_Restart_%d.npy'
 
     totalData, totalThreshold = [], []
     for index in range(5):

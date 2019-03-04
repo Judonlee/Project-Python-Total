@@ -5,11 +5,16 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import auc
 
 if __name__ == '__main__':
-    loadpath = 'E:/ProjectData_LIDC/Features/Step4_Result/SVC/'
+    loadpath = 'E:/ProjectData_LIDC/Features/Step4_Result/CurveletFeature_DX/Gaussian/'
     with open('Result-AUC.csv', 'w') as file:
         for filename in os.listdir(loadpath):
-            # print(filename, filename[18])
-            data = numpy.genfromtxt(fname=os.path.join(loadpath, filename), dtype=float, delimiter=',')
+            print(filename, filename[18])
+            try:
+                data = numpy.genfromtxt(fname=os.path.join(loadpath, filename), dtype=float, delimiter=',')
+            except:
+                os.remove(os.path.join(loadpath, filename))
+                print('Delete', filename)
+                continue
 
             labelData = numpy.genfromtxt(
                 fname='E:/ProjectData_LIDC/Features/Step4_Result/Featurelabel_%s.csv' % filename[18], dtype=int,

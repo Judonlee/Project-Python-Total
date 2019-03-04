@@ -2,7 +2,7 @@ import numpy
 import os
 
 if __name__ == '__main__':
-    loadpath = 'E:/ProjectData_LIDC/Features/Step4_Result/Gaussian/'
+    loadpath = 'E:/ProjectData_LIDC/Features/Step4_Result/CurveletFeature_DX/Tree/'
     filePrecision = open('Result-Precision.csv', 'w')
     fileSensitivity = open('Result-Sensitivity.csv', 'w')
     fileSpecificity = open('Result-Specificity.csv', 'w')

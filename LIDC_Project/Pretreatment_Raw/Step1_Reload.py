@@ -2,13 +2,11 @@ import numpy
 import os
 
 if __name__ == '__main__':
-    loadpath = 'E:/ProjectData_LIDC/Features/Step0_Raw/'
-    savepath = 'E:/ProjectData_LIDC/Features/Step1_Npy-Media/'
-    if not os.path.exists(savepath): os.makedirs(savepath)
+    loadpath = 'E:/ProjectData_LIDC/Features/Step0_Raw/DicFeature_Restart_%d.csv'
+    savepath = 'E:/ProjectData_LIDC/Features/Step1_Npy-Media/DicFeature_Restart_%d.npy'
+    # if not os.path.exists(savepath): os.makedirs(savepath)
 
-    for filename in os.listdir(loadpath):
-        if filename.find('label') != -1: continue
-        print(filename)
-        data = numpy.genfromtxt(fname=os.path.join(loadpath, filename), dtype=float, delimiter=',')
-        print(max(data), min(data))
-        # numpy.save(file=os.path.join(savepath, filename[0:filename.find('.')] + '.csv'), arr=data)
+    for index in range(5):
+        data = numpy.genfromtxt(fname=loadpath % index, dtype=float, delimiter=',')
+        print(numpy.shape(data))
+        numpy.save(file=savepath % index, arr=data)

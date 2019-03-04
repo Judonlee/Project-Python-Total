@@ -3,12 +3,12 @@ import os
 from sklearn.preprocessing import scale
 
 if __name__ == '__main__':
-    loadpath = 'E:/ProjectData_LIDC/Features/Step1_Npy-Media/DicFeature_%d.csv.npy'
-    savepath = 'E:/ProjectData_LIDC/Features/Step2_Features/DicFeature_%d.csv.npy'
+    loadpath = 'E:/ProjectData_LIDC/Features/Step1_Npy-Media/DicFeature_Restart_%d.npy'
+    savepath = 'E:/ProjectData_LIDC/Features/Step2_Features/DicFeature_Restart_%d.npy'
     # os.makedirs(savepath)
 
     totalData, totalThreshold = [], []
-    for index in range(1):
+    for index in range(5):
         data = numpy.load(file=loadpath % index)
 
         totalData.extend(data)
@@ -18,10 +18,10 @@ if __name__ == '__main__':
 
     print(numpy.argwhere(numpy.isnan(totalData)))
 
-    # totalData = scale(totalData)
-    #
-    # startPosition = 0
-    # for index in range(len(totalThreshold)):
-    #     print(numpy.shape(totalData[startPosition:startPosition + totalThreshold[index]]))
-    #     numpy.save(file=savepath % index, arr=totalData[startPosition:startPosition + totalThreshold[index]])
-    #     startPosition += totalThreshold[index]
+    totalData = scale(totalData)
+
+    startPosition = 0
+    for index in range(len(totalThreshold)):
+        print(numpy.shape(totalData[startPosition:startPosition + totalThreshold[index]]))
+        numpy.save(file=savepath % index, arr=totalData[startPosition:startPosition + totalThreshold[index]])
+        startPosition += totalThreshold[index]

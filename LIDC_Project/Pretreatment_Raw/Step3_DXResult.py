@@ -19,7 +19,7 @@ def DXFeatureSelection(data, label, maxFeatures=1):
     for index in range(numpy.shape(data)[1]):
         print('\rTreating %d/%d' % (index, numpy.shape(data)[1]), end='')
         score = DXSingleCalculation(data=data[:, index], label=label)
-        # print('\n', score)
+        print('\n', score)
         totalScore.append(score)
 
     print('\n')
@@ -40,9 +40,9 @@ def DXFeatureSelection(data, label, maxFeatures=1):
 
 
 if __name__ == '__main__':
-    loadpath = 'E:/ProjectData_LIDC/Features/Step2_Features/CurveletFeature_%d.csv.npy'
-    labelpath = 'E:/ProjectData_LIDC/Features/Step2_Features/Featurelabel_%d.csv'
-    savepath = 'E:/ProjectData_LIDC/Features/Step3_DX/CurveletFeature_%d.csv.npy'
+    loadpath = 'E:/ProjectData_LIDC/Features/Step2_Features/DicFeature_Restart_%d.npy'
+    labelpath = 'E:/ProjectData_LIDC/Features/Step2_Features/Featurelabel_Restart_%d.csv'
+    savepath = 'E:/ProjectData_LIDC/Features/Step3_DX/DicFeature_Restart_%d.npy'
 
     totalData, totalLabel, totalThreshold = [], [], []
     for index in range(5):
