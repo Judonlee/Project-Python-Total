@@ -2,7 +2,7 @@ import numpy
 import os
 
 if __name__ == '__main__':
-    loadpath = 'E:/ProjectData_LIDC/Features/Step4_Result/CurveletFeature_DX/Tree/'
+    loadpath = 'E:/ProjectData_LIDC/Features/Step4_Result/DicFeature_Restart_DX/AdaBoost/'
     filePrecision = open('Result-Precision.csv', 'w')
     fileSensitivity = open('Result-Sensitivity.csv', 'w')
     fileSpecificity = open('Result-Specificity.csv', 'w')
@@ -12,7 +12,7 @@ if __name__ == '__main__':
         data = numpy.genfromtxt(fname=os.path.join(loadpath, filename), dtype=float, delimiter=',')
 
         labelData = numpy.genfromtxt(
-            fname='E:/ProjectData_LIDC/Features/Step4_Result/Featurelabel_%s.csv' % filename[18], dtype=int,
+            fname='E:/ProjectData_LIDC/Features/Step4_Result/Featurelabel_Restart_%s.csv' % filename[18], dtype=int,
             delimiter=',')
 
         matrix = numpy.zeros([2, 2])

@@ -9,8 +9,8 @@ import time
 
 
 def Treatment(classifyType):
-    loadType = 'DX'
-    loadFeature = 'CurveletFeature'
+    loadType = 'PCA'
+    loadFeature = 'DicFeature_Restart'
 
     for componentNumber in range(1, 31):
         for part in range(5):

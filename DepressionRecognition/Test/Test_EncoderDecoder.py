@@ -13,9 +13,11 @@ if __name__ == '__main__':
 
     classifier = AttentionTransform(
         trainData=trainData, trainLabel=trainLabel, trainDataSeq=trainSeq, trainLabelSeq=trainLabelSeq,
-        firstAttention=LocalAttentionInitializer, firstAttentionName='LA', firstAttentionScope=1,
-        batchSize=32, learningRate=1E-4, startFlag=False)
-    classifier.Load(loadpath=r'E:\ProjectData_Depression\Experiment\EncoderDecoder\LA_1\0019-Network')
+        firstAttention=StandardAttentionInitializer, firstAttentionName='SA', firstAttentionScope=None,
+        batchSize=32, learningRate=1E-4, startFlag=True)
+    classifier.LoadPart(loadpath=r'E:\ProjectData_Depression\Experiment\EncoderDecoder\Standard\0019-Network')
     print(tensorflow.global_variables())
+    for sample in tensorflow.global_variables():
+        print(sample)
     print(len(tensorflow.global_variables()))
-    classifier.Train()
+    classifier.EncoderDecoderTrain()

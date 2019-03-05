@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import auc
 
 if __name__ == '__main__':
-    loadpath = 'E:/ProjectData_LIDC/Features/Step4_Result/CurveletFeature_DX/Gaussian/'
+    loadpath = 'E:/ProjectData_LIDC/Features/Step4_Result/DicFeature_Restart_DX/AdaBoost/'
     with open('Result-AUC.csv', 'w') as file:
         for filename in os.listdir(loadpath):
             print(filename, filename[18])
@@ -17,7 +17,7 @@ if __name__ == '__main__':
                 continue
 
             labelData = numpy.genfromtxt(
-                fname='E:/ProjectData_LIDC/Features/Step4_Result/Featurelabel_%s.csv' % filename[18], dtype=int,
+                fname='E:/ProjectData_LIDC/Features/Step4_Result/Featurelabel_Restart_%s.csv' % filename[18], dtype=int,
                 delimiter=',')
             score = data[:, 0]
             try:
