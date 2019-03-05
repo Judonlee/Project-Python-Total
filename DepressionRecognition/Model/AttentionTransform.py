@@ -4,6 +4,7 @@ import tensorflow
 from tensorflow.contrib import rnn
 from tensorflow.contrib import seq2seq
 from tensorflow.python.layers.core import Dense
+from DepressionRecognition.Tools import Shuffle_Part3
 
 VOCABULAR = 41
 
@@ -17,7 +18,7 @@ class AttentionTransform(NeuralNetwork_Base):
                  firstAttentionScope, secondAttention=None, secondAttentionName=None, secondAttentionScope=None,
                  rnnLayer=2, featureShape=40, batchSize=32, hiddenNodules=128, learningRate=1E-3, startFlag=True,
                  graphRevealFlag=True, graphPath='logs/', occupyRate=-1, attentionTransformLoss='L1',
-                 attentionTransformWeight=1):
+                 attentionTransformWeight=1, lossType='RMSE'):
         #####################################################################
         if len(trainData) != len(trainLabel) or len(trainLabel) != len(trainDataSeq):
             raise RuntimeError("Train Data, Label, Seq don't have same Len!")
@@ -39,6 +40,7 @@ class AttentionTransform(NeuralNetwork_Base):
 
         self.attentionTransformLoss = attentionTransformLoss
         self.attentionTransformWeight = attentionTransformWeight
+        self.lossType = lossType
 
         super(AttentionTransform, self).__init__(
             trainData=trainData, trainLabel=trainLabel, batchSize=batchSize, learningRate=learningRate,
@@ -141,9 +143,9 @@ class AttentionTransform(NeuralNetwork_Base):
                 self.parameters['Cost'])
 
         #############################################################################
-        self.DBLSTM_Structure()
+        self.DBLSTM_Structure(learningRate=learningRate)
 
-    def DBLSTM_Structure(self):
+    def DBLSTM_Structure(self, learningRate):
         with tensorflow.variable_scope('First_BLSTM_DR'):
             self.parameters['First_FW_Cell_DR'] = tensorflow.nn.rnn_cell.MultiRNNCell(
                 cells=[rnn.LSTMCell(num_units=self.hiddenNodules) for _ in range(self.rnnLayers)], state_is_tuple=True)
@@ -188,6 +190,38 @@ class AttentionTransform(NeuralNetwork_Base):
                     inputs=self.parameters['First_FinalOutput_DR'][tensorflow.newaxis, :, :],
                     dtype=tensorflow.float32)
 
+            ##########################################################################
+
+        if self.secondAttention is None:
+            self.parameters['Second_FinalOutput_DR'] = tensorflow.concat(
+                [self.parameters['Second_FinalState_DR'][self.rnnLayers - 1][0].h,
+                 self.parameters['Second_FinalState_DR'][self.rnnLayers - 1][1].h], axis=1)
+        else:
+            self.secondAttentionList_DR = self.secondAttention(dataInput=self.parameters['Second_Output_DR'],
+                                                               scopeName=self.secondAttentionName,
+                                                               hiddenNoduleNumber=2 * self.hiddenNodules,
+                                                               attentionScope=self.secondAttentionScope,
+                                                               blstmFlag=True)
+            self.parameters['Second_FinalOutput_DR'] = self.secondAttentionList_DR['FinalResult']
+
+        self.parameters['FinalPredict_DR'] = tensorflow.reshape(
+            tensor=tensorflow.layers.dense(inputs=self.parameters['Second_FinalOutput_DR'], units=1,
+                                           activation=None, name='FinalPredict_DR'), shape=[1])
+
+        if self.lossType == 'MSE':
+            self.parameters['Loss_DR'] = tensorflow.losses.mean_squared_error(
+                labels=self.labelInputDR, predictions=self.parameters['FinalPredict_DR'])
+        if self.lossType == 'RMSE':
+            self.parameters['Loss_DR'] = tensorflow.sqrt(
+                tensorflow.losses.mean_squared_error(labels=self.labelInputDR,
+                                                     predictions=self.parameters['FinalPredict_DR']))
+        if self.lossType == 'MAE':
+            self.parameters['Loss_DR'] = tensorflow.losses.absolute_difference(
+                labels=self.labelInputDR, predictions=self.parameters['FinalPredict_DR'])
+        self.train_DR = tensorflow.train.AdamOptimizer(learning_rate=learningRate).minimize(
+            loss=self.parameters['Loss_DR'] + self.parameters['AttentionLoss'],
+            var_list=tensorflow.global_variables()[NETWORK_LENGTH[self.firstAttentionName]:])
+
     def EncoderDecoderTrain(self):
         trainData, trainlabel, dataSeq, labelSeq = self.data, self.label, self.dataSeq, self.labelSeq
 
@@ -229,8 +263,24 @@ class AttentionTransform(NeuralNetwork_Base):
     def Valid(self):
         trainData, trainLabel, trainSeq = self.data, self.label, self.dataSeq
 
-        result = self.session.run(fetches=self.parameters['Second_Output_DR'],
+        result = self.session.run(fetches=self.parameters['Loss_DR'],
                                   feed_dict={self.dataInput: trainData[0], self.labelInputDR: trainLabel[0],
                                              self.dataLenInput: trainSeq[0]})
         print(result)
         print(numpy.shape(result))
+
+    def Train(self, logName):
+        trainData, trainLabel, trainSeq = Shuffle_Part3(data=self.data, label=self.label, seq=self.dataSeq)
+        totalLoss = 0
+        with open(logName, 'w') as file:
+            for index in range(len(trainData)):
+                distanceLoss, attentionLoss, _ = self.session.run(
+                    fetches=[self.parameters['Loss_DR'], self.parameters['AttentionLoss'], self.train_DR],
+                    feed_dict={self.dataInput: trainData[index],
+                               self.labelInputDR: trainLabel[index],
+                               self.dataLenInput: trainSeq[index]})
+                totalLoss += distanceLoss + attentionLoss
+                file.write(str(distanceLoss) + ',' + str(attentionLoss) + '\n')
+                print('\rTraining %d/%d DistanceLoss = %f\tAttentionLoss = %f' % (
+                    index, len(trainData), distanceLoss, attentionLoss), end='')
+        return totalLoss
