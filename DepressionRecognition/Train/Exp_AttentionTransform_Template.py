@@ -7,19 +7,19 @@ from DepressionRecognition.AttentionMechanism.MonotonicAttention import Monotoni
 import os
 
 if __name__ == '__main__':
-    # os.environ['CUDA_VISIBLE_DEVICES'] = '3'
-
     firstAttention = StandardAttentionInitializer
     firstAttentionName = 'SA'
     firstAttentionScope = None
 
-    secondAttention = StandardAttentionInitializer
-    secondAttentionName = 'SA_2'
+    secondAttention = None
+    secondAttentionName = None
     secondAttentionScope = None
 
     attentionTransformLoss = 'L1'
-    attentionTransformWeight = 100
-    lossType = 'MAE'
+    attentionTransformWeight = 100000
+    lossType = 'RMSE'
+
+    loadname = 'Standard'
 
     savepath = 'E:/ProjectData_Depression/Experiment/AttentionTransform/%s/%s_%s_%s_%d/' % (
         lossType, firstAttentionName, ('First' if (secondAttention == None) else 'Both'), attentionTransformLoss,
@@ -39,7 +39,7 @@ if __name__ == '__main__':
         secondAttentionScope=secondAttentionScope, attentionTransformLoss=attentionTransformLoss,
         attentionTransformWeight=attentionTransformWeight, lossType=lossType, batchSize=32, learningRate=1E-3,
         startFlag=True)
-    classifier.LoadPart(loadpath=r'E:\ProjectData_Depression\Experiment\EncoderDecoder\Standard\0019-Network')
+    classifier.LoadPart(loadpath='E:/ProjectData_Depression/Experiment/EncoderDecoder/%s/0019-Network' % loadname)
     # classifier.EncoderDecoderTrain()
 
     for episode in range(100):

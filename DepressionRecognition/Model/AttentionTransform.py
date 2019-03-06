@@ -284,3 +284,12 @@ class AttentionTransform(NeuralNetwork_Base):
                 print('\rTraining %d/%d DistanceLoss = %f\tAttentionLoss = %f' % (
                     index, len(trainData), distanceLoss, attentionLoss), end='')
         return totalLoss
+
+    def Test(self, testData, testLabel, testSeq, logName):
+        with open(logName, 'w') as file:
+            for index in range(len(testData)):
+                print('\rTesting %d/%d' % (index, len(testData)), end='')
+                predict = self.session.run(fetches=self.parameters['FinalPredict_DR'],
+                                           feed_dict={self.dataInput: testData[index],
+                                                      self.dataLenInput: testSeq[index]})
+                file.write(str(testLabel[index][0]) + ',' + str(predict[0]) + '\n')
