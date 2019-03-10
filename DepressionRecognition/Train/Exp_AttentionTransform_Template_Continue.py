@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
     ####################################################################
 
-    os.makedirs(savepath)
+    # os.makedirs(savepath)
     trainData, trainLabel, trainSeq, testData, testLabel, testSeq = Load_DBLSTM()
     trainLabelSeq = None
     # trainData, trainLabel, trainSeq, trainLabelSeq, testData, testLabel, testSeq, testLabelSeq = Load_EncoderDecoder()
@@ -38,10 +38,10 @@ if __name__ == '__main__':
         secondAttention=secondAttention, secondAttentionName=secondAttentionName,
         secondAttentionScope=secondAttentionScope, attentionTransformLoss=attentionTransformLoss,
         attentionTransformWeight=attentionTransformWeight, lossType=lossType, batchSize=32, learningRate=1E-3,
-        startFlag=True)
-    classifier.LoadPart(loadpath='E:/ProjectData_Depression/Experiment/EncoderDecoder/%s/0019-Network' % loadname)
+        startFlag=False)
+    classifier.Load(loadpath=savepath + '%04d-Network' % 39)
     # classifier.EncoderDecoderTrain()
 
-    for episode in range(100):
+    for episode in range(40, 100):
         print('\nEpisode %d/100 Total Loss = %f' % (episode, classifier.Train(logName=savepath + '%04d.csv' % episode)))
         classifier.Save(savepath=savepath + '%04d-Network' % episode)
