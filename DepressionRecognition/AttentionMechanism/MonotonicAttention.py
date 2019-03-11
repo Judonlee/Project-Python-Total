@@ -88,8 +88,8 @@ def MonotonicChunkwiseAttentionInitializer(dataInput, scopeName, hiddenNoduleNum
             'HiddenNoduleNumber'] = tensorflow.unstack(tensorflow.shape(networkParameter['DataInput'], name='Shape'))
 
         networkParameter['DataLogits'] = tensorflow.layers.dense(
-            inputs=networkParameter['DataInput'], units=1, activation=tensorflow.nn.tanh, name='DataLogits')[
-            ..., 0]
+            inputs=networkParameter['DataInput'], units=1, activation=tensorflow.nn.tanh,
+            name='DataLogits_%s' % scopeName)[..., 0]
         MovingMax(tensor=networkParameter['DataLogits'], windowLen=attentionScope, namescope='Logits_Max')
 
         #########################################################################

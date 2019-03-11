@@ -4,7 +4,7 @@ import matplotlib.pylab as plt
 import os
 
 if __name__ == '__main__':
-    loadpath = 'E:/ProjectData_Depression/Experiment/AttentionTransform/RMSE/LA_Both_L1_100000_Result/%04d.csv'
+    loadpath = 'E:/ProjectData_Depression/Experiment/AttentionTransform/MAE/MA_Both_L1_1000_Result/%04d.csv'
     MAEList, RMSEList = [], []
     for index in range(100):
         if not os.path.exists(loadpath % index): continue
