@@ -1,14 +1,15 @@
 import numpy
 from sklearn.decomposition import PCA
+import os
 
 
 def DXSingleCalculation(data, label):
     listZero, listOne = [], []
     for index in range(len(data)):
-        if label[index] == 2: listZero.append(data[index])
+        if label[index] == 0: listZero.append(data[index])
         if label[index] == 1: listOne.append(data[index])
-    # print(numpy.mean(listOne), numpy.mean(listZero))
-    # print(numpy.std(listOne), numpy.std(listZero))
+    print(numpy.mean(listOne), numpy.mean(listZero))
+    print(numpy.std(listOne), numpy.std(listZero))
     DXScore = (numpy.mean(listOne) - numpy.mean(listZero)) * (numpy.mean(listOne) - numpy.mean(listZero)) / \
               (numpy.std(listOne) * numpy.std(listOne) + numpy.std(listZero) * numpy.std(listZero))
     return DXScore
@@ -40,14 +41,15 @@ def DXFeatureSelection(data, label, maxFeatures=1):
 
 
 if __name__ == '__main__':
-    loadpath = 'E:/ProjectData_LIDC/Features/Step2_Features/DicFeature_Restart_%d.npy'
-    labelpath = 'E:/ProjectData_LIDC/Features/Step2_Features/Featurelabel_Restart_%d.csv'
-    savepath = 'E:/ProjectData_LIDC/Features/Step3_DX/DicFeature_Restart_%d.npy'
+    loadpath = 'D:/LIDC/LBP-Npy/R=3_P=24_Normalization/Part%d-Data.npy'
+    labelpath = 'D:/LIDC/LBP-Npy/R=3_P=24_Normalization/Part%d-Label.npy'
+    os.makedirs('D:/LIDC/LBP-Npy/R=3_P=24_DX/')
+    savepath = 'D:/LIDC/LBP-Npy/R=3_P=24_DX/Part%d-Data.npy'
 
     totalData, totalLabel, totalThreshold = [], [], []
     for index in range(5):
         data = numpy.load(loadpath % index)
-        label = numpy.genfromtxt(fname=labelpath % index, dtype=int, delimiter=',')
+        label = numpy.argmax(numpy.load(labelpath % index), axis=1)
 
         totalData.extend(data)
         totalLabel.extend(label)

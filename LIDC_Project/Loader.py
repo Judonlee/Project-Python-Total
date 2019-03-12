@@ -6,7 +6,7 @@ def LoadPCA(name, part, componentNumber=10):
     trainData, trainLabel, testData, testLabel = [], [], [], []
 
     for index in range(5):
-        currentData = numpy.load(loadpath + '%s_%d.csv.npy' % (name, index))[:, 0:componentNumber]
+        currentData = numpy.load(loadpath + '%s/Part%d-Data.npy' % (name, index))[:, 0:componentNumber]
         currentLabel = numpy.genfromtxt(fname=loadpath + 'Featurelabel_%d.csv' % index, dtype=int, delimiter=',')
         # print(numpy.shape(currentData), numpy.shape(currentLabel))
 
@@ -26,7 +26,7 @@ def LoadDX(name, part, componentNumber=10):
     trainData, trainLabel, testData, testLabel = [], [], [], []
 
     for index in range(5):
-        currentData = numpy.load(loadpath + '%s_%d.csv.npy' % (name, index))[:, 0:componentNumber]
+        currentData = numpy.load(loadpath + '%s/Part%d-Data.npy' % (name, index))[:, 0:componentNumber]
         currentLabel = numpy.genfromtxt(fname=loadpath + 'Featurelabel_%d.csv' % index, dtype=int, delimiter=',')
         # print(numpy.shape(currentData), numpy.shape(currentLabel))
 
