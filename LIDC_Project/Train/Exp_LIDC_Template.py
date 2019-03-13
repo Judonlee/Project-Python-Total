@@ -10,11 +10,11 @@ import numpy
 
 
 def Treatment(classifyType):
-    loadFeature = 'R=1_P=4'
-    for loadType in ['DX']:
+    loadFeature = 'R=2_P=16'
+    for loadType in ['PCA']:
         for componentNumber in range(1, 31):
             for part in range(5):
-                savepath = 'E:/ProjectData_LIDC/%s_%s/%s/' % (loadFeature, loadType, classifyType)
+                savepath = 'E:/ProjectData_LIDC/Features/Step4_Result/%s_%s/%s/' % (loadFeature, loadType, classifyType)
                 if os.path.exists(savepath + 'Component%04d-Part%d.csv' % (componentNumber, part)): continue
 
                 if loadType == 'PCA':
