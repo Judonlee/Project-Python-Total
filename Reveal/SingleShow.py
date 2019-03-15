@@ -4,8 +4,8 @@ import numpy
 import math
 
 if __name__ == '__main__':
-    drift = 'Epsilon18NXR'
-    fold = 'Epsilon15NXR-Epsilon18NXR-Expand'
+    drift = 'Epsilon15NAR'
+    fold = 'Epsilon15NAR-Epsilon18NXR-Expand'
 
     maxValue = 15
     minValue = -15
@@ -52,7 +52,7 @@ if __name__ == '__main__':
         ###########################################################
 
         ax = plt.subplot(1, 1, 1)
-        plt.imshow(totalData, cmap='Blues', origin='lower')
+        plt.imshow(totalData, cmap='Greys', origin='lower')
         colorbar = plt.colorbar()
         if fold == 'Epsilon15NAR-Epsilon15NXR':
             colorbar.set_label('$^{15}$ε$_{NAR}$ / $^{15}$ε$_{NXR}$')

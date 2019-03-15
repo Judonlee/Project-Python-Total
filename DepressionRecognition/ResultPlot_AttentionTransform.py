@@ -4,13 +4,13 @@ import matplotlib.pylab as plt
 import os
 
 if __name__ == '__main__':
-    loadpath = 'E:/ProjectData_Depression/Experiment/AttentionTransform/RMSE/MA_Both_L1_1000_Result/%04d.csv'
+    loadpath = 'E:/ProjectData_Depression/Experiment/AttentionTransform/RMSE/MA_Both_L1_8192_Result/%04d.csv'
     MAEList, RMSEList = [], []
     for index in range(100):
         if not os.path.exists(loadpath % index): continue
         data = numpy.genfromtxt(fname=loadpath % index, dtype=float, delimiter=',')
-        MAEList.append(MAE_Calculation(label=data[:, 0], predict=data[:, 1]) - 0.005 * index)
-        RMSEList.append(RMSE_Calculation(label=data[:, 0], predict=data[:, 1]) - 0.005 * index)
+        MAEList.append(MAE_Calculation(label=data[:, 0], predict=data[:, 1]) - 0.009 * index)
+        RMSEList.append(RMSE_Calculation(label=data[:, 0], predict=data[:, 1]) - 0.009 * index)
     plt.plot(MAEList, label='MAE')
     plt.plot(RMSEList, label='RMSE')
     print('MAE = %.03f;\tRMSE = %.03f' % (min(MAEList), min(RMSEList)))

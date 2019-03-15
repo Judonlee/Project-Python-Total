@@ -4,8 +4,8 @@ import numpy
 import math
 
 if __name__ == '__main__':
-    drift = 'Epsilon15NAR'
-    fold = 'Epsilon15NAR-Epsilon15NXR-Expand'
+    drift = 'Epsilon18NXR'
+    fold = 'Epsilon15NXR-Epsilon18NXR-Expand'
 
     for ratio in range(10, 100, 10):
         loadpath = 'D:/Project-Matlab/Treatment/新建文件夹/%s-Drifted/%s/%s/Ratio%d.txt'

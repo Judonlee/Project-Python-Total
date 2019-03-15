@@ -79,6 +79,22 @@ def Load_DBLSTM(maxSentence=128, maxLen=1000):
     return trainData, trainLabel, trainSeq, testData, testLabel, testSeq
 
 
+def Loader_AutoEncoder():
+    loadpath = 'E:/ProjectData_Depression/Step5_Assembly/'
+    data, seq = [], []
+
+    for indexA in ['Train', 'Develop', 'Test']:
+        labelData = numpy.genfromtxt(fname=os.path.join(loadpath, '%sLabel.csv' % indexA), dtype=int, delimiter=',')[
+                    0:2]
+
+        for indexB in range(numpy.shape(labelData)[0]):
+            currentData = numpy.load(file=os.path.join(loadpath, indexA, '%d_P_Data.npy' % labelData[indexB][0]))
+            data.extend(currentData)
+            for sample in currentData:
+                seq.append(numpy.shape(sample)[0])
+    return data, seq
+
+
 if __name__ == '__main__':
     # trainData, trainLabel, trainDataSeq, trainLabelSeq, testData, testLabel, testDataSeq, testLabelSeq = Load_EncoderDecoder()
     # print(trainData[0:5])
