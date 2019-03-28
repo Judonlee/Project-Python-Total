@@ -1,12 +1,12 @@
-from DepressionRecognition.Loader import Loader_AutoEncoder, Load_DBLSTM
+import tensorflow
+import numpy
+import os
 from DepressionRecognition.Model.DBLSTM_AutoEncoder import DBLSTM_AutoEncoder
+from DepressionRecognition.Loader import Load_DBLSTM
 from DepressionRecognition.AttentionMechanism.StandardAttention import StandardAttentionInitializer
 from DepressionRecognition.AttentionMechanism.LocalAttention import LocalAttentionInitializer
 from DepressionRecognition.AttentionMechanism.MonotonicAttention import MonotonicAttentionInitializer, \
     MonotonicChunkwiseAttentionInitializer
-import numpy
-import os
-import tensorflow
 
 if __name__ == '__main__':
     attention = StandardAttentionInitializer
@@ -17,7 +17,9 @@ if __name__ == '__main__':
     secondAttentionScope = 0
     secondAttentionName = 'SA_2'
 
-    savepath = 'E:/ProjectData_Depression/Experiment/DBLSTM-AutoEncoder-Both/%s_%d/' % (attentionName, attentionScope)
+    loadpath = 'E:/ProjectData_Depression/Experiment/DBLSTM-AutoEncoder-Both/%s_%d/' % (attentionName, attentionScope)
+    savepath = 'E:/ProjectData_Depression/Experiment/DBLSTM-AutoEncoder-Both/%s_%d_Result/' % (
+        attentionName, attentionScope)
     os.makedirs(savepath)
 
     trainData, trainLabel, trainSeq, testData, testLabel, testSeq = Load_DBLSTM()
@@ -26,16 +28,12 @@ if __name__ == '__main__':
     print(numpy.shape(trainData), numpy.shape(trainLabel), numpy.shape(trainSeq))
     print(numpy.shape(testData), numpy.shape(testLabel), numpy.shape(testSeq))
 
-    # trainData, trainSeq = Loader_AutoEncoder()
-    # trainLabel = None
-    # for sample in trainData:
-    #     print(numpy.shape(sample))
-
     classifier = DBLSTM_AutoEncoder(data=trainData, label=trainLabel, seq=trainSeq, regressionWeight=1,
                                     attention=attention, attentionName=attentionName, attentionScope=attentionScope,
                                     secondAttention=secondAttention, secondAttentionScope=secondAttentionScope,
                                     secondAttentionName=secondAttentionName, batchSize=64, learningRate=1E-3)
-    for episode in range(100):
-        print('\nEpisode %d/100 Total Loss = %f' % (
-            episode, classifier.TrainTotal(logname=savepath + '%04d.csv' % episode)))
-        classifier.Save(savepath=savepath + '%04d-Network' % episode)
+
+    for episode in range(88, 89):
+        classifier.Load(loadpath=loadpath + '%04d-Network' % episode)
+        classifier.Test(testData=testData, testLabel=testLabel, testSeq=testSeq,
+                        logname=savepath + '%04d.csv' % episode)

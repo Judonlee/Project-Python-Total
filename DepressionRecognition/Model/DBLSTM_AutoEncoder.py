@@ -10,19 +10,20 @@ NETWORK_LENGTH = {'None': 44, 'SA': 50, 'LA': 50, 'MA': 56, 'MCA': 50}
 
 
 class DBLSTM_AutoEncoder(AutoEncoder):
-    def __init__(self, data, label, seq, lossType='MAE', weight=10, attention=None, attentionName=None,
-                 attentionScope=None, secondAttention=None, secondAttentionName=None, secondAttentionScope=None,
-                 batchSize=32, maxLen=1000, rnnLayers=2, hiddenNodules=128, learningRate=1E-3, startFlag=True,
-                 graphRevealFlag=True, graphPath='logs/', occupyRate=-1):
+    def __init__(self, data, label, seq, lossType='MAE', autoEncoderWeight=10, regressionWeight=24, attention=None,
+                 attentionName=None, attentionScope=None, secondAttention=None, secondAttentionName=None,
+                 secondAttentionScope=None, batchSize=32, maxLen=1000, rnnLayers=2, hiddenNodules=128,
+                 learningRate=1E-3, startFlag=True, graphRevealFlag=True, graphPath='logs/', occupyRate=-1):
         self.treatLabel = label
         self.lossType = lossType
+        self.regressionWeight = regressionWeight
 
         self.secondAttention = secondAttention
         self.secondAttentionName = secondAttentionName
         self.secondAttentionScope = secondAttentionScope
 
         super(DBLSTM_AutoEncoder, self).__init__(
-            data=data, seq=seq, weight=weight, attention=attention, attentionName=attentionName,
+            data=data, seq=seq, weight=autoEncoderWeight, attention=attention, attentionName=attentionName,
             attentionScope=attentionScope, batchSize=batchSize, maxLen=maxLen, rnnLayers=rnnLayers,
             hiddenNodules=hiddenNodules, learningRate=learningRate, startFlag=startFlag,
             graphRevealFlag=graphRevealFlag, graphPath=graphPath, occupyRate=occupyRate)
@@ -142,24 +143,22 @@ class DBLSTM_AutoEncoder(AutoEncoder):
                                            activation=None, name='FinalPredict'), shape=[1])
 
         if self.lossType == 'MSE':
-            self.parameters['Loss'] = tensorflow.losses.mean_squared_error(labels=self.labelInput,
-                                                                           predictions=self.parameters['FinalPredict'],
-                                                                           weights=24)
+            self.parameters['Loss'] = tensorflow.losses.mean_squared_error(
+                labels=self.labelInput, predictions=self.parameters['FinalPredict'], weights=self.regressionWeight)
         if self.lossType == 'RMSE':
             self.parameters['Loss'] = tensorflow.sqrt(
-                tensorflow.losses.mean_squared_error(labels=self.labelInput,
-                                                     predictions=self.parameters['FinalPredict'], weights=24))
+                tensorflow.losses.mean_squared_error(
+                    labels=self.labelInput, predictions=self.parameters['FinalPredict'], weights=self.regressionWeight))
         if self.lossType == 'MAE':
-            self.parameters['Loss'] = tensorflow.losses.absolute_difference(labels=self.labelInput,
-                                                                            predictions=self.parameters['FinalPredict'],
-                                                                            weights=24)
+            self.parameters['Loss'] = tensorflow.losses.absolute_difference(
+                labels=self.labelInput, predictions=self.parameters['FinalPredict'], weights=self.regressionWeight)
 
         self.train_DR_Part = tensorflow.train.AdamOptimizer(
             learning_rate=learningRate).minimize(self.parameters['Loss'],
                                                  var_list=tensorflow.global_variables()[
                                                           NETWORK_LENGTH[self.attentionName]:])
         self.train_DR_Total = tensorflow.train.AdamOptimizer(learning_rate=learningRate).minimize(
-            self.parameters['Loss'])
+            self.parameters['Loss'] + self.parameters['Loss_AE'])
 
     def AutoEncoderTrain(self, logname):
         data, seq = Shuffle_Train(data=self.treatData, label=self.treatSeq)
@@ -220,5 +219,34 @@ class DBLSTM_AutoEncoder(AutoEncoder):
                 print('\rTraining %d/%d Loss = %f' % (index, len(trainData), loss), end='')
         return totalLoss
 
-    def Test(self, logname):
-        pass
+    def TrainTotal(self, logname):
+        with open(logname, 'w') as file:
+            trainData, trainLabel, trainSeq = self.treatData, self.treatLabel, self.treatSeq
+            # print(numpy.shape(trainData), numpy.shape(trainLabel), numpy.shape(trainSeq))
+            regressionLoss, autoEncoderLoss = 0.0, 0.0
+
+            for index in range(len(trainData)):
+                batchData, batchLabel, batchSeq = trainData[index], trainLabel[index], trainSeq[index]
+                # print(numpy.shape(batchData), numpy.shape(batchLabel), numpy.shape(batchSeq))
+                lossRegression, lossAutoEncoder, _ = self.session.run(
+                    fetches=[self.parameters['Loss'], self.parameters['Loss_AE'], self.train_DR_Total],
+                    feed_dict={self.dataInput: batchData, self.labelInput: batchLabel,
+                               self.seqInput: batchSeq})
+                regressionLoss += lossRegression
+                autoEncoderLoss += lossAutoEncoder
+                file.write(str(lossRegression) + ',' + str(lossAutoEncoder) + '\n')
+
+                print('\rTraining %d/%d Regression = %f\tAutoEncoder = %f' % (
+                    index, len(trainData), lossRegression, lossAutoEncoder), end='')
+        return regressionLoss + autoEncoderLoss
+
+    def Test(self, testData, testLabel, testSeq, logname):
+        with open(logname, 'w') as file:
+            for index in range(len(testData)):
+                batchData, batchLabel, batchSeq = testData[index], testLabel[index], testSeq[index]
+                # print(numpy.shape(batchData), numpy.shape(batchLabel), numpy.shape(batchSeq))
+                finalPredict = self.session.run(fetches=self.parameters['FinalPredict'],
+                                                feed_dict={self.dataInput: batchData, self.labelInput: batchLabel,
+                                                           self.seqInput: batchSeq})
+                file.write(str(batchLabel[0]) + ',' + str(finalPredict[0] * self.regressionWeight) + '\n')
+                print('\rTreating %d/%d' % (index, len(testData)), end='')
