@@ -78,6 +78,38 @@ def Load_DBLSTM(maxSentence=128, maxLen=1000):
     return trainData, trainLabel, trainSeq, testData, testLabel, testSeq
 
 
+def Load_DBLSTM_ChoosePart(part, maxSentence=128, maxLen=1000):
+    loadpath = 'E:/ProjectData_Depression/Step5_Assembly/'
+    trainData, trainLabel, trainSeq = [], [], []
+
+    for indexA in part:
+        labelData = numpy.genfromtxt(fname=os.path.join(loadpath, '%sLabel.csv' % indexA), dtype=int, delimiter=',')
+
+        for indexB in range(numpy.shape(labelData)[0]):
+            batchData, batchLabel, batchSeq = [], labelData[indexB][2], []
+
+            currentData = numpy.load(file=os.path.join(loadpath, indexA, '%d_P_Data.npy' % labelData[indexB][0]))[
+                          0:maxSentence]
+            for indexC in range(numpy.shape(currentData)[0]):
+                batchSeq.append(min(maxLen, numpy.shape(currentData[indexC])[0]))
+            for indexC in range(numpy.shape(currentData)[0]):
+                if numpy.shape(currentData[indexC])[0] > maxLen:
+                    partData = currentData[indexC][0:maxLen]
+                else:
+                    partData = numpy.concatenate([currentData[indexC], numpy.zeros(
+                        shape=[max(batchSeq) - numpy.shape(currentData[indexC])[0],
+                               numpy.shape(currentData[indexC])[1]])], axis=0)
+                # print(numpy.shape(partData))
+                batchData.append(partData)
+            print(indexA, labelData[indexB][0], numpy.shape(batchData), batchLabel, numpy.shape(batchSeq))
+            trainData.append(batchData)
+            trainLabel.append([batchLabel])
+            trainSeq.append(batchSeq)
+
+    print('Train Load Completed', numpy.shape(trainData), numpy.shape(trainLabel), numpy.shape(trainSeq))
+    return trainData, trainLabel, trainSeq
+
+
 def Loader_AutoEncoder():
     loadpath = 'E:/ProjectData_Depression/Step5_Assembly/'
     data, seq = [], []

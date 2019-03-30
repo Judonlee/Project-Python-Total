@@ -106,3 +106,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+Useless/Damage.csv
+Useless/InputRecord.csv
+Useless/Score.csv

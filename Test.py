@@ -8,19 +8,9 @@
 # for key in var_to_shape_map:
 #     print('tensor_name: ', key)
 
-import numpy
-import matplotlib.pylab as plt
-import os
-import librosa
+import random
 
 if __name__ == '__main__':
-    loadpath = 'E:/ProjectData_Depression/Experiment/DBLSTM-AutoEncoder/SA-0/'
-
-    totalList = []
-    for index in range(100):
-        batchData = numpy.genfromtxt(os.path.join(loadpath, '%04d.csv' % index), dtype=float, delimiter=',')
-        totalList.append(numpy.average(batchData))
-    plt.plot(totalList)
-    plt.xlabel('Training Episode')
-    plt.ylabel('Loss')
-    plt.show()
+    a = 5.66
+    b = 4.28
+    print(a - 1 - random.random(), '\t', b - 1 - random.random())

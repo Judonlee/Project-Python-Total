@@ -1,4 +1,4 @@
-from DepressionRecognition.Loader import Load_DBLSTM, Load_EncoderDecoder
+from DepressionRecognition.Loader import Load_DBLSTM, Load_EncoderDecoder, Load_DBLSTM_ChoosePart
 from DepressionRecognition.Model.AttentionTransform import AttentionTransform
 from DepressionRecognition.AttentionMechanism.StandardAttention import StandardAttentionInitializer
 from DepressionRecognition.AttentionMechanism.LocalAttention import LocalAttentionInitializer
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     ####################################################################
 
     os.makedirs(savepath)
-    trainData, trainLabel, trainSeq, testData, testLabel, testSeq = Load_DBLSTM()
+    trainData, trainLabel, trainSeq = Load_DBLSTM_ChoosePart(part=['Develop'])
     trainLabelSeq = None
     # trainData, trainLabel, trainSeq, trainLabelSeq, testData, testLabel, testSeq, testLabelSeq = Load_EncoderDecoder()
 
