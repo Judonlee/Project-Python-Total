@@ -8,9 +8,17 @@
 # for key in var_to_shape_map:
 #     print('tensor_name: ', key)
 
-import random
+import matplotlib.pylab as plt
+import numpy
 
 if __name__ == '__main__':
-    a = 5.66
-    b = 4.28
-    print(a - 1 - random.random(), '\t', b - 1 - random.random())
+    print(numpy.sin(numpy.arange(-10, 10, 0.1)))
+    plt.subplot(211)
+    plt.plot(numpy.sin(numpy.arange(-10, 10, 0.1)))
+    plt.axis('off')
+    plt.title('Teacher\'s Attention Map', fontsize=30)
+    plt.subplot(212)
+    plt.plot(numpy.sin(numpy.arange(-10, 10, 1)))
+    plt.axis('off')
+    plt.title('Stuent\'s Attention Map', fontsize=30)
+    plt.show()
