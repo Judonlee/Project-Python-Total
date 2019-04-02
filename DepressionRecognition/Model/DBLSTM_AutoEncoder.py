@@ -2,6 +2,7 @@ import tensorflow
 import numpy
 from DepressionRecognition.Model.AutoEncoder import AutoEncoder
 from __Base.Shuffle import Shuffle_Train
+from DepressionRecognition.Tools import Shuffle_Part3
 from tensorflow.contrib import rnn
 from tensorflow.contrib import seq2seq
 from tensorflow.python.layers.core import Dense
@@ -10,10 +11,12 @@ NETWORK_LENGTH = {'None': 44, 'SA': 50, 'LA': 50, 'MA': 56, 'MCA': 50}
 
 
 class DBLSTM_AutoEncoder(AutoEncoder):
-    def __init__(self, data, label, seq, lossType='MAE', autoEncoderWeight=10, regressionWeight=24, attention=None,
-                 attentionName=None, attentionScope=None, secondAttention=None, secondAttentionName=None,
-                 secondAttentionScope=None, batchSize=32, maxLen=1000, rnnLayers=2, hiddenNodules=128,
-                 learningRate=1E-3, startFlag=True, graphRevealFlag=True, graphPath='logs/', occupyRate=-1):
+    def __init__(self, data, label, seq, concatType='Concat', lossType='MAE', autoEncoderWeight=10, regressionWeight=24,
+                 attention=None, attentionName=None, attentionScope=None, secondAttention=None,
+                 secondAttentionName=None, secondAttentionScope=None, batchSize=32, maxLen=1000, rnnLayers=2,
+                 hiddenNodules=128, learningRate=1E-3, startFlag=True, graphRevealFlag=True, graphPath='logs/',
+                 occupyRate=-1):
+        self.concatType = concatType
         self.treatLabel = label
         self.lossType = lossType
         self.regressionWeight = regressionWeight
@@ -107,25 +110,54 @@ class DBLSTM_AutoEncoder(AutoEncoder):
 
         self.parameters['Loss_AE'] = tensorflow.losses.absolute_difference(
             labels=self.dataInput, predictions=self.parameters['Decoder_Logits_AE'][0], weights=self.weight)
-        self.train = tensorflow.train.AdamOptimizer(learning_rate=learningRate).minimize(self.parameters['Loss_AE'])
+        self.trainAE = tensorflow.train.AdamOptimizer(learning_rate=learningRate).minimize(self.parameters['Loss_AE'])
 
         #############################################################################
         # DBLSTM Second BLSTM
         #############################################################################
 
-        with tensorflow.variable_scope('Second_BLSTM'):
-            self.parameters['Second_FW_Cell'] = tensorflow.nn.rnn_cell.MultiRNNCell(
-                cells=[rnn.LSTMCell(num_units=self.hiddenNodules) for _ in range(self.rnnLayers)],
-                state_is_tuple=True)
-            self.parameters['Second_BW_Cell'] = tensorflow.nn.rnn_cell.MultiRNNCell(
-                cells=[rnn.LSTMCell(num_units=self.hiddenNodules) for _ in range(self.rnnLayers)],
-                state_is_tuple=True)
+        with tensorflow.variable_scope('FirstBLSTM'):
+            self.parameters['First_Cell_Forward'] = tensorflow.nn.rnn_cell.MultiRNNCell(
+                cells=[rnn.LSTMCell(num_units=self.hiddenNodules) for _ in range(self.rnnLayers)], state_is_tuple=True)
+            self.parameters['First_Cell_Backward'] = tensorflow.nn.rnn_cell.MultiRNNCell(
+                cells=[rnn.LSTMCell(num_units=self.hiddenNodules) for _ in range(self.rnnLayers)], state_is_tuple=True)
+
+            self.parameters['First_Output'], self.parameters['First_FinalState'] = \
+                tensorflow.nn.bidirectional_dynamic_rnn(
+                    cell_fw=self.parameters['First_Cell_Forward'], cell_bw=self.parameters['First_Cell_Backward'],
+                    inputs=self.dataInput, sequence_length=self.seqInput, dtype=tensorflow.float32)
+
+        if self.attention is None:
+            self.parameters['First_FinalOutput'] = tensorflow.concat(
+                [self.parameters['First_FinalState'][self.rnnLayers - 1][0].h,
+                 self.parameters['First_FinalState'][self.rnnLayers - 1][1].h], axis=1)
+        else:
+            self.firstAttentionList = self.attention(dataInput=self.parameters['First_Output'],
+                                                     scopeName=self.attentionName + '_DBLTM',
+                                                     hiddenNoduleNumber=2 * self.hiddenNodules,
+                                                     attentionScope=self.attentionScope, blstmFlag=True)
+            self.parameters['First_FinalOutput'] = self.firstAttentionList['FinalResult']
+
+        if self.concatType == 'Concat':
+            self.parameters['First_Concat'] = tensorflow.concat(
+                [self.parameters['First_FinalOutput'], self.attentionList['FinalResult']], axis=1, name='First_Concat')
+        if self.concatType == 'Plus':
+            self.parameters['First_Concat'] = tensorflow.add(self.parameters['First_FinalOutput'],
+                                                             self.attentionList['FinalResult'], name='First_Plus')
+        if self.concatType == 'Multiply':
+            self.parameters['First_Concat'] = tensorflow.multiply(
+                self.parameters['First_FinalOutput'], self.attentionList['FinalResult'], name='First_Multiply')
+
+        with tensorflow.variable_scope('SecondBLSTM'):
+            self.parameters['Second_Cell_Forward'] = tensorflow.nn.rnn_cell.MultiRNNCell(
+                cells=[rnn.LSTMCell(num_units=self.hiddenNodules) for _ in range(self.rnnLayers)], state_is_tuple=True)
+            self.parameters['Second_Cell_Backward'] = tensorflow.nn.rnn_cell.MultiRNNCell(
+                cells=[rnn.LSTMCell(num_units=self.hiddenNodules) for _ in range(self.rnnLayers)], state_is_tuple=True)
 
             self.parameters['Second_Output'], self.parameters['Second_FinalState'] = \
                 tensorflow.nn.bidirectional_dynamic_rnn(
-                    cell_fw=self.parameters['Second_FW_Cell'], cell_bw=self.parameters['Second_BW_Cell'],
-                    inputs=self.attentionList['FinalResult'][tensorflow.newaxis, :, :],
-                    dtype=tensorflow.float32)
+                    cell_fw=self.parameters['Second_Cell_Forward'], cell_bw=self.parameters['Second_Cell_Backward'],
+                    inputs=self.parameters['First_Concat'][tensorflow.newaxis, :, :], dtype=tensorflow.float32)
 
         if self.secondAttention is None:
             self.parameters['Second_FinalOutput'] = tensorflow.concat(
@@ -143,110 +175,51 @@ class DBLSTM_AutoEncoder(AutoEncoder):
                                            activation=None, name='FinalPredict'), shape=[1])
 
         if self.lossType == 'MSE':
-            self.parameters['Loss'] = tensorflow.losses.mean_squared_error(
-                labels=self.labelInput, predictions=self.parameters['FinalPredict'], weights=self.regressionWeight)
+            self.parameters['Loss'] = tensorflow.losses.mean_squared_error(labels=self.labelInput,
+                                                                           predictions=self.parameters['FinalPredict'])
         if self.lossType == 'RMSE':
             self.parameters['Loss'] = tensorflow.sqrt(
-                tensorflow.losses.mean_squared_error(
-                    labels=self.labelInput, predictions=self.parameters['FinalPredict'], weights=self.regressionWeight))
+                tensorflow.losses.mean_squared_error(labels=self.labelInput,
+                                                     predictions=self.parameters['FinalPredict']))
         if self.lossType == 'MAE':
-            self.parameters['Loss'] = tensorflow.losses.absolute_difference(
-                labels=self.labelInput, predictions=self.parameters['FinalPredict'], weights=self.regressionWeight)
+            self.parameters['Loss'] = tensorflow.losses.absolute_difference(labels=self.labelInput,
+                                                                            predictions=self.parameters['FinalPredict'])
 
-        self.train_DR_Part = tensorflow.train.AdamOptimizer(
-            learning_rate=learningRate).minimize(self.parameters['Loss'],
-                                                 var_list=tensorflow.global_variables()[
-                                                          NETWORK_LENGTH[self.attentionName]:])
-        self.train_DR_Total = tensorflow.train.AdamOptimizer(learning_rate=learningRate).minimize(
-            self.parameters['Loss'] + self.parameters['Loss_AE'])
-
-    def AutoEncoderTrain(self, logname):
-        data, seq = Shuffle_Train(data=self.treatData, label=self.treatSeq)
-
-        with open(logname, 'w') as file:
-            startPosition = 0
-            totalLoss = 0.0
-            while startPosition < numpy.shape(data)[0]:
-                batchData, batchSeq = [], []
-
-                maxSeq = min(numpy.max(seq[startPosition:startPosition + self.batchSize]), self.maxLen)
-                for index in range(startPosition, min(startPosition + self.batchSize, numpy.shape(data)[0])):
-                    batchSeq.append(min(seq[index], self.maxLen))
-
-                for index in range(startPosition, min(startPosition + self.batchSize, numpy.shape(data)[0])):
-                    if numpy.shape(data[index])[0] >= self.maxLen:
-                        currentData = data[index][0:self.maxLen]
-                    else:
-                        currentData = numpy.concatenate(
-                            [data[index],
-                             numpy.zeros([maxSeq - numpy.shape(data[index])[0], numpy.shape(data[index])[1]])],
-                            axis=0)
-                    # print(numpy.shape(currentData))
-                    batchData.append(currentData)
-
-                # print(startPosition, numpy.shape(batchData), numpy.shape(batchSeq), maxSeq)
-                # print(batchSeq, '\n')
-
-                loss, _ = self.session.run(fetches=[self.parameters['Loss_AE'], self.train],
-                                           feed_dict={self.dataInput: batchData, self.seqInput: batchSeq})
-                file.write(str(loss) + '\n')
-                totalLoss += loss
-                print('\rBatch %d/%d Loss = %f' % (startPosition, len(data), loss), end='')
-
-                # exit()
-
-                startPosition += self.batchSize
-        return totalLoss
+        self.train = tensorflow.train.AdamOptimizer(learning_rate=learningRate).minimize(
+            self.parameters['Loss'], var_list=tensorflow.global_variables()[NETWORK_LENGTH[self.attentionName]:])
 
     def LoadPart(self, loadpath):
         saver = tensorflow.train.Saver(tensorflow.global_variables()[0:NETWORK_LENGTH[self.attentionName]])
         saver.restore(self.session, loadpath)
 
-    def TrainPart(self, logname):
+    def Valid(self):
+        trainData, trainLabel, trainSeq = self.treatData, self.treatLabel, self.treatSeq
+        # print(numpy.shape(trainData), numpy.shape(trainLabel), numpy.shape(trainSeq))
+        totalLoss = 0.0
+
+        for index in range(len(trainData)):
+            batchData, batchLabel, batchSeq = trainData[index], trainLabel[index], trainSeq[index]
+            # print(numpy.shape(batchData), numpy.shape(batchLabel), numpy.shape(batchSeq))
+            loss = self.session.run(fetches=self.parameters['Loss'],
+                                    feed_dict={self.dataInput: batchData, self.labelInput: batchLabel,
+                                               self.seqInput: batchSeq})
+            print(loss)
+            print(numpy.shape(loss))
+            exit()
+            # print('\rTraining %d/%d Loss = %f' % (index, len(trainData), loss), end='')
+
+    def Train(self, logname):
         with open(logname, 'w') as file:
-            trainData, trainLabel, trainSeq = self.treatData, self.treatLabel, self.treatSeq
-            # print(numpy.shape(trainData), numpy.shape(trainLabel), numpy.shape(trainSeq))
+            trainData, trainLabel, trainSeq = Shuffle_Part3(self.treatData, self.treatLabel, self.treatSeq)
             totalLoss = 0.0
-
             for index in range(len(trainData)):
-                batchData, batchLabel, batchSeq = trainData[index], trainLabel[index], trainSeq[index]
-                # print(numpy.shape(batchData), numpy.shape(batchLabel), numpy.shape(batchSeq))
-                loss, _ = self.session.run(fetches=[self.parameters['Loss'], self.train_DR_Part],
-                                           feed_dict={self.dataInput: batchData, self.labelInput: batchLabel,
-                                                      self.seqInput: batchSeq})
+                # print(numpy.shape(trainData[index]), numpy.shape(trainLabel[index]), numpy.shape(trainSeq[index]))
+                loss, _ = self.session.run(fetches=[self.parameters['Loss'], self.train],
+                                           feed_dict={self.dataInput: trainData[index],
+                                                      self.labelInput: trainLabel[index],
+                                                      self.seqInput: trainSeq[index]})
                 file.write(str(loss) + '\n')
-                totalLoss += loss
+
                 print('\rTraining %d/%d Loss = %f' % (index, len(trainData), loss), end='')
+                totalLoss += loss
         return totalLoss
-
-    def TrainTotal(self, logname):
-        with open(logname, 'w') as file:
-            trainData, trainLabel, trainSeq = self.treatData, self.treatLabel, self.treatSeq
-            # print(numpy.shape(trainData), numpy.shape(trainLabel), numpy.shape(trainSeq))
-            regressionLoss, autoEncoderLoss = 0.0, 0.0
-
-            for index in range(len(trainData)):
-                batchData, batchLabel, batchSeq = trainData[index], trainLabel[index], trainSeq[index]
-                # print(numpy.shape(batchData), numpy.shape(batchLabel), numpy.shape(batchSeq))
-                lossRegression, lossAutoEncoder, _ = self.session.run(
-                    fetches=[self.parameters['Loss'], self.parameters['Loss_AE'], self.train_DR_Total],
-                    feed_dict={self.dataInput: batchData, self.labelInput: batchLabel,
-                               self.seqInput: batchSeq})
-                regressionLoss += lossRegression
-                autoEncoderLoss += lossAutoEncoder
-                file.write(str(lossRegression) + ',' + str(lossAutoEncoder) + '\n')
-
-                print('\rTraining %d/%d Regression = %f\tAutoEncoder = %f' % (
-                    index, len(trainData), lossRegression, lossAutoEncoder), end='')
-        return regressionLoss + autoEncoderLoss
-
-    def Test(self, testData, testLabel, testSeq, logname):
-        with open(logname, 'w') as file:
-            for index in range(len(testData)):
-                batchData, batchLabel, batchSeq = testData[index], testLabel[index], testSeq[index]
-                # print(numpy.shape(batchData), numpy.shape(batchLabel), numpy.shape(batchSeq))
-                finalPredict = self.session.run(fetches=self.parameters['FinalPredict'],
-                                                feed_dict={self.dataInput: batchData, self.labelInput: batchLabel,
-                                                           self.seqInput: batchSeq})
-                file.write(str(batchLabel[0]) + ',' + str(finalPredict[0] * self.regressionWeight) + '\n')
-                print('\rTreating %d/%d' % (index, len(testData)), end='')

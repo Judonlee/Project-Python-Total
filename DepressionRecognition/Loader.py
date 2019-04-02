@@ -44,8 +44,9 @@ def Load_DBLSTM(maxSentence=128, maxLen=1000):
     loadpath = 'E:/ProjectData_Depression/Step5_Assembly/'
     trainData, trainLabel, trainSeq, testData, testLabel, testSeq = [], [], [], [], [], []
 
-    for indexA in ['Develop', 'Test']:
-        labelData = numpy.genfromtxt(fname=os.path.join(loadpath, '%sLabel.csv' % indexA), dtype=int, delimiter=',')
+    for indexA in ['Train', 'Develop', 'Test']:
+        labelData = numpy.genfromtxt(fname=os.path.join(loadpath, '%sLabel.csv' % indexA), dtype=int, delimiter=',')[
+                    0:2]
 
         for indexB in range(numpy.shape(labelData)[0]):
             batchData, batchLabel, batchSeq = [], labelData[indexB][2], []

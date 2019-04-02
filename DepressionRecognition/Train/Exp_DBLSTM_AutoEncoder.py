@@ -17,25 +17,25 @@ if __name__ == '__main__':
     secondAttentionScope = 0
     secondAttentionName = 'SA_2'
 
-    savepath = 'E:/ProjectData_Depression/Experiment/DBLSTM-AutoEncoder-Both/%s_%d/' % (attentionName, attentionScope)
-    os.makedirs(savepath)
+    concatType = 'Multiply'
 
     trainData, trainLabel, trainSeq, testData, testLabel, testSeq = Load_DBLSTM()
-    # for index in range(len(trainLabel)):
-    #     trainLabel[index][0] = float(trainLabel[index][0]) / 24
     print(numpy.shape(trainData), numpy.shape(trainLabel), numpy.shape(trainSeq))
     print(numpy.shape(testData), numpy.shape(testLabel), numpy.shape(testSeq))
 
-    # trainData, trainSeq = Loader_AutoEncoder()
-    # trainLabel = None
-    # for sample in trainData:
-    #     print(numpy.shape(sample))
+    loadpath = 'E:/ProjectData_Depression/Experiment/AutoEncoder-New/%s-%d/' % (attentionName, attentionScope)
+    savepath = 'E:/ProjectData_Depression/Experiment/DBLSTM-AutoEncoder-%s/%s-%d/' % (
+        concatType, attentionName, attentionScope)
+    os.makedirs(savepath)
 
-    classifier = DBLSTM_AutoEncoder(data=trainData, label=trainLabel, seq=trainSeq, regressionWeight=1,
+    classifier = DBLSTM_AutoEncoder(data=trainData, label=trainLabel, seq=trainSeq, concatType=concatType,
                                     attention=attention, attentionName=attentionName, attentionScope=attentionScope,
                                     secondAttention=secondAttention, secondAttentionScope=secondAttentionScope,
                                     secondAttentionName=secondAttentionName, batchSize=64, learningRate=1E-3)
+    classifier.SaveGraph('logs/')
+    classifier.LoadPart(loadpath + '%04d-Network' % 19)
+
+    # classifier.Train('log.csv')
     for episode in range(100):
-        print('\nEpisode %d/100 Total Loss = %f' % (
-            episode, classifier.TrainTotal(logname=savepath + '%04d.csv' % episode)))
+        print('\nEpisode %d : Total Loss = %f' % (episode, classifier.Train(logname=savepath + '%04d.csv' % episode)))
         classifier.Save(savepath=savepath + '%04d-Network' % episode)
