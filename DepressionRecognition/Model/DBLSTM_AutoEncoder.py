@@ -223,3 +223,11 @@ class DBLSTM_AutoEncoder(AutoEncoder):
                 print('\rTraining %d/%d Loss = %f' % (index, len(trainData), loss), end='')
                 totalLoss += loss
         return totalLoss
+
+    def Test(self, logname, testData, testLabel, testSeq):
+        with open(logname, 'w') as file:
+            for index in range(len(testData)):
+                predict = self.session.run(fetches=self.parameters['FinalPredict'],
+                                           feed_dict={self.dataInput: testData[index], self.seqInput: testSeq[index]})
+                file.write(str(testLabel[index][0]) + ',' + str(predict[0]) + '\n')
+                print('\rTreating %d/%d' % (index, len(testData)), end='')
