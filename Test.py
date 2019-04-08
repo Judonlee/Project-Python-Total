@@ -1,24 +1,29 @@
-# from tensorflow.python import pywrap_tensorflow
-# import os
-#
-# checkpoint_path = os.path.join(
-#     r'E:\ProjectData_Depression\Experiment\AttentionTransform\RMSE\LA_Both_L1_100\0099-Network')
-# reader = pywrap_tensorflow.NewCheckpointReader(checkpoint_path)
-# var_to_shape_map = reader.get_variable_to_shape_map()
-# for key in var_to_shape_map:
-#     print('tensor_name: ', key)
+import numpy as np
+import tensorflow as tf
+from math import pi
 
-import matplotlib.pylab as plt
-import numpy
+tf.enable_eager_execution()
+tfe = tf.contrib.eager
 
-if __name__ == '__main__':
-    print(numpy.sin(numpy.arange(-10, 10, 0.1)))
-    plt.subplot(211)
-    plt.plot(numpy.sin(numpy.arange(-10, 10, 0.1)))
-    plt.axis('off')
-    plt.title('Teacher\'s Attention Map', fontsize=30)
-    plt.subplot(212)
-    plt.plot(numpy.sin(numpy.arange(-10, 10, 1)))
-    plt.axis('off')
-    plt.title('Stuent\'s Attention Map', fontsize=30)
-    plt.show()
+sess = tf.Session()
+
+
+def f(x):
+    return tf.square(tf.sin(x))
+
+
+def grad(f):
+    return lambda x: tfe.gradients_function(f)(x)[0]
+
+
+x = tf.lin_space(-pi, pi, 100)
+# print(grad(f)(x).numpy())
+x = x.numpy()
+import matplotlib.pyplot as plt
+
+plt.plot(x, f(x).numpy(), label="f")
+plt.plot(x, grad(f)(x).numpy(), label="first derivative")  # 一阶导
+# plt.plot(x, grad(grad(f))(x).numpy(), label="second derivative")  # 二阶导
+# plt.plot(x, grad(grad(grad(f)))(x).numpy(), label="third derivative")  # 三阶导
+plt.legend()
+plt.show()
