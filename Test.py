@@ -1,29 +1,14 @@
-import numpy as np
-import tensorflow as tf
-from math import pi
+import matplotlib.pylab as plt
+import numpy
 
-tf.enable_eager_execution()
-tfe = tf.contrib.eager
-
-sess = tf.Session()
-
-
-def f(x):
-    return tf.square(tf.sin(x))
-
-
-def grad(f):
-    return lambda x: tfe.gradients_function(f)(x)[0]
-
-
-x = tf.lin_space(-pi, pi, 100)
-# print(grad(f)(x).numpy())
-x = x.numpy()
-import matplotlib.pyplot as plt
-
-plt.plot(x, f(x).numpy(), label="f")
-plt.plot(x, grad(f)(x).numpy(), label="first derivative")  # 一阶导
-# plt.plot(x, grad(grad(f))(x).numpy(), label="second derivative")  # 二阶导
-# plt.plot(x, grad(grad(grad(f)))(x).numpy(), label="third derivative")  # 三阶导
-plt.legend()
-plt.show()
+if __name__ == '__main__':
+    loadpath = 'E:/ProjectData_Depression/Experiment/HierarchyAutoEncoder/Test2/%04d.csv'
+    data = []
+    for index in range(100):
+        currentData = numpy.genfromtxt(loadpath % index, dtype=float, delimiter=',')
+        data.extend(currentData)
+    plt.plot(data)
+    plt.xlabel('Batch')
+    plt.ylabel('Loss')
+    plt.title('Frame Level Feasibility Experiment')
+    plt.show()

@@ -8,11 +8,12 @@ from __Base.Shuffle import Shuffle
 
 
 class HierarchyAutoEncoder(NeuralNetwork_Base):
-    def __init__(self, trainData, trainLabel, trainSeq, firstAttention=None, firstAttentionName='',
+    def __init__(self, trainData, trainLabel, trainSeq, lossType='frame', firstAttention=None, firstAttentionName='',
                  firstAttentionScope=0, secondAttention=None, secondAttentionName='', secondAttentionScope=0,
                  rnnLayers=2, hiddenNoduleNumber=128, learningRate=1E-3, startFlag=True, graphRevealFlag=True,
                  graphPath='logs/', occupyRate=-1):
         self.seq = trainSeq
+        self.lossType = lossType
 
         self.firstAttention = firstAttention
         self.firstAttentionName = firstAttentionName
@@ -91,6 +92,22 @@ class HierarchyAutoEncoder(NeuralNetwork_Base):
                                          self.parameters['Second_FinalState'][index][1].h], axis=1))
                 self.parameters['Decoder_InitalState'].append(self.parameters['Encoder_Cell_Layer%d' % index])
             self.parameters['Decoder_InitalState_First'] = tuple(self.parameters['Decoder_InitalState'])
+        else:
+            self.attentionListSecond = self.secondAttention(dataInput=self.parameters['Second_Output'],
+                                                            scopeName=self.secondAttentionName,
+                                                            hiddenNoduleNumber=2 * self.hiddenNodules,
+                                                            attentionScope=self.secondAttentionScope, blstmFlag=True)
+            self.parameters['Decoder_InitalState'] = []
+            self.attentionListSecond['FinalResult'].set_shape([1, 2 * self.hiddenNodules])
+            for index in range(self.rnnLayers):
+                self.parameters['Encoder_Cell_Layer%d' % index] = rnn.LSTMStateTuple(
+                    c=self.attentionListSecond['FinalResult'],
+                    h=tensorflow.concat(
+                        [self.parameters['Second_FinalState'][index][0].h,
+                         self.parameters['Second_FinalState'][index][1].h],
+                        axis=1))
+                self.parameters['Decoder_InitalState'].append(self.parameters['Encoder_Cell_Layer%d' % index])
+            self.parameters['Decoder_InitalState_First'] = tuple(self.parameters['Decoder_InitalState'])
 
         #########################################################################
 
@@ -138,13 +155,38 @@ class HierarchyAutoEncoder(NeuralNetwork_Base):
             self.parameters['Decoder_Logits_Second'], self.parameters['Decoder_FinalState_Second'], self.parameters[
                 'Decoder_FinalSeq_Second'] = seq2seq.dynamic_decode(decoder=self.parameters['Decoder_Second'])
 
-    def Train(self):
-        # trainData, trainLabel, trainSeq = Shuffle(data=self.data, label=self.label, seqLen=self.seq)
+        with tensorflow.variable_scope('LossScope'):
+            if self.lossType == 'frame':
+                self.parameters['Loss'] = tensorflow.losses.absolute_difference(
+                    labels=self.dataInput, predictions=self.parameters['Decoder_Logits_Second'][0], weights=100)
+            if self.lossType == 'sentence':
+                self.parameters['Loss'] = tensorflow.losses.absolute_difference(
+                    labels=self.parameters['First_FinalOutput'][tensorflow.newaxis, :, :],
+                    predictions=self.parameters['Decoder_Logits_First'][0],
+                    weights=100)
+            self.train = tensorflow.train.AdamOptimizer(learning_rate=learningRate).minimize(self.parameters['Loss'])
+
+    def Train(self, logname):
+        with open(logname, 'w') as file:
+            trainData, trainLabel, trainSeq = Shuffle(data=self.data, label=self.label, seqLen=self.seq)
+            totalLoss = 0.0
+            # trainData, trainLabel, trainSeq = self.data, self.label, self.seq
+            for index in range(len(trainData)):
+                loss, _ = self.session.run(fetches=[self.parameters['Loss'], self.train],
+                                           feed_dict={self.dataInput: trainData[index],
+                                                      self.labelInput: trainLabel[index],
+                                                      self.seqInput: trainSeq[index]})
+                totalLoss += loss
+                file.write(str(loss) + '\n')
+                print('\rTraining %d/%d Loss = %f' % (index, len(trainData), loss), end='')
+        return totalLoss
+
+    def Valid(self):
         trainData, trainLabel, trainSeq = self.data, self.label, self.seq
         for index in range(len(trainData)):
-            loss = self.session.run(fetches=self.parameters['Decoder_Logits_Second'][0],
+            loss = self.session.run(fetches=self.parameters['Decoder_Logits_First'],
                                     feed_dict={self.dataInput: trainData[index], self.labelInput: trainLabel[index],
                                                self.seqInput: trainSeq[index]})
             print(loss)
-            print(numpy.shape(loss))
+            # print(numpy.shape(loss))
             exit()
