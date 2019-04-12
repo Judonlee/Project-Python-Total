@@ -3,6 +3,7 @@ from tensorflow.contrib import rnn
 from tensorflow.python.layers.core import Dense
 from tensorflow.contrib import seq2seq
 import numpy
+import os
 from __Base.BaseClass import NeuralNetwork_Base
 from __Base.Shuffle import Shuffle
 
@@ -99,6 +100,7 @@ class HierarchyAutoEncoder(NeuralNetwork_Base):
                                                             attentionScope=self.secondAttentionScope, blstmFlag=True)
             self.parameters['Decoder_InitalState'] = []
             self.attentionListSecond['FinalResult'].set_shape([1, 2 * self.hiddenNodules])
+            self.parameters['FinalResult'] = self.attentionListSecond['FinalResult']
             for index in range(self.rnnLayers):
                 self.parameters['Encoder_Cell_Layer%d' % index] = rnn.LSTMStateTuple(
                     c=self.attentionListSecond['FinalResult'],
@@ -190,3 +192,24 @@ class HierarchyAutoEncoder(NeuralNetwork_Base):
             print(loss)
             # print(numpy.shape(loss))
             exit()
+
+    def TestOut(self, logname, treatData, treatSeq, treatname):
+        with open(logname, 'w') as file:
+            for index in range(len(treatData)):
+                print('\rTreating %d/%d' % (index, len(treatData)), end='')
+                result = self.session.run(fetches=self.parameters[treatname],
+                                          feed_dict={self.dataInput: treatData[index], self.seqInput: treatSeq[index]})
+                for writeIndex in range(len(result[0])):
+                    if writeIndex != 0: file.write(',')
+                    file.write(str(result[0][writeIndex]))
+                file.write('\n')
+        print('\nTreat Completed')
+
+    def TestOutHuge(self, savepath, treatData, treatSeq, treatname):
+        os.makedirs(savepath)
+        for index in range(len(treatData)):
+            result = self.session.run(fetches=self.parameters[treatname],
+                                      feed_dict={self.dataInput: treatData[index], self.seqInput: treatSeq[index]})
+            # result = numpy.concatenate([result[0], result[1]], axis=2)
+            print('\rTreating %d/%d' % (index, len(treatData)) + str(numpy.shape(result)), end='')
+            numpy.save(savepath + '%04d.npy' % index, result)

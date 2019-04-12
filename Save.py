@@ -1,54 +1,36 @@
-from DepressionRecognition.Loader import Load_DBLSTM, Load_EncoderDecoder
-from DepressionRecognition.Model.AttentionTransform import AttentionTransform
-from DepressionRecognition.AttentionMechanism.StandardAttention import StandardAttentionInitializer
-from DepressionRecognition.AttentionMechanism.LocalAttention import LocalAttentionInitializer
-from DepressionRecognition.AttentionMechanism.MonotonicAttention import MonotonicAttentionInitializer, \
-    MonotonicChunkwiseAttentionInitializer
+import numpy
 import os
+from sklearn.svm import SVR
+
+
+def Load(name):
+    trainData = numpy.genfromtxt(
+        fname='E:/ProjectData_Depression/Experiment/HierarchyAutoEncoder/Normalization/%s-Train.csv' % name,
+        dtype=float, delimiter=',')
+    trainLabel = numpy.genfromtxt(
+        fname='E:/ProjectData_Depression/Experiment/HierarchyAutoEncoder/Normalization/TrainLabel.csv', dtype=float,
+        delimiter=',')[:, 2].tolist()
+    trainLabel.extend(numpy.genfromtxt(
+        fname='E:/ProjectData_Depression/Experiment/HierarchyAutoEncoder/Normalization/DevelopLabel.csv', dtype=float,
+        delimiter=',')[:, 2])
+    testData = numpy.genfromtxt(
+        fname='E:/ProjectData_Depression/Experiment/HierarchyAutoEncoder/Normalization/%s-Test.csv' % name, dtype=float,
+        delimiter=',')
+    testLabel = numpy.genfromtxt(
+        fname='E:/ProjectData_Depression/Experiment/HierarchyAutoEncoder/Normalization/TestLabel.csv', dtype=float,
+        delimiter=',')[:, 2]
+    # print(trainLabel)
+    print(numpy.shape(trainData), numpy.shape(trainLabel), numpy.shape(testData), numpy.shape(testLabel))
+    return trainData, trainLabel, testData, testLabel
+
 
 if __name__ == '__main__':
-    startPosition = 0
+    name = 'SA-0-sentence'
+    trainData, trainLabel, testData, testLabel = Load(name=name)
+    clf = SVR()
+    clf.fit(trainData, trainLabel)
+    result = clf.predict(testData)
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-
-    firstAttention = MonotonicAttentionInitializer
-    firstAttentionName = 'MA'
-    firstAttentionScope = 10
-
-    secondAttention = MonotonicAttentionInitializer
-    secondAttentionName = 'MA_2'
-    secondAttentionScope = 10
-
-    attentionTransformLoss = 'L1'
-    attentionTransformWeight = 100
-    lossType = 'RMSE'
-
-    loadname = 'MA_10'
-
-    savepath = '/mnt/external/Bobs/201902-Depression/AttentionTransform/%s/%s_%s_%s_%d/' % (
-        lossType, firstAttentionName, ('First' if (secondAttention == None) else 'Both'), attentionTransformLoss,
-        attentionTransformWeight)
-
-    ####################################################################
-
-    os.makedirs(savepath)
-    trainData, trainLabel, trainSeq, testData, testLabel, testSeq = Load_DBLSTM()
-    trainLabelSeq = None
-    # trainData, trainLabel, trainSeq, trainLabelSeq, testData, testLabel, testSeq, testLabelSeq = Load_EncoderDecoder()
-
-    classifier = AttentionTransform(
-        trainData=trainData, trainLabel=trainLabel, trainDataSeq=trainSeq, trainLabelSeq=trainLabelSeq,
-        firstAttention=firstAttention, firstAttentionName=firstAttentionName, firstAttentionScope=firstAttentionScope,
-        secondAttention=secondAttention, secondAttentionName=secondAttentionName,
-        secondAttentionScope=secondAttentionScope, attentionTransformLoss=attentionTransformLoss,
-        attentionTransformWeight=attentionTransformWeight, lossType=lossType, batchSize=32, learningRate=1E-3,
-        startFlag=True)
-    if startPosition == 0:
-        classifier.LoadPart(loadpath='/mnt/external/Bobs/201902-Depression/EncoderDecoder/%s/0019-Network' % loadname)
-    else:
-        classifier.Load(loadpath=savepath + '%04d-Network' % (startPosition - 1))
-    # classifier.EncoderDecoderTrain()
-
-    for episode in range(startPosition, 100):
-        print('\nEpisode %d/100 Total Loss = %f' % (episode, classifier.Train(logName=savepath + '%04d.csv' % episode)))
-        classifier.Save(savepath=savepath + '%04d-Network' % episode)
+    with open('E:/ProjectData_Depression/Experiment/HierarchyAutoEncoder/%s.csv' % name, 'w') as file:
+        for index in range(len(result)):
+            file.write(str(result[index]) + ',' + str(testLabel[index]) + '\n')
