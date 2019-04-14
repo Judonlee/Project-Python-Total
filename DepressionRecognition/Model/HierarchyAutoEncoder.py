@@ -205,6 +205,20 @@ class HierarchyAutoEncoder(NeuralNetwork_Base):
                 file.write('\n')
         print('\nTreat Completed')
 
+    def TestOutMedia(self, savepath, treatData, treatSeq, treatname):
+        os.makedirs(savepath)
+        for index in range(len(treatData)):
+            result = self.session.run(fetches=self.parameters[treatname],
+                                      feed_dict={self.dataInput: treatData[index], self.seqInput: treatSeq[index]})
+            print('\rTreating %d/%d' % (index, len(treatData)) + str(numpy.shape(result)), end='')
+
+            with open(savepath + '/%04d.csv' % index, 'w') as file:
+                for indexX in range(numpy.shape(result)[0]):
+                    for indexY in range(numpy.shape(result)[1]):
+                        if indexY != 0: file.write(',')
+                        file.write(str(result[indexX][indexY]))
+                    file.write('\n')
+
     def TestOutHuge(self, savepath, treatData, treatSeq, treatname):
         os.makedirs(savepath)
         for index in range(len(treatData)):

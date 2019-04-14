@@ -16,6 +16,7 @@ def Loader(usedPart):
         filename = '%04d.npy' % index
         print('Reload Train', filename)
         currentData = numpy.load(os.path.join(loadpath % (usedPart, 'Train'), filename))
+        currentData = numpy.concatenate([currentData[0], currentData[1]], axis=2)
         trainData.append(currentData)
         print(numpy.shape(currentData))
 
@@ -23,6 +24,7 @@ def Loader(usedPart):
         filename = '%04d.npy' % index
         print('Reload Test', filename)
         currentData = numpy.load(os.path.join(loadpath % (usedPart, 'Test'), filename))
+        currentData = numpy.concatenate([currentData[0], currentData[1]], axis=2)
         testData.append(currentData)
         print(numpy.shape(currentData))
 
@@ -32,22 +34,23 @@ def Loader(usedPart):
 
 
 if __name__ == '__main__':
-    usedPart = 'SA-0-frame-Normalization'
+    attention = LocalAttentionInitializer
+    attentionScope = 1
+    attentionName = 'LA'
+    usedPart = '%s-%d-sentence' % (attentionName, attentionScope)
     trainData, trainLabel, trainSeq, testData, testLabel, testSeq = Loader(usedPart=usedPart)
 
-    attention = StandardAttentionInitializer
-    attentionScope = 0
-    attentionName = 'SA'
-
-    savepath = 'E:/ProjectData_Depression/DBLSTM_%s_%d/' % (attentionName, attentionScope)
+    loadpath = 'E:/ProjectData_Depression/Experiment/HierarchyAutoEncoder/%s/' % usedPart
+    savepath = 'E:/ProjectData_Depression/Experiment/HierarchyAutoEncoder/%s_Result/' % usedPart
     # os.makedirs(savepath)
 
     classifier = DBLSTM(trainData=trainData, trainLabel=trainLabel, trainSeq=trainSeq,
                         firstAttention=attention, secondAttention=attention, firstAttentionScope=attentionScope,
                         secondAttentionScope=attentionScope, firstAttentionName=attentionName,
-                        secondAttentionName=attentionName + '_2', graphPath=savepath, lossType='RMSE', featureShape=256)
+                        secondAttentionName=attentionName + '_2', graphPath=savepath, lossType='RMSE', featureShape=256,
+                        startFlag=False)
     # classifier.Valid()
-    for episode in range(100):
-        print('\nEpisode %d/%d Total Loss = %f' % (
-            episode, 100, classifier.Train(logName=savepath + '%04d.csv' % episode)))
-        classifier.Save(savepath=savepath + '%04d-Network' % episode)
+    for episode in range(99, 100):
+        classifier.Load(loadpath=loadpath + '%04d-Network' % episode)
+        classifier.Test(testData=testData, testLabel=testLabel, testSeq=testSeq,
+                        logName=savepath + '%04d.csv' % episode)

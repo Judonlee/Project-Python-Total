@@ -8,12 +8,12 @@ import numpy
 import os
 
 if __name__ == '__main__':
-    firstAttention = StandardAttentionInitializer
-    firstAttentionName = 'SA'
-    firstAttentionScope = 0
+    firstAttention = LocalAttentionInitializer
+    firstAttentionName = 'LA'
+    firstAttentionScope = 1
     lossType = 'frame'
 
-    loadpath = 'E:/ProjectData_Depression/Experiment/HierarchyAutoEncoder/%s-%d-%s/%04d-Parameter' % (
+    loadpath = 'E:/ProjectData_Depression/Experiment/HierarchyAutoEncoder-Parameter/%s-%d-%s/%04d-Parameter' % (
         firstAttentionName, firstAttentionScope, lossType, 99)
 
     trainData, trainLabel, trainSeq, testData, testLabel, testSeq = Load_DBLSTM()
@@ -33,11 +33,16 @@ if __name__ == '__main__':
     # classifier.TestOut(logname='%s-%d-%s-Test.csv' % (firstAttentionName, firstAttentionScope, lossType),
     #                    treatData=testData, treatSeq=testSeq, treatname='FinalResult')
 
+    # classifier.TestOutMedia(savepath='%s-%d-%s-Train.csv' % (firstAttentionName, firstAttentionScope, lossType),
+    #                         treatData=trainData, treatSeq=trainSeq, treatname='First_FinalOutput')
+    # classifier.TestOutMedia(savepath='%s-%d-%s-Test.csv' % (firstAttentionName, firstAttentionScope, lossType),
+    #                         treatData=testData, treatSeq=testSeq, treatname='First_FinalOutput')
+
     classifier.TestOutHuge(
-        savepath='HierarchyAutoEncoder/SentenceLevel/%s-%d-%s-Train-Second/' % (
+        savepath='HierarchyAutoEncoder/SentenceLevel/%s-%d-%s-Train-First/' % (
             firstAttentionName, firstAttentionScope, lossType), treatData=trainData, treatSeq=trainSeq,
-        treatname='Decoder_First_Result')
-    # classifier.TestOutHuge(
-    #     savepath='HierarchyAutoEncoder/SentenceLevel/%s-%d-%s-Test-Second/' % (
-    #         firstAttentionName, firstAttentionScope, lossType), treatData=testData, treatSeq=testSeq,
-    #     treatname='First_Output')
+        treatname='First_Output')
+    classifier.TestOutHuge(
+        savepath='HierarchyAutoEncoder/SentenceLevel/%s-%d-%s-Test-First/' % (
+            firstAttentionName, firstAttentionScope, lossType), treatData=testData, treatSeq=testSeq,
+        treatname='First_Output')
