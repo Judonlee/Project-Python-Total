@@ -1,0 +1,53 @@
+#delay 100
+#click 896 506
+#delay 45000
+#click 664 431
+#delay 3500
+#click 845 452
+#delay 3500
+#click 648 156
+#delay 2000
+#click 859 372
+#delay 2000
+#click 677 376
+#delay 2000
+#delay 45000
+#click 288 429
+#delay 3500
+#click 434 428
+#delay 3500
+#click 526 432
+#delay 3500
+#click 596 432
+#delay 3500
+#click 845 452
+#delay 3500
+#click 464 149
+#delay 2000
+#click 284 377
+#delay 2000
+#click 464 366
+#delay 2000
+#delay 45000
+#click 55 433
+#delay 3500
+#click 190 437
+#delay 3500
+#click 664 431
+#delay 3500
+#click 241 343
+#delay 3500
+#click 890 228
+#delay 3500
+#click 677 235
+#delay 3500
+#click 241 343
+#delay 3500
+#click 845 452
+#delay 3500
+#click 281 147
+#delay 2000
+#click 87 383
+#delay 2000
+#click 284 377
+#delay 2000
