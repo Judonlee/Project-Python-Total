@@ -126,18 +126,13 @@ def Loader_AutoEncoder():
     return data, seq
 
 
-if __name__ == '__main__':
-    # trainData, trainLabel, trainDataSeq, trainLabelSeq, testData, testLabel, testDataSeq, testLabelSeq = Load_EncoderDecoder()
-    # print(trainData[0:5])
-    # print(trainLabel[0:5])
-    # print(trainDataSeq[0:5])
-    # print(trainLabelSeq[0:5])
-    trainData, trainLabel, trainSeq, testData, testLabel, testSeq = Load_DBLSTM()
-    import matplotlib.pylab as plt
+def Loader_SentenceLevel(part):
+    loadpath = 'E:/ProjectData_Depression/Step5_Assembly/SentenceLevel/'
+    trainData = numpy.load(loadpath + '%s-Train.npy' % part)
+    testData = numpy.load(loadpath + '%s-Test.npy' % part)
+    print(numpy.shape(trainData), numpy.shape(testData))
+    return trainData, testData
 
-    data = trainData[0][0]
-    plt.figure(figsize=[10, 4])
-    data = numpy.transpose(data, [1, 0])[:, 0:100]
-    plt.imshow(data, cmap='YlOrBr')
-    plt.axis('off')
-    plt.show()
+
+def Loader_SpeechLevel(part):
+    pass
