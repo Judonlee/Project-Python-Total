@@ -135,4 +135,10 @@ def Loader_SentenceLevel(part):
 
 
 def Loader_SpeechLevel(part):
-    pass
+    loadpath = 'E:/ProjectData_Depression/Step5_Assembly/SpeechLevel/'
+    trainData = numpy.reshape(numpy.genfromtxt(fname=loadpath + '%s-Train.csv' % part, dtype=float, delimiter=','),
+                              [-1, 1, 256])
+    testData = numpy.reshape(numpy.genfromtxt(fname=loadpath + '%s-Test.csv' % part, dtype=float, delimiter=','),
+                             [-1, 1, 256])
+    print(numpy.shape(trainData), numpy.shape(testData))
+    return trainData, testData

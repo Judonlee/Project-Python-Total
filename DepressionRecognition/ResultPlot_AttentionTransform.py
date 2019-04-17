@@ -4,7 +4,7 @@ import matplotlib.pylab as plt
 import os
 
 if __name__ == '__main__':
-    loadpath = 'E:/ProjectData_Depression/SpeechLevel/SA-0-frame/%04d.csv'
+    loadpath = 'E:/ProjectData_Depression/Experiment/DBLSTM_With_Hierarchy/DBLSTM_HA_MA_10_sentence_Result/%04d.csv'
     MAEList, RMSEList = [], []
     for index in range(1000):
         if not os.path.exists(loadpath % index): continue

@@ -1,4 +1,4 @@
-from DepressionRecognition.Loader import Load_DBLSTM, Loader_SentenceLevel
+from DepressionRecognition.Loader import Load_DBLSTM, Loader_SentenceLevel, Loader_SpeechLevel
 from DepressionRecognition.Model.DBLSTM_WithHierarchyAutoEncoder import DBLSTM_WithHierarchyAutoEncoder
 from DepressionRecognition.AttentionMechanism.StandardAttention import StandardAttentionInitializer
 from DepressionRecognition.AttentionMechanism.LocalAttention import LocalAttentionInitializer
@@ -14,13 +14,17 @@ if __name__ == '__main__':
     attentionScope = 0
     part = 'frame'
 
-    savepath = 'E:/ProjectData_Depression/DBLSTM_HA_%s_%d/' % (attentionName, attentionScope)
+    savepath = 'E:/ProjectData_Depression/SpeechLevel/DBLSTM_HA_%s_%d_%s/' % (attentionName, attentionScope, part)
 
     trainData, trainLabel, trainSeq, testData, testLabel, testSeq = Load_DBLSTM()
-    sentenceTrain, sentenceTest = Loader_SentenceLevel(part='%s-%d-%s' % (attentionName, attentionScope, part))
+    sentenceTrain, speechTrain = None, None
+
+    # sentenceTrain, sentenceTest = Loader_SentenceLevel(part='%s-%d-%s' % (attentionName, attentionScope, part))
+    speechTrain, speechTest = Loader_SpeechLevel(part='%s-%d-%s' % (attentionName, attentionScope, part))
+
     classifier = DBLSTM_WithHierarchyAutoEncoder(
         trainData=trainData, trainLabel=trainLabel, trainSeq=trainSeq, sentenceLevelInformation=sentenceTrain,
-        speechLevelInformation=None, firstAttention=attention, secondAttention=attention,
+        speechLevelInformation=speechTrain, firstAttention=attention, secondAttention=attention,
         firstAttentionScope=attentionScope, secondAttentionScope=attentionScope, firstAttentionName=attentionName,
         secondAttentionName=attentionName + '_2', graphPath=savepath, lossType='MAE')
     # classifier.Valid()
