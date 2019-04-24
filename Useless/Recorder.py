@@ -41,6 +41,7 @@ if __name__ == '__main__':
             file.write(str(counter))
             file.write('\n')
 
+    totalLoss = 0
     with open('Score.csv', 'w') as file:
         for name in sequence:
             file.write(name + ',')
@@ -51,7 +52,7 @@ if __name__ == '__main__':
             for index in range(len(data)):
                 findFlag = False
                 if data[index][0] == name:
-                    score = float(data[index][1]) * float(data[index][2])
+                    score = int(float(data[index][1]) * float(data[index][2]))
 
                     file.write(str(score))
                     counter += score
@@ -75,10 +76,17 @@ if __name__ == '__main__':
                     file.write('(%s)' % data[index][-1])
                 if findFlag: file.write(',')
 
+            flag = True
             for _ in range(times, 3):
                 file.write('0,')
+                if flag:
+                    totalLoss += 3 - times
+                    print(name, 3 - times)
+                    flag = False
             file.write(str(counter))
             file.write('\n')
 
-    print(data)
-    print(sequence)
+    # print(data)
+    # print(sequence)
+
+    print('共计缺%d刀' % totalLoss)

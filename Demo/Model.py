@@ -92,17 +92,38 @@ class NetworkStructure:
 
     def Train(self):
         trainData, trainLabel = Shuffle(data=self.trainData, label=self.trainLabel)
+        totalPredict = []
 
         startPosition = 0
         totalLoss = 0.0
         while startPosition < len(trainData):
             batchData, batchLabel = trainData[startPosition:startPosition + self.batchSize], \
                                     trainLabel[startPosition:startPosition + self.batchSize]
-            loss, _ = self.session.run(fetches=[self.parameter['Loss'], self.train],
-                                       feed_dict={self.dataInput: batchData, self.labelInput: batchLabel})
+            batchPredict, loss, _ = self.session.run(
+                fetches=[self.parameter['FinalPredict'], self.parameter['Loss'], self.train],
+                feed_dict={self.dataInput: batchData, self.labelInput: batchLabel})
+            totalPredict.extend(batchPredict)
+
+            confusionMatrix = numpy.zeros([4, 4])
+            for index in range(len(batchPredict)):
+                confusionMatrix[numpy.argmax(numpy.array(batchPredict[index]))][
+                    numpy.argmax(numpy.array(batchLabel[index]))] += 1
+
+            batchPrecisioin = 0
+            for index in range(4):
+                batchPrecisioin += confusionMatrix[index][index]
+
             totalLoss += loss
-            print('\rTraining %d/%d Loss = %f' % (startPosition, len(trainData), loss), end='')
+            print('\rTraining %d/%d Loss = %f Batch Precision = %f' % (
+                startPosition, len(trainData), loss, batchPrecisioin / numpy.sum(confusionMatrix)), end='')
             startPosition += self.batchSize
+
+        confusionMatrix = numpy.zeros([4, 4])
+        for index in range(len(trainLabel)):
+            confusionMatrix[numpy.argmax(numpy.array(trainLabel[index]))][
+                numpy.argmax(numpy.array(totalPredict[index]))] += 1
+        print('\n')
+        print(confusionMatrix)
         return totalLoss
 
     def Test(self, logname, testData, testLabel):
