@@ -8,12 +8,12 @@ import numpy
 import os
 
 if __name__ == '__main__':
-    firstAttention = MonotonicAttentionInitializer
-    firstAttentionName = 'MA'
-    firstAttentionScope = 10
-    lossType = 'sentence'
+    firstAttention = None
+    firstAttentionName = 'None'
+    firstAttentionScope = 0
+    lossType = 'frame'
 
-    loadpath = 'E:/ProjectData_Depression/Experiment/HierarchyAutoEncoder-Parameter/%s-%d-%s/%04d-Parameter' % (
+    loadpath = 'E:/ProjectData_Depression/HierarchyAutoEncoder/%s-%d-%s/%04d-Parameter' % (
         firstAttentionName, firstAttentionScope, lossType, 99)
 
     trainData, trainLabel, trainSeq, testData, testLabel, testSeq = Load_DBLSTM()
@@ -26,22 +26,22 @@ if __name__ == '__main__':
     with open('TestLabel.csv', 'w') as file:
         for sample in testLabel: file.write(str(sample[0]) + '\n')
 
-    # classifier = HierarchyAutoEncoder(
-    #     trainData=trainData, trainLabel=trainLabel, trainSeq=trainSeq, firstAttention=firstAttention,
-    #     firstAttentionName=firstAttentionName + '_0', firstAttentionScope=firstAttentionScope,
-    #     secondAttention=firstAttention, secondAttentionName=firstAttentionName + '_1',
-    #     secondAttentionScope=firstAttentionScope, lossType=lossType, startFlag=False)
-    #
-    # classifier.Load(loadpath=loadpath)
-    # classifier.TestOut(logname='%s-%d-%s-Train.csv' % (firstAttentionName, firstAttentionScope, lossType),
-    #                    treatData=trainData, treatSeq=trainSeq, treatname='FinalResult')
-    # classifier.TestOut(logname='%s-%d-%s-Test.csv' % (firstAttentionName, firstAttentionScope, lossType),
-    #                    treatData=testData, treatSeq=testSeq, treatname='FinalResult')
+    classifier = HierarchyAutoEncoder(
+        trainData=trainData, trainLabel=trainLabel, trainSeq=trainSeq, firstAttention=firstAttention,
+        firstAttentionName=firstAttentionName + '_0', firstAttentionScope=firstAttentionScope,
+        secondAttention=firstAttention, secondAttentionName=firstAttentionName + '_1',
+        secondAttentionScope=firstAttentionScope, lossType=lossType, startFlag=False)
 
-    # classifier.TestOutMedia(savepath='%s-%d-%s-Train.csv' % (firstAttentionName, firstAttentionScope, lossType),
-    #                         treatData=trainData, treatSeq=trainSeq, treatname='First_FinalOutput')
-    # classifier.TestOutMedia(savepath='%s-%d-%s-Test.csv' % (firstAttentionName, firstAttentionScope, lossType),
-    #                         treatData=testData, treatSeq=testSeq, treatname='First_FinalOutput')
+    classifier.Load(loadpath=loadpath)
+    # classifier.TestOut(logname='%s-%d-%s-Train.csv' % (firstAttentionName, firstAttentionScope, lossType),
+    #                    treatData=trainData, treatSeq=trainSeq, treatname='Second_FinalState')
+    # classifier.TestOut(logname='%s-%d-%s-Test.csv' % (firstAttentionName, firstAttentionScope, lossType),
+    #                    treatData=testData, treatSeq=testSeq, treatname='Second_FinalState')
+
+    classifier.TestOutMedia(savepath='%s-%d-%s-Train.csv' % (firstAttentionName, firstAttentionScope, lossType),
+                            treatData=trainData, treatSeq=trainSeq, treatname='First_FinalState')
+    classifier.TestOutMedia(savepath='%s-%d-%s-Test.csv' % (firstAttentionName, firstAttentionScope, lossType),
+                            treatData=testData, treatSeq=testSeq, treatname='First_FinalState')
 
     # classifier.TestOutHuge(
     #     savepath='HierarchyAutoEncoder/SentenceLevel/%s-%d-%s-Train-First/' % (

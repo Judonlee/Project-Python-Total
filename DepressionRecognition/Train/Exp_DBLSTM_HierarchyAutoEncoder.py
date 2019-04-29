@@ -9,18 +9,22 @@ import os
 if __name__ == '__main__':
     # os.environ['CUDA_VISIBLE_DEVICES'] = '3'
 
-    attention = StandardAttentionInitializer
-    attentionName = 'SA'
-    attentionScope = 0
-    part = 'frame'
+    autoencoderName = 'None'
+    autooencoderScope = 0
+    part = 'sentence'
 
-    savepath = 'E:/ProjectData_Depression/SpeechLevel/DBLSTM_HA_%s_%d_%s/' % (attentionName, attentionScope, part)
+    attention = None
+    attentionName = 'None'
+    attentionScope = 0
+
+    savepath = 'E:/ProjectData_Depression/DBLSTM_HA_From_%s_To_%s_%d_%s/' % (
+    autoencoderName, attentionName, attentionScope, part)
 
     trainData, trainLabel, trainSeq, testData, testLabel, testSeq = Load_DBLSTM()
     sentenceTrain, speechTrain = None, None
 
-    # sentenceTrain, sentenceTest = Loader_SentenceLevel(part='%s-%d-%s' % (attentionName, attentionScope, part))
-    speechTrain, speechTest = Loader_SpeechLevel(part='%s-%d-%s' % (attentionName, attentionScope, part))
+    sentenceTrain, sentenceTest = Loader_SentenceLevel(part='%s-%d-%s' % (autoencoderName, autooencoderScope, part))
+    speechTrain, speechTest = Loader_SpeechLevel(part='%s-%d-%s' % (autoencoderName, autooencoderScope, part))
 
     classifier = DBLSTM_WithHierarchyAutoEncoder(
         trainData=trainData, trainLabel=trainLabel, trainSeq=trainSeq, sentenceLevelInformation=sentenceTrain,

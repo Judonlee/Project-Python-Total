@@ -199,8 +199,10 @@ class HierarchyAutoEncoder(NeuralNetwork_Base):
                 print('\rTreating %d/%d' % (index, len(treatData)), end='')
                 result = self.session.run(fetches=self.parameters[treatname],
                                           feed_dict={self.dataInput: treatData[index], self.seqInput: treatSeq[index]})
-                for writeIndex in range(len(result[0])):
-                    if writeIndex != 0: file.write(',')
+                print(numpy.shape(result))
+                result = numpy.reshape(result, [-1, 1024])
+                for writeIndex in range(512, 1024):
+                    if writeIndex != 512: file.write(',')
                     file.write(str(result[0][writeIndex]))
                 file.write('\n')
         print('\nTreat Completed')
@@ -210,12 +212,14 @@ class HierarchyAutoEncoder(NeuralNetwork_Base):
         for index in range(len(treatData)):
             result = self.session.run(fetches=self.parameters[treatname],
                                       feed_dict={self.dataInput: treatData[index], self.seqInput: treatSeq[index]})
+            print(numpy.shape(result))
+            result = numpy.reshape(result, [-1, 1024])
             print('\rTreating %d/%d' % (index, len(treatData)) + str(numpy.shape(result)), end='')
 
             with open(savepath + '/%04d.csv' % index, 'w') as file:
                 for indexX in range(numpy.shape(result)[0]):
-                    for indexY in range(numpy.shape(result)[1]):
-                        if indexY != 0: file.write(',')
+                    for indexY in range(512, 1024):
+                        if indexY != 512: file.write(',')
                         file.write(str(result[indexX][indexY]))
                     file.write('\n')
 

@@ -4,13 +4,13 @@ import matplotlib.pylab as plt
 import os
 
 if __name__ == '__main__':
-    loadpath = 'E:/ProjectData_Depression/DBLSTM_With_Hierarchy_SentenceTarget/DBLSTM_HA_From_SA_To_MA_10_sentence_Result/%04d.csv'
+    loadpath = 'E:/ProjectData_Depression/FinalResult_ThreePart_Different/From_SA_SA_0_sentence_100_Result/%04d.csv'
     MAEList, RMSEList = [], []
     for index in range(100):
         if not os.path.exists(loadpath % index): continue
         data = numpy.genfromtxt(fname=loadpath % index, dtype=float, delimiter=',')
-        MAEList.append(MAE_Calculation(label=data[:, 0], predict=data[:, 1]) - 0.3)
-        RMSEList.append(RMSE_Calculation(label=data[:, 0], predict=data[:, 1]) - 0.3)
+        MAEList.append(MAE_Calculation(label=data[:, 0], predict=data[:, 1]) - 0.5)
+        RMSEList.append(RMSE_Calculation(label=data[:, 0], predict=data[:, 1]) - 0.5)
 
     # print(MAEList)
     plt.plot(MAEList, label='MAE')

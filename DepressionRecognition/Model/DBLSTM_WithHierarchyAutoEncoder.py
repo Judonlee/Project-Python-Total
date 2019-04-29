@@ -27,7 +27,7 @@ class DBLSTM_WithHierarchyAutoEncoder(DBLSTM):
         self.labelInput = tensorflow.placeholder(dtype=tensorflow.float32, shape=None, name='labelInput')
         self.seqInput = tensorflow.placeholder(dtype=tensorflow.int64, shape=None, name='seqInput')
         self.sentenceLevelInput = tensorflow.placeholder(
-            dtype=tensorflow.float32, shape=[None, 2 * self.hiddenNodules], name='sentenceLevelInput')
+            dtype=tensorflow.float32, shape=[None, 4 * self.hiddenNodules], name='sentenceLevelInput')
         self.speechLevelInput = tensorflow.placeholder(
             dtype=tensorflow.float32, shape=[1, 2 * self.hiddenNodules], name='speechLevelInput')
 
