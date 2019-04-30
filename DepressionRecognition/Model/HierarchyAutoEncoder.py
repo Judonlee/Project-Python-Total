@@ -186,11 +186,16 @@ class HierarchyAutoEncoder(NeuralNetwork_Base):
     def Valid(self):
         trainData, trainLabel, trainSeq = self.data, self.label, self.seq
         for index in range(len(trainData)):
-            loss = self.session.run(fetches=self.parameters['Decoder_Logits_First'],
-                                    feed_dict={self.dataInput: trainData[index], self.labelInput: trainLabel[index],
-                                               self.seqInput: trainSeq[index]})
-            print(loss)
-            # print(numpy.shape(loss))
+            print(numpy.shape(trainData[index]))
+            result = self.session.run(fetches=self.firstAttentionList['AttentionReshape'],
+                                      feed_dict={self.dataInput: trainData[index], self.labelInput: trainLabel[index],
+                                                 self.seqInput: trainSeq[index]})
+            with open('Result-AutoEncoder.csv', 'w') as file:
+                for indexX in range(numpy.shape(result)[0]):
+                    for indexY in range(numpy.shape(result)[1]):
+                        if indexY != 0: file.write(',')
+                        file.write(str(result[indexX][indexY]))
+                    file.write('\n')
             exit()
 
     def TestOut(self, logname, treatData, treatSeq, treatname):

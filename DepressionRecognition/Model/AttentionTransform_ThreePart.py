@@ -265,3 +265,21 @@ class AttentionTransform_ThreePart(NeuralNetwork_Base):
                                self.sentenceDataInput: testSentence[index], self.speechDataInput: testSpeech[index]})
                 file.write(str(testLabel[index]) + ',' + str(predict) + '\n')
                 print('\rTraining %d/%d' % (index, len(testData)), end='')
+
+    def Visualization(self):
+
+        trainData, trainLabel, trainSeq, sentenceData, speechData = \
+            self.data, self.label, self.dataSeq, self.sentenceData, self.speechData
+
+        predict = self.session.run(
+            fetches=self.secondAttentionList_DR['AttentionReshape'],
+            feed_dict={self.dataInput: trainData[0], self.dataLenInput: trainSeq[0],
+                       self.sentenceDataInput: sentenceData[0], self.speechDataInput: speechData[0]})
+        print(numpy.shape(predict))
+
+        with open('Result-Whole.csv', 'w') as file:
+            for indexX in range(numpy.shape(predict)[0]):
+                for indexY in range(numpy.shape(predict)[1]):
+                    if indexY != 0: file.write(',')
+                    file.write(str(predict[indexX][indexY]))
+                file.write('\n')

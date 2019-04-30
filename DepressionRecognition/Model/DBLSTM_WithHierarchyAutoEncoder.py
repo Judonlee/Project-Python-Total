@@ -27,7 +27,7 @@ class DBLSTM_WithHierarchyAutoEncoder(DBLSTM):
         self.labelInput = tensorflow.placeholder(dtype=tensorflow.float32, shape=None, name='labelInput')
         self.seqInput = tensorflow.placeholder(dtype=tensorflow.int64, shape=None, name='seqInput')
         self.sentenceLevelInput = tensorflow.placeholder(
-            dtype=tensorflow.float32, shape=[None, 4 * self.hiddenNodules], name='sentenceLevelInput')
+            dtype=tensorflow.float32, shape=[None, 2 * self.hiddenNodules], name='sentenceLevelInput')
         self.speechLevelInput = tensorflow.placeholder(
             dtype=tensorflow.float32, shape=[1, 2 * self.hiddenNodules], name='speechLevelInput')
 
@@ -177,3 +177,37 @@ class DBLSTM_WithHierarchyAutoEncoder(DBLSTM):
                     feed_dict={self.dataInput: batchData, self.seqInput: batchSeq,
                                self.sentenceLevelInput: batchSentence, self.speechLevelInput: batchSpeech})
                 file.write(str(batchLabel[0]) + ',' + str(predict[0]) + '\n')
+
+    def Visualization(self):
+        index = 0
+
+        if self.sentenceLevelInformation is None:
+            treatSentence = numpy.ones([len(self.data), 1])
+        else:
+            treatSentence = self.sentenceLevelInformation
+
+        if self.speechLevelInformation is None:
+            treatSpeech = numpy.ones([len(self.data), 1])
+        else:
+            treatSpeech = self.speechLevelInformation
+
+        trainData, trainLabel, trainSeq, trainSentenceLevel, trainSpeechlevel = self.data, self.label, self.seq, treatSentence, treatSpeech
+
+        if self.sentenceLevelInformation is None:
+            batchSentence = numpy.ones([len(trainData[index]), 2 * self.hiddenNodules])
+        else:
+            batchSentence = trainSentenceLevel[index]
+
+        if self.speechLevelInformation is None:
+            batchSpeech = numpy.ones([1, 2 * self.hiddenNodules])
+        else:
+            batchSpeech = trainSpeechlevel[index]
+
+        result = self.session.run(
+            fetches=self.firstAttentionList['AttentionReshape'],
+            feed_dict={self.dataInput: trainData[index], self.seqInput: trainSeq[index],
+                       self.sentenceLevelInput: batchSentence, self.speechLevelInput: batchSpeech})
+        # print(numpy.shape(result))
+        import matplotlib.pylab as plt
+        plt.plot(result[1])
+        plt.show()
